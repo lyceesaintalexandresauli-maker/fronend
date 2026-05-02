@@ -32,6 +32,12 @@ const extractAuthConfigMessage = (error) => {
   return backendMessage;
 };
 
+const shouldForceSignOut = (error) => {
+  const status = error?.response?.status;
+  if (status === 401 || status === 403) return true;
+  return false;
+};
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(safeGetStoredUser());
   const [token, setToken] = useState(safeGetStoredToken());
@@ -81,7 +87,9 @@ export function AuthProvider({ children }) {
       if (error?.response?.status === 503 && configMessage) {
         setAuthConfigError(configMessage);
       }
-      clearSession();
+      if (shouldForceSignOut(error)) {
+        clearSession();
+      }
       throw error;
     }
   };
@@ -106,8 +114,10 @@ export function AuthProvider({ children }) {
         if (session?.access_token) {
           try {
             await hydrateProfile(session.access_token);
-          } catch {
-            await supabase.auth.signOut();
+          } catch (error) {
+            if (shouldForceSignOut(error)) {
+              await supabase.auth.signOut();
+            }
           }
         } else {
           clearSession();
@@ -123,8 +133,10 @@ export function AuthProvider({ children }) {
             if (nextSession?.access_token) {
               try {
                 await hydrateProfile(nextSession.access_token);
-              } catch {
-                await supabase.auth.signOut();
+              } catch (error) {
+                if (shouldForceSignOut(error)) {
+                  await supabase.auth.signOut();
+                }
               }
             }
           }, 0);
