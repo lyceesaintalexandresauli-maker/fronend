@@ -158,7 +158,11 @@ export function AuthProvider({ children }) {
       });
 
       if (error) {
-        return { ok: false, error: error.message || "Login failed" };
+        const message = String(error.message || "");
+        if (/invalid login credentials/i.test(message)) {
+          return { ok: false, error: "Invalid email or password." };
+        }
+        return { ok: false, error: message || "Login failed" };
       }
 
       const profile = await hydrateProfile(data.session?.access_token);
