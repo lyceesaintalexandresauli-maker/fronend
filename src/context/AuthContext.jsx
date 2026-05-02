@@ -23,6 +23,27 @@ const safeGetStoredToken = () => {
   }
 };
 
+const purgeAuthStorage = () => {
+  try {
+    const keysToRemove = [];
+    for (let i = 0; i < localStorage.length; i += 1) {
+      const key = localStorage.key(i);
+      if (!key) continue;
+      if (
+        key === "auth_token" ||
+        key === "auth_user" ||
+        key === "user" ||
+        key.startsWith("sb-")
+      ) {
+        keysToRemove.push(key);
+      }
+    }
+    keysToRemove.forEach((key) => localStorage.removeItem(key));
+  } catch {
+    // ignore storage cleanup errors
+  }
+};
+
 const extractAuthConfigMessage = (error) => {
   const backendMessage = error?.response?.data?.error || "";
   const details = error?.response?.data?.details;
@@ -67,6 +88,18 @@ export function AuthProvider({ children }) {
   const clearSession = () => {
     saveToken(null);
     saveUser(null);
+  };
+
+  const hardResetAuthState = async () => {
+    clearSession();
+    purgeAuthStorage();
+    if (!isSupabaseConfigured()) return;
+    try {
+      const supabase = getSupabaseBrowserClient();
+      await supabase.auth.signOut();
+    } catch {
+      // ignore hard-reset signout failures
+    }
   };
 
   const hydrateProfile = async (accessToken) => {
@@ -116,17 +149,18 @@ export function AuthProvider({ children }) {
             await hydrateProfile(session.access_token);
           } catch (error) {
             if (shouldForceSignOut(error)) {
-              await supabase.auth.signOut();
+              await hardResetAuthState();
             }
           }
         } else {
-          clearSession();
+          await hardResetAuthState();
         }
 
         const { data } = supabase.auth.onAuthStateChange((event, nextSession) => {
           setTimeout(async () => {
             if (event === "SIGNED_OUT") {
               clearSession();
+              purgeAuthStorage();
               return;
             }
 
@@ -135,7 +169,7 @@ export function AuthProvider({ children }) {
                 await hydrateProfile(nextSession.access_token);
               } catch (error) {
                 if (shouldForceSignOut(error)) {
-                  await supabase.auth.signOut();
+                  await hardResetAuthState();
                 }
               }
             }
@@ -164,6 +198,8 @@ export function AuthProvider({ children }) {
 
     try {
       const supabase = getSupabaseBrowserClient();
+      // Clear stale/deleted-user session state before new login attempts.
+      await supabase.auth.signOut();
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -207,15 +243,7 @@ export function AuthProvider({ children }) {
   };
 
   const logout = async () => {
-    clearSession();
-    if (!isSupabaseConfigured()) return;
-
-    try {
-      const supabase = getSupabaseBrowserClient();
-      await supabase.auth.signOut();
-    } catch {
-      // ignore local logout fallback
-    }
+    await hardResetAuthState();
   };
 
   const value = useMemo(
