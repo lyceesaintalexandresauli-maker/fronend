@@ -13,6 +13,15 @@ export default function LoginPage() {
 
   const destinationForRole = (role) => (role === "admin" ? "/admin" : "/profile");
 
+  // 🔥 FIX: prevent premature redirect before session stabilizes
+  const [checkingAuth, setCheckingAuth] = useState(true);
+
+  setTimeout(() => setCheckingAuth(false), 300);
+
+  if (checkingAuth) {
+    return null;
+  }
+
   if (isAuthenticated) {
     return <Navigate to={destinationForRole(user?.role)} replace />;
   }
@@ -22,15 +31,24 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
 
-    const result = await loginStep1(email, password);
-    setLoading(false);
+    try {
+      const result = await loginStep1(email, password);
 
-    if (!result.ok) {
-      setError(result.error);
-      return;
+      setLoading(false);
+
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
+
+      // 🔥 FIX: small delay prevents redirect race condition
+      setTimeout(() => {
+        navigate(destinationForRole(result.data.user.role));
+      }, 100);
+    } catch (err) {
+      setLoading(false);
+      setError("Login failed. Please try again.");
     }
-
-    navigate(destinationForRole(result.data.user.role));
   };
 
   return (
@@ -93,6 +111,7 @@ export default function LoginPage() {
                         required
                       />
                     </div>
+
                     <div className="mb-4">
                       <label className="form-label text-muted">Password</label>
                       <div className="input-group">
@@ -114,6 +133,7 @@ export default function LoginPage() {
                         </button>
                       </div>
                     </div>
+
                     <div className="d-grid mt-4">
                       <button
                         className="btn btn-lg text-white"
@@ -123,7 +143,7 @@ export default function LoginPage() {
                       >
                         {loading ? (
                           <>
-                            <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            <span className="spinner-border spinner-border-sm me-2"></span>
                             Authenticating...
                           </>
                         ) : (
@@ -133,6 +153,7 @@ export default function LoginPage() {
                         )}
                       </button>
                     </div>
+
                   </form>
                 </div>
               </div>

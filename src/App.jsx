@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -19,8 +20,36 @@ import FadPage from "./pages/FadPage";
 import AccPage from "./pages/AccPage";
 import TimetablesPage from "./pages/TimetablesPage";
 import AdminTimetablesPage from "./pages/AdminTimetablesPage";
+import { getSupabaseBrowserClient } from "./supabase";
 
 export default function App() {
+  const supabase = getSupabaseBrowserClient();
+  const [loadingSession, setLoadingSession] = useState(true);
+
+  // 🔥 FIX: ensure session is checked before routing
+  useEffect(() => {
+    const init = async () => {
+      await supabase.auth.getSession();
+      setLoadingSession(false);
+    };
+
+    init();
+
+    const { data: listener } = supabase.auth.onAuthStateChange(() => {
+      // just refresh state awareness
+    });
+
+    return () => listener.subscription.unsubscribe();
+  }, [supabase]);
+
+  if (loadingSession) {
+    return (
+      <div style={{ padding: 20 }}>
+        Loading session...
+      </div>
+    );
+  }
+
   return (
     <Routes>
       <Route element={<Layout />}>
@@ -45,6 +74,7 @@ export default function App() {
         <Route path="/timetables" element={<TimetablesPage />} />
         <Route path="/:slug" element={<ContentPage />} />
       </Route>
+
       <Route element={<ProtectedRoute roles={["admin"]} />}>
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/timetables" element={<AdminTimetablesPage />} />
