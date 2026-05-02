@@ -2,7 +2,6 @@ import axios from "axios";
 
 const PRODUCTION_API_BASE_URLS = [
   "https://muhura-backend.onrender.com",
-  "https://muhura-backend-web.onrender.com",
 ];
 const LOCAL_API_BASE_URL = "http://localhost:5000";
 const LOCAL_API_ORIGINS = new Set(["http://localhost:5000", "http://127.0.0.1:5000"]);
