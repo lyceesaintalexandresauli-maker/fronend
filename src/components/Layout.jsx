@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { api, mediaUrl } from "../api/client";
-import { useAuth } from "../context/AuthContext";
+import { api } from "../api/client";
 import NavTree from "./NavTree";
 
 const fallbackNavigation = [
@@ -34,6 +33,8 @@ const fallbackNavigation = [
   { id: 14, label: "Contact", href: "/contact", children: [] },
 ];
 
+const BOOTSTRAP_CACHE_TTL_MS = 5 * 60 * 1000;
+
 const pathToPage = (pathname) => {
   if (!pathname || pathname === "/") return "index";
   const slug = pathname.replace(/^\//, "").replace(/\.html$/i, "").toLowerCase();
@@ -42,18 +43,35 @@ const pathToPage = (pathname) => {
   return slug;
 };
 
-const flattenNav = (items = [], seen = new Set(), depth = 0) => {
-  if (!Array.isArray(items) || depth > 6) return [];
-  const out = [];
-  for (const item of items) {
-    if (!item || seen.has(item.id)) continue;
-    seen.add(item.id);
-    out.push(item);
-    if (Array.isArray(item.children) && item.children.length > 0) {
-      out.push(...flattenNav(item.children, seen, depth + 1));
+const getBootstrapCacheKey = (page) => `site-bootstrap:${page}`;
+
+const readCachedBootstrap = (page) => {
+  try {
+    const raw = sessionStorage.getItem(getBootstrapCacheKey(page));
+    if (!raw) return null;
+
+    const parsed = JSON.parse(raw);
+    if (!parsed?.savedAt || Date.now() - parsed.savedAt > BOOTSTRAP_CACHE_TTL_MS) {
+      sessionStorage.removeItem(getBootstrapCacheKey(page));
+      return null;
     }
+
+    return parsed.data || null;
+  } catch {
+    return null;
   }
-  return out;
+};
+
+const writeCachedBootstrap = (page, data) => {
+  try {
+    sessionStorage.setItem(
+      getBootstrapCacheKey(page),
+      JSON.stringify({
+        savedAt: Date.now(),
+        data,
+      })
+    );
+  } catch {}
 };
 
 export default function Layout() {
@@ -63,14 +81,28 @@ export default function Layout() {
     content: [],
   });
   const [menuOpen, setMenuOpen] = useState(false);
-  const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const { pathname } = useLocation();
 
   useEffect(() => {
     const load = async () => {
+      const page = pathToPage(pathname);
+      const cached = readCachedBootstrap(page);
+
+      if (cached) {
+        setBoot({
+          settings: cached.settings || {},
+          navigation:
+            Array.isArray(cached.navigation) && cached.navigation.length > 0
+              ? cached.navigation
+              : fallbackNavigation,
+          content: cached.content || [],
+        });
+        return;
+      }
+
       try {
-        const page = pathToPage(pathname);
         const { data } = await api.get(`/site/bootstrap?page=${page}`);
+        writeCachedBootstrap(page, data);
         setBoot({
           settings: data?.settings || {},
           navigation:
@@ -90,43 +122,56 @@ export default function Layout() {
         }));
       }
     };
+
     load();
   }, [pathname]);
 
   useEffect(() => {
     setMenuOpen(false);
     if (window.AOS) {
-      setTimeout(() => {
-         window.AOS.refresh();
-      }, 100);
+      window.requestAnimationFrame(() => {
+        window.AOS.refresh();
+      });
     }
   }, [pathname]);
 
-  // Handle body class for mobile nav
   useEffect(() => {
     if (menuOpen) {
-      document.body.classList.add('mobile-nav-active');
+      document.body.classList.add("mobile-nav-active");
     } else {
-      document.body.classList.remove('mobile-nav-active');
+      document.body.classList.remove("mobile-nav-active");
     }
-    return () => document.body.classList.remove('mobile-nav-active');
+    return () => document.body.classList.remove("mobile-nav-active");
   }, [menuOpen]);
 
-  // Global AOS Init
   useEffect(() => {
     if (window.AOS) {
       window.AOS.init({
         duration: 600,
-        easing: 'ease-in-out',
+        easing: "ease-in-out",
         once: true,
-        mirror: false
+        mirror: false,
       });
     }
   }, []);
 
   return (
     <div className="app-shell index-page">
-      <header id="header" className="header fixed-top" style={{ backgroundColor: '#E6C56A', padding: '10px 0', position: 'fixed', top: '0', left: '0', right: '0', width: '100%', zIndex: '9999', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+      <header
+        id="header"
+        className="header fixed-top"
+        style={{
+          backgroundColor: "#E6C56A",
+          padding: "10px 0",
+          position: "fixed",
+          top: "0",
+          left: "0",
+          right: "0",
+          width: "100%",
+          zIndex: "9999",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+        }}
+      >
         <div className="container-fluid px-3 px-sm-4 d-flex align-items-center justify-content-between">
           <Link to="/" className="logo d-flex align-items-center gap-2 text-decoration-none flex-shrink-0">
             <img
@@ -164,24 +209,23 @@ export default function Layout() {
           </Link>
 
           <nav id="navmenu" className={`navmenu d-flex align-items-center ${menuOpen ? "nav-open" : ""}`}>
-            <NavTree
-              items={boot.navigation}
-              onNavigate={() => setMenuOpen(false)}
-              includeMobileClose
-            />
-            <Link className="ms-3 d-none d-xl-inline-block rounded-pill px-3 py-2 fw-bold text-decoration-none flex-shrink-0" to="/login" style={{ backgroundColor: 'white', color: '#333', border: '2px solid #333', fontSize: '0.9rem' }}>
+            <NavTree items={boot.navigation} onNavigate={() => setMenuOpen(false)} includeMobileClose />
+            <Link
+              className="ms-3 d-none d-xl-inline-block rounded-pill px-3 py-2 fw-bold text-decoration-none flex-shrink-0"
+              to="/login"
+              style={{ backgroundColor: "white", color: "#333", border: "2px solid #333", fontSize: "0.9rem" }}
+            >
               Login
             </Link>
             <i
               className={`mobile-nav-toggle d-xl-none bi ms-3 ${menuOpen ? "bi-x" : "bi-list"}`}
-              style={{ fontSize: '1.5rem', cursor: 'pointer', color: '#333', flexShrink: '0' }}
-              onClick={() => setMenuOpen((v) => !v)}
+              style={{ fontSize: "1.5rem", cursor: "pointer", color: "#333", flexShrink: "0" }}
+              onClick={() => setMenuOpen((value) => !value)}
             ></i>
           </nav>
         </div>
       </header>
 
-      {/* Spacer to prevent content from hiding behind fixed header */}
       <div style={{ height: "clamp(56px, 8vw, 65px)" }}></div>
 
       <Outlet />
@@ -189,14 +233,23 @@ export default function Layout() {
       <footer id="footer" className="footer">
         <div className="footer-content">
           <div className="footer-section">
-            <h4>Developers</h4>
-            <div dangerouslySetInnerHTML={{ __html: boot.settings.developers || 'IRASUBIZA Jean Cadeau<br/>IHIRWE Aimee Saina<br/>HABAKUBAHO Brainy Justin<br/>TUMURAMYWE Placide' }} />
+            <h4>School Contact</h4>
+            <p className="mb-2">
+              Quality education, moral formation, and practical training for future leaders.
+            </p>
             <p><strong>Email:</strong> {boot.settings.primary_email || "lycemuhur@gmail.com"}</p>
+            {boot.settings.primary_phone && <p><strong>Phone:</strong> {boot.settings.primary_phone}</p>}
           </div>
 
           <div className="footer-section">
             <h4>School Location</h4>
-            <div dangerouslySetInnerHTML={{ __html: boot.settings.location || 'Rwanda, Eastern Province<br/>Gatsibo District<br/>Muhura Sector, Taba Cell<br/>Kanyinya Village' }} />
+            <div
+              dangerouslySetInnerHTML={{
+                __html:
+                  boot.settings.location ||
+                  "Rwanda, Eastern Province<br/>Gatsibo District<br/>Muhura Sector, Taba Cell<br/>Kanyinya Village",
+              }}
+            />
           </div>
 
           <div className="footer-section">
@@ -211,7 +264,7 @@ export default function Layout() {
           </div>
         </div>
         <div className="footer-bottom">
-          © {new Date().getFullYear()} <strong>LYCEE SAINT ALEXANDRE SAULI DE MUHURA</strong> — All Rights Reserved
+          &copy; {new Date().getFullYear()} <strong>LYCEE SAINT ALEXANDRE SAULI DE MUHURA</strong> All Rights Reserved
         </div>
       </footer>
 
@@ -221,4 +274,3 @@ export default function Layout() {
     </div>
   );
 }
-

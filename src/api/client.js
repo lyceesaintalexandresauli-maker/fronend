@@ -1,17 +1,21 @@
 import axios from "axios";
 
-const DEFAULT_REMOTE_API_BASE_URL = "https://muhura-backend-web.onrender.com";
+const PRODUCTION_API_BASE_URLS = [
+  "https://muhura-backend.onrender.com",
+  "https://muhura-backend-web.onrender.com",
+];
 const LOCAL_API_BASE_URL = "http://localhost:5000";
 const LOCAL_API_ORIGINS = new Set(["http://localhost:5000", "http://127.0.0.1:5000"]);
 
 const trimTrailingSlash = (value = "") => String(value).replace(/\/+$/, "");
 const isLocalValue = (value = "") => LOCAL_API_ORIGINS.has(trimTrailingSlash(value));
-const isLocalFrontend = () => /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(window.location.origin);
+const isLocalFrontend = () =>
+  /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(window.location.origin);
 
 const resolveApiBaseUrl = () => {
   const configured = trimTrailingSlash(import.meta.env.VITE_API_BASE_URL || "");
   if (configured && (!isLocalValue(configured) || isLocalFrontend())) return configured;
-  return isLocalFrontend() ? LOCAL_API_BASE_URL : DEFAULT_REMOTE_API_BASE_URL;
+  return isLocalFrontend() ? LOCAL_API_BASE_URL : PRODUCTION_API_BASE_URLS[0];
 };
 
 const resolveAssetsBaseUrl = (apiBaseUrl) => {
@@ -25,16 +29,27 @@ export const ASSETS_BASE_URL = resolveAssetsBaseUrl(API_BASE_URL);
 
 export const api = axios.create({
   baseURL: `${API_BASE_URL}/api`,
-  timeout: 15000,
+  timeout: 10000,
 });
 
 const IDEMPOTENT_METHODS = new Set(["get", "head", "options"]);
+const PRIMARY_REMOTE_API_BASE_URL = PRODUCTION_API_BASE_URLS[0];
+const SECONDARY_REMOTE_API_BASE_URL = PRODUCTION_API_BASE_URLS[1];
+const isPrimaryRemoteBaseUrl = (value = "") => trimTrailingSlash(value) === PRIMARY_REMOTE_API_BASE_URL;
+const buildApiBaseUrl = (baseUrl) => `${trimTrailingSlash(baseUrl)}/api`;
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("auth_token");
-  if (token) {
+  // 🔥 FIX: safer token handling (prevents invalid/undefined token issues)
+  const token =
+    localStorage.getItem("auth_token") ||
+    localStorage.getItem("sb-access-token");
+
+  if (token && token !== "undefined" && token !== "null") {
     config.headers.Authorization = `Bearer ${token}`;
+  } else {
+    delete config.headers.Authorization;
   }
+
   return config;
 });
 
@@ -45,7 +60,22 @@ api.interceptors.response.use(
     const method = String(config?.method || "").toLowerCase();
     const status = error?.response?.status || 0;
     const isNetworkError = !error?.response;
-    const shouldRetry = config && IDEMPOTENT_METHODS.has(method) && (isNetworkError || status >= 500);
+
+    const shouldRetry =
+      config &&
+      IDEMPOTENT_METHODS.has(method) &&
+      (isNetworkError || status >= 500);
+
+    if (
+      shouldRetry &&
+      !config.__retryFallbackHost &&
+      !isLocalFrontend() &&
+      isPrimaryRemoteBaseUrl(config?.baseURL?.replace(/\/api$/i, ""))
+    ) {
+      config.__retryFallbackHost = true;
+      config.baseURL = buildApiBaseUrl(SECONDARY_REMOTE_API_BASE_URL);
+      return api(config);
+    }
 
     if (shouldRetry && !config.__retry) {
       config.__retry = true;
@@ -61,14 +91,20 @@ export const getApiError = (error, fallback = "Request failed") =>
 
 export const mediaUrl = (inputPath) => {
   if (!inputPath) return "";
+
   if (/^https?:\/\//i.test(inputPath)) {
     if (!isLocalFrontend()) {
-      return inputPath.replace(/^https?:\/\/(localhost|127\.0\.0\.1):5000/i, API_BASE_URL);
+      return inputPath.replace(
+        /^https?:\/\/(localhost|127\.0\.0\.1):5000/i,
+        API_BASE_URL
+      );
     }
     return inputPath;
   }
+
   if (inputPath.startsWith("/uploads")) return `${API_BASE_URL}${inputPath}`;
   if (inputPath.startsWith("/assets")) return `${ASSETS_BASE_URL}${inputPath}`;
   if (inputPath.startsWith("assets/")) return `${ASSETS_BASE_URL}/${inputPath}`;
+
   return inputPath;
 };

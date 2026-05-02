@@ -101,7 +101,7 @@ integrating academic excellence, Christian morals, discipline, and practical ski
           </div>
           <div className="col-lg-6" data-aos="fade-left">
             <img
-              src={mediaUrl(whoWeAre.image_path) || "/assets/img/logo1.jpg"}
+              src={mediaUrl(whoWeAre.image_path) || "/assets/img/sauli2.jpg"}
               className="img-fluid rounded"
               alt="Our School"
             />
@@ -189,7 +189,7 @@ integrating academic excellence, Christian morals, discipline, and practical ski
               style={{ backgroundColor: "#E6C56A", maxWidth: "460px" }}
             >
               <img
-                src={mediaUrl(saint.image_path) || "/assets/img/logo1.jpg"}
+                src={mediaUrl(saint.image_path) || "/assets/img/sauli1.jfif"}
                 className="img-fluid rounded w-100"
                 style={{ aspectRatio: "4 / 5", objectFit: "cover" }}
                 alt="Saint Alexandre Sauli"
@@ -211,7 +211,7 @@ integrating academic excellence, Christian morals, discipline, and practical ski
           </div>
           <div className="col-lg-6" data-aos="fade-left">
             <img
-              src={mediaUrl(fathers.image_path) || "/assets/img/logo1.jpg"}
+              src={mediaUrl(fathers.image_path) || "/assets/img/saul2.jpg"}
               className="img-fluid rounded"
               alt="Barnabite Fathers"
             />

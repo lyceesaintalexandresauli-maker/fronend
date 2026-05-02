@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
+import Seo from "../components/Seo";
 import { useAuth } from "../context/AuthContext";
 
 export default function LoginPage() {
-  const { isAuthenticated, user, loginStep1, authConfigError } = useAuth();
+  const { isAuthenticated, user, loginStep1, authConfigError, isReady } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -13,12 +14,7 @@ export default function LoginPage() {
 
   const destinationForRole = (role) => (role === "admin" ? "/admin" : "/profile");
 
-  // 🔥 FIX: prevent premature redirect before session stabilizes
-  const [checkingAuth, setCheckingAuth] = useState(true);
-
-  setTimeout(() => setCheckingAuth(false), 300);
-
-  if (checkingAuth) {
+  if (!isReady) {
     return null;
   }
 
@@ -26,40 +22,42 @@ export default function LoginPage() {
     return <Navigate to={destinationForRole(user?.role)} replace />;
   }
 
-  const submitLogin = async (e) => {
-    e.preventDefault();
+  const submitLogin = async (event) => {
+    event.preventDefault();
     setLoading(true);
     setError("");
 
     try {
       const result = await loginStep1(email, password);
 
-      setLoading(false);
-
       if (!result.ok) {
         setError(result.error);
         return;
       }
 
-      // 🔥 FIX: small delay prevents redirect race condition
-      setTimeout(() => {
-        navigate(destinationForRole(result.data.user.role));
-      }, 100);
-    } catch (err) {
-      setLoading(false);
+      navigate(destinationForRole(result.data.user.role), { replace: true });
+    } catch {
       setError("Login failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <main className="main">
+      <Seo
+        title="Staff Login"
+        description="Secure staff portal access for teachers, administrators, and school personnel at Lycee Saint Alexandre Sauli de Muhura."
+        path="/login"
+      />
+
       <div className="page-title" data-aos="fade">
         <div className="heading">
           <div className="container">
             <div className="row d-flex justify-content-center text-center">
               <div className="col-lg-8">
                 <h1>Staff Portal</h1>
-                <p className="mb-0">Secure login with Supabase Auth for faculty and administrators.</p>
+                <p className="mb-0">Secure access for teachers, administrators, and school staff.</p>
               </div>
             </div>
           </div>
@@ -81,7 +79,7 @@ export default function LoginPage() {
                     />
                     <h3 className="fw-bold" style={{ color: "#37423b" }}>Sign In</h3>
                     <p className="text-muted" style={{ fontSize: "0.9rem" }}>
-                      Login with your Supabase email and password.
+                      Use your official school account to continue.
                     </p>
                   </div>
 
@@ -107,7 +105,7 @@ export default function LoginPage() {
                         className="form-control form-control-lg"
                         placeholder="name@example.com"
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        onChange={(event) => setEmail(event.target.value)}
                         required
                       />
                     </div>
@@ -120,13 +118,13 @@ export default function LoginPage() {
                           className="form-control form-control-lg border-end-0"
                           placeholder="Enter your password"
                           value={password}
-                          onChange={(e) => setPassword(e.target.value)}
+                          onChange={(event) => setPassword(event.target.value)}
                           required
                         />
                         <button
                           className="btn btn-outline-secondary border-start-0 bg-transparent"
                           type="button"
-                          onClick={() => setShowPassword(!showPassword)}
+                          onClick={() => setShowPassword((value) => !value)}
                           style={{ borderColor: "#dee2e6" }}
                         >
                           <i className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"}`}></i>
@@ -153,7 +151,6 @@ export default function LoginPage() {
                         )}
                       </button>
                     </div>
-
                   </form>
                 </div>
               </div>

@@ -1,8 +1,9 @@
 import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
-import { api, mediaUrl } from "../api/client";
+import { mediaUrl } from "../api/client";
 import { eventsAPI, staffAPI, contentAPI, departmentsAPI } from "../api/services";
 import { getContentRows } from "../utils/helpers";
+import Seo from "../components/Seo";
 
 export default function HomePage() {
   const [loading, setLoading] = useState(true);
@@ -12,6 +13,7 @@ export default function HomePage() {
   const [content, setContent] = useState({});
   const [heroSlides, setHeroSlides] = useState([]);
   const [currentEventIndex, setCurrentEventIndex] = useState(0);
+  const swiperRef = useRef(null);
 
   useEffect(() => {
     const load = async () => {
@@ -28,8 +30,6 @@ export default function HomePage() {
         setDepartments(depsRes.data || []);
         setContent(contentRes.data || {});
         setHeroSlides(getContentRows(heroRes.data));
-      } catch (err) {
-        console.error('Error loading home data:', err);
       } finally {
         setLoading(false);
       }
@@ -45,7 +45,8 @@ export default function HomePage() {
 
   useEffect(() => {
     if (!loading && window.Swiper) {
-      new window.Swiper('.heroSwiper', {
+      swiperRef.current?.destroy?.(true, true);
+      swiperRef.current = new window.Swiper('.heroSwiper', {
         loop: true, speed: 800,
         autoplay: { delay: 4000, disableOnInteraction: false },
         slidesPerView: 1, spaceBetween: 0,
@@ -54,6 +55,10 @@ export default function HomePage() {
         effect: 'slide'
       });
     }
+    return () => {
+      swiperRef.current?.destroy?.(true, true);
+      swiperRef.current = null;
+    };
   }, [loading]);
 
   // Auto-play event slider
@@ -70,6 +75,11 @@ export default function HomePage() {
 
   return (
     <main className="main">
+      <Seo
+        title="Home"
+        description="Lycee Saint Alexandre Sauli de Muhura offers quality education, moral formation, and strong technical programs in ICT, fashion design, and accounting."
+        path="/"
+      />
       {/* Hero Section - Full Screen Slider */}
       <section id="hero" className="hero section position-relative">
         <div className="swiper heroSwiper" style={{ width: '100%', height: '100vh' }}>
@@ -81,6 +91,9 @@ export default function HomePage() {
                   className="w-100 h-100"
                   style={{ objectFit: 'cover', width: '100%', height: '100vh' }}
                   alt={slide.title || `Slide ${index + 1}`}
+                  fetchPriority={index === 0 ? "high" : "auto"}
+                  loading={index === 0 ? "eager" : "lazy"}
+                  decoding="async"
                 />
                 <div className="container position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
                   <div className="text-center px-4" style={{ color: '#ffffff' }}>
@@ -96,7 +109,7 @@ export default function HomePage() {
             )) : (
               <>
                 <div className="swiper-slide position-relative">
-                  <img src="/assets/img/photos/sod10.jpg" className="w-100 h-100" style={{ objectFit: 'cover', width: '100%', height: '100vh' }} alt="Welcome" />
+                  <img src="/assets/img/photos/sod10.jpg" className="w-100 h-100" style={{ objectFit: 'cover', width: '100%', height: '100vh' }} alt="Welcome" fetchPriority="high" loading="eager" decoding="async" />
                   <div className="container position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
                     <div className="text-center px-4" style={{ color: '#ffffff' }}>
                       <h2 className="fw-bold mb-4" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', lineHeight: '1.3', color: '#ffffff', textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }} data-aos="fade-up" data-aos-delay="50">
@@ -109,7 +122,7 @@ export default function HomePage() {
                   </div>
                 </div>
                 <div className="swiper-slide position-relative">
-                  <img src="/assets/img/photos/sod0.jpg" className="w-100 h-100" style={{ objectFit: 'cover', width: '100%', height: '100vh' }} alt="Education" />
+                  <img src="/assets/img/photos/sod0.jpg" className="w-100 h-100" style={{ objectFit: 'cover', width: '100%', height: '100vh' }} alt="Education" loading="lazy" decoding="async" />
                   <div className="container position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
                     <div className="text-center px-4" style={{ color: '#ffffff' }}>
                       <h2 className="fw-bold mb-4" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', lineHeight: '1.3', color: '#ffffff', textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }} data-aos="fade-up" data-aos-delay="50">
@@ -122,7 +135,7 @@ export default function HomePage() {
                   </div>
                 </div>
                 <div className="swiper-slide position-relative">
-                  <img src="/assets/img/photos/sod1.jpg" className="w-100 h-100" style={{ objectFit: 'cover', width: '100%', height: '100vh' }} alt="Excellence" />
+                  <img src="/assets/img/photos/sod1.jpg" className="w-100 h-100" style={{ objectFit: 'cover', width: '100%', height: '100vh' }} alt="Excellence" loading="lazy" decoding="async" />
                   <div className="container position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
                     <div className="text-center px-4" style={{ color: '#ffffff' }}>
                       <h2 className="fw-bold mb-4" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', lineHeight: '1.3', color: '#ffffff', textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }} data-aos="fade-up" data-aos-delay="50">
@@ -169,6 +182,8 @@ export default function HomePage() {
                             className="w-100 h-100"
                             style={{ objectFit: 'cover', height: '86px', transform: 'scale(1.15)', transformOrigin: 'center center' }}
                             alt={event.title}
+                            loading="lazy"
+                            decoding="async"
                           />
                         )}
                       </div>
@@ -271,10 +286,12 @@ export default function HomePage() {
             <div className="col-lg-5 order-lg-2" data-aos="fade-left" data-aos-delay="100">
               <div className="about-img position-relative" style={{ backgroundColor: '#E6C56A', padding: '2rem', borderRadius: '8px' }}>
                 <img
-                  src={mediaUrl(content['about']?.[0]?.image_path) || "/assets/img/logo1.jpg"}
+                  src={mediaUrl(content['about']?.[0]?.image_path) || "/assets/img/saul2.jpg"}
                   className="img-fluid rounded"
                   alt="About Our School"
                   style={{ maxHeight: '450px', objectFit: 'cover', width: '100%', display: 'block', margin: '0 auto' }}
+                  loading="lazy"
+                  decoding="async"
                 />
               </div>
             </div>
@@ -374,11 +391,11 @@ export default function HomePage() {
                     <div className="position-relative overflow-hidden" style={{ height: '180px' }}>
                       <img
                         src={mediaUrl(dep.image_path) || "/assets/img/photos/sod1.jpg"}
-                        className="w-100 h-100 object-fit-cover"
-                        style={{ transition: 'transform 0.5s' }}
-                        alt={dep.name}
-                        loading="lazy"
-                        decoding="async"
+                      className="w-100 h-100 object-fit-cover"
+                      style={{ transition: 'transform 0.5s' }}
+                      alt={dep.name}
+                      loading="lazy"
+                      decoding="async"
                       />
                       <span className="badge position-absolute top-0 start-0 m-2" style={{ backgroundColor: '#E6C56A' }}>
                         {dep.code || dep.name?.substring(0,3).toUpperCase() || "N/A"}
@@ -420,6 +437,8 @@ export default function HomePage() {
                         className="img-fluid w-100 h-100" 
                         style={{ objectFit: 'cover' }}
                         alt={member.name}
+                        loading="lazy"
+                        decoding="async"
                       />
                     ) : (
                       <div className="w-100 h-100 bg-light d-flex align-items-center justify-content-center">
