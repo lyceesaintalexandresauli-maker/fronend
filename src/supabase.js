@@ -1,11 +1,18 @@
 import { createClient } from "@supabase/supabase-js";
 
 const readEnv = (value) => String(value || "").trim();
+const DEFAULT_SUPABASE_PROJECT_REF = "penlltgpdbokowlsthej";
+const DEFAULT_SUPABASE_URL = `https://${DEFAULT_SUPABASE_PROJECT_REF}.supabase.co`;
+const DEFAULT_SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBlbmxsdGdwZGJva293bHN0aGVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2NDIxMDMsImV4cCI6MjA5MzIxODEwM30.A6yaI7X_kkHYY83ohtNdoympXRqc6NM74Et_HnncseE";
 
-const projectRef = readEnv(import.meta.env.VITE_SUPABASE_PROJECT_REF);
+const projectRef = readEnv(import.meta.env.VITE_SUPABASE_PROJECT_REF) || DEFAULT_SUPABASE_PROJECT_REF;
 const derivedUrl = projectRef ? `https://${projectRef}.supabase.co` : "";
-const supabaseUrl = readEnv(import.meta.env.VITE_SUPABASE_URL) || derivedUrl;
-const supabaseAnonKey = readEnv(import.meta.env.VITE_SUPABASE_ANON_KEY);
+const supabaseUrl = readEnv(import.meta.env.VITE_SUPABASE_URL) || derivedUrl || DEFAULT_SUPABASE_URL;
+const supabaseAnonKey =
+  readEnv(import.meta.env.VITE_SUPABASE_ANON_KEY) ||
+  readEnv(import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY) ||
+  DEFAULT_SUPABASE_ANON_KEY;
 
 let browserClient = null;
 
