@@ -271,7 +271,7 @@ export default function HomePage() {
             <div className="col-lg-5 order-lg-2" data-aos="fade-left" data-aos-delay="100">
               <div className="about-img position-relative" style={{ backgroundColor: '#E6C56A', padding: '2rem', borderRadius: '8px' }}>
                 <img
-                  src={mediaUrl(content['about']?.[0]?.image_path) || "/assets/img/saul2.jpg"}
+                  src={mediaUrl(content['about']?.[0]?.image_path) || "/assets/img/logo1.jpg"}
                   className="img-fluid rounded"
                   alt="About Our School"
                   style={{ maxHeight: '450px', objectFit: 'cover', width: '100%', display: 'block', margin: '0 auto' }}
