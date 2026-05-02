@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { api, getApiError, mediaUrl } from "../../api/client";
 import { useAuth } from "../../context/AuthContext";
 import "../../styles/timetables.css";
@@ -121,13 +121,13 @@ const RESOURCE_CONFIG = {
       { key: "username", label: "Username", type: "text", required: true },
       { key: "email", label: "Email", type: "email", required: true },
       { key: "password", label: "Password", type: "password", required: true, createOnly: true },
-      { key: "role", label: "Role (admin/teacher/dos)", type: "text", required: true },
+      { key: "role", label: "Role (admin/teacher/secretary/dos)", type: "text", required: true },
       { key: "full_name", label: "Full name", type: "text" },
       { key: "phone", label: "Phone", type: "text" },
       { key: "bio", label: "Bio", type: "textarea" },
       { key: "is_active", label: "Active", type: "checkbox", editOnly: true },
     ],
-    columns: ["id", "username", "email", "role", "is_active", "two_factor_enabled"],
+    columns: ["id", "username", "email", "role", "is_active"],
   },
   timetables: {
     title: "Timetables",
@@ -474,7 +474,7 @@ function ProfileSecurityPanel({
     <div className="adm-panel">
       <div className="adm-panel-head">
         <h3>Admin Profile & Security</h3>
-        <p>Connected to `/auth/me`, `/auth/me/password`, `/auth/me/profile-image`</p>
+        <p>Connected to `/auth/me`, `/auth/me/password`, `/auth/me/profile-image` using Supabase Auth</p>
       </div>
 
       <div className="adm-profile-grid">
@@ -491,7 +491,6 @@ function ProfileSecurityPanel({
         <div className="adm-security-col">
           <form className="adm-form" onSubmit={onChangePassword}>
             <h4>Password</h4>
-            <label className="adm-field"><span>Current password</span><input type="password" value={pwd.current_password} onChange={(e) => setPwd((s) => ({ ...s, current_password: e.target.value }))} required /></label>
             <label className="adm-field"><span>New password</span><input type="password" minLength={8} value={pwd.new_password} onChange={(e) => setPwd((s) => ({ ...s, new_password: e.target.value }))} required /></label>
             <button className="adm-btn" type="submit">Update Password</button>
           </form>
@@ -506,7 +505,7 @@ function ProfileSecurityPanel({
             <h4>Security Status</h4>
             <p>Role: <strong>{user?.role || "admin"}</strong></p>
             <p>Account: <strong>{user?.is_active === false ? "Disabled" : "Active"}</strong></p>
-            <p>2FA via Email OTP: <strong>{user?.two_factor_enabled ? "Enabled" : "Enabled on first login"}</strong></p>
+            <p>Authentication: <strong>Supabase email/password</strong></p>
             {user?.profile_image && <img className="adm-avatar" src={mediaUrl(user.profile_image)} alt="Profile" />}
           </div>
         </div>
@@ -517,9 +516,9 @@ function ProfileSecurityPanel({
 }
 
 function TimetablePanel() {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const flaskTimetableUrl = "http://127.0.0.1:5000";
-  const token = user?.token;
+  
 
   return (
     <div style={{ width: '100%', height: 'calc(100vh - 64px)', overflow: 'hidden' }}>
@@ -579,7 +578,7 @@ export default function AdminDashboard() {
     schoolWorkers: null,
   });
   const [profileForm, setProfileForm] = useState({ username: "", email: "", full_name: "", phone: "", bio: "" });
-  const [pwd, setPwd] = useState({ current_password: "", new_password: "" });
+  const [pwd, setPwd] = useState({ new_password: "" });
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState("");
 
@@ -785,7 +784,7 @@ export default function AdminDashboard() {
     if (!nextPassword) return;
     try {
       await api.put(`/users/${userId}/password`, { password: nextPassword });
-      setStatus("User password reset. 2FA will be re-initialized on next login.");
+      setStatus("User password reset in Supabase Auth.");
       await loadEverything();
     } catch (error) {
       setStatus(getApiError(error, "Failed to reset password"));
@@ -856,7 +855,7 @@ export default function AdminDashboard() {
     e.preventDefault();
     try {
       await api.put("/auth/me/password", pwd);
-      setPwd({ current_password: "", new_password: "" });
+      setPwd({ new_password: "" });
       setStatus("Password updated successfully");
     } catch (error) {
       setStatus(getApiError(error, "Failed to update password"));
@@ -992,9 +991,10 @@ export default function AdminDashboard() {
 
         <footer className="adm-compact-footer">
           <img src="/assets/img/logo1.jpg" alt="School Logo" />
-          <span>© {new Date().getFullYear()} Lycee Saint Alexandre Sauli De Muhura</span>
+          <span>Â(c) {new Date().getFullYear()} Lycee Saint Alexandre Sauli De Muhura</span>
         </footer>
       </main>
     </div>
   );
 }
+

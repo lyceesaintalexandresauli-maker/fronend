@@ -3,7 +3,7 @@ import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export default function LoginPage() {
-  const { isAuthenticated, user, loginStep1 } = useAuth();
+  const { isAuthenticated, user, loginStep1, authConfigError } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -11,18 +11,26 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
+  const destinationForRole = (role) => (role === "admin" ? "/admin" : "/profile");
+
   if (isAuthenticated) {
-    return <Navigate to={user?.role === "admin" ? "/admin" : "/profile"} replace />;
+    return <Navigate to={destinationForRole(user?.role)} replace />;
   }
 
   const submitLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+
     const result = await loginStep1(email, password);
     setLoading(false);
-    if (!result.ok) return setError(result.error);
-    navigate(result.data.user.role === "admin" ? "/admin" : "/profile");
+
+    if (!result.ok) {
+      setError(result.error);
+      return;
+    }
+
+    navigate(destinationForRole(result.data.user.role));
   };
 
   return (
@@ -33,7 +41,7 @@ export default function LoginPage() {
             <div className="row d-flex justify-content-center text-center">
               <div className="col-lg-8">
                 <h1>Staff Portal</h1>
-                <p className="mb-0">Secure login interface for faculty and administrators.</p>
+                <p className="mb-0">Secure login with Supabase Auth for faculty and administrators.</p>
               </div>
             </div>
           </div>
@@ -46,8 +54,6 @@ export default function LoginPage() {
             <div className="col-lg-5 col-md-8">
               <div className="card shadow-lg border-0 rounded-lg">
                 <div className="card-body p-5">
-
-                  {/* Header */}
                   <div className="text-center mb-4">
                     <img
                       src="/assets/img/logo1.jpg"
@@ -55,15 +61,19 @@ export default function LoginPage() {
                       style={{ width: "80px", borderRadius: "5px" }}
                       className="mb-3"
                     />
-                    <h3 className="fw-bold" style={{ color: "#37423b" }}>
-                      Sign In
-                    </h3>
+                    <h3 className="fw-bold" style={{ color: "#37423b" }}>Sign In</h3>
                     <p className="text-muted" style={{ fontSize: "0.9rem" }}>
-                      Login with your email and password.
+                      Login with your Supabase email and password.
                     </p>
                   </div>
 
-                  {/* Error Alert */}
+                  {authConfigError && (
+                    <div className="alert alert-warning" role="alert">
+                      <i className="bi bi-exclamation-triangle-fill me-2"></i>
+                      {authConfigError}
+                    </div>
+                  )}
+
                   {error && (
                     <div className="alert alert-danger" role="alert">
                       <i className="bi bi-exclamation-triangle-fill me-2"></i>
@@ -89,7 +99,7 @@ export default function LoginPage() {
                         <input
                           type={showPassword ? "text" : "password"}
                           className="form-control form-control-lg border-end-0"
-                          placeholder="••••••••"
+                          placeholder="Enter your password"
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           required
@@ -109,7 +119,7 @@ export default function LoginPage() {
                         className="btn btn-lg text-white"
                         style={{ backgroundColor: "#004080" }}
                         type="submit"
-                        disabled={loading}
+                        disabled={loading || !!authConfigError}
                       >
                         {loading ? (
                           <>

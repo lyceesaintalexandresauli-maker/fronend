@@ -32,7 +32,7 @@ export default function App() {
         <Route path="/trainers" element={<StaffPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route element={<ProtectedRoute roles={["admin", "teacher"]} />}>
+        <Route element={<ProtectedRoute roles={["admin", "teacher", "secretary"]} />}>
           <Route path="/profile" element={<ProfilePage />} />
         </Route>
         <Route path="/about" element={<AboutPage />} />

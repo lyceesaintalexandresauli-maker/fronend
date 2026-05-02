@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { api, getApiError } from "../api/client";
+import { getSupabaseBrowserClient, getSupabaseConfigError, isSupabaseConfigured } from "../supabase";
 
 const AuthContext = createContext(null);
 
@@ -22,91 +23,182 @@ const safeGetStoredToken = () => {
   }
 };
 
+const extractAuthConfigMessage = (error) => {
+  const backendMessage = error?.response?.data?.error || "";
+  const details = error?.response?.data?.details;
+  if (Array.isArray(details) && details.length > 0) {
+    return `${backendMessage}: ${details.join(", ")}`;
+  }
+  return backendMessage;
+};
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(safeGetStoredUser());
   const [token, setToken] = useState(safeGetStoredToken());
+  const [isReady, setIsReady] = useState(false);
+  const [authConfigError, setAuthConfigError] = useState("");
 
-  const saveSession = (nextToken, nextUser) => {
-    setToken(nextToken);
-    setUser(nextUser);
-    localStorage.setItem("auth_token", nextToken);
-    localStorage.setItem("auth_user", JSON.stringify(nextUser));
-    localStorage.setItem("user", JSON.stringify(nextUser));
+  const saveToken = (nextToken) => {
+    setToken(nextToken || null);
+    if (nextToken) {
+      localStorage.setItem("auth_token", nextToken);
+    } else {
+      localStorage.removeItem("auth_token");
+    }
+  };
+
+  const saveUser = (nextUser) => {
+    setUser(nextUser || null);
+    if (nextUser) {
+      localStorage.setItem("auth_user", JSON.stringify(nextUser));
+      localStorage.setItem("user", JSON.stringify(nextUser));
+    } else {
+      localStorage.removeItem("auth_user");
+      localStorage.removeItem("user");
+    }
   };
 
   const clearSession = () => {
-    setToken(null);
-    setUser(null);
+    saveToken(null);
+    saveUser(null);
+  };
+
+  const hydrateProfile = async (accessToken) => {
+    if (!accessToken) {
+      clearSession();
+      return null;
+    }
+
+    saveToken(accessToken);
+
     try {
-      localStorage.removeItem("auth_token");
-      localStorage.removeItem("auth_user");
-      localStorage.removeItem("user");
-    } catch {
-      // no-op
+      const { data } = await api.get("/auth/me");
+      saveUser(data);
+      setAuthConfigError("");
+      return data;
+    } catch (error) {
+      const configMessage = extractAuthConfigMessage(error);
+      if (error?.response?.status === 503 && configMessage) {
+        setAuthConfigError(configMessage);
+      }
+      clearSession();
+      throw error;
     }
   };
 
-  // Restore missing user data from backend when a token exists.
   useEffect(() => {
-    const hydrateSession = async () => {
-      if (!token || user) return;
+    let subscription;
+
+    const bootstrap = async () => {
+      const configError = getSupabaseConfigError();
+      if (configError) {
+        setAuthConfigError(configError);
+        setIsReady(true);
+        return;
+      }
+
       try {
-        const { data } = await api.get("/auth/me");
-        setUser(data);
-        localStorage.setItem("auth_user", JSON.stringify(data));
-        localStorage.setItem("user", JSON.stringify(data));
-      } catch {
-        clearSession();
+        const supabase = getSupabaseBrowserClient();
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        if (session?.access_token) {
+          try {
+            await hydrateProfile(session.access_token);
+          } catch {
+            await supabase.auth.signOut();
+          }
+        } else {
+          clearSession();
+        }
+
+        const { data } = supabase.auth.onAuthStateChange((event, nextSession) => {
+          setTimeout(async () => {
+            if (event === "SIGNED_OUT") {
+              clearSession();
+              return;
+            }
+
+            if (nextSession?.access_token) {
+              try {
+                await hydrateProfile(nextSession.access_token);
+              } catch {
+                await supabase.auth.signOut();
+              }
+            }
+          }, 0);
+        });
+
+        subscription = data.subscription;
+      } catch (error) {
+        setAuthConfigError(error.message || "Failed to initialize Supabase Auth");
+      } finally {
+        setIsReady(true);
       }
     };
-    hydrateSession();
-  }, [token, user]);
+
+    bootstrap();
+
+    return () => {
+      subscription?.unsubscribe();
+    };
+  }, []);
 
   const loginStep1 = async (email, password) => {
+    if (!isSupabaseConfigured()) {
+      return { ok: false, error: getSupabaseConfigError() || "Supabase Auth is not configured yet." };
+    }
+
     try {
-      const { data } = await api.post("/auth/login", { email, password });
-      if (data?.token && data?.user) {
-        saveSession(data.token, data.user);
+      const supabase = getSupabaseBrowserClient();
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        return { ok: false, error: error.message || "Login failed" };
       }
-      return { ok: true, data };
-    } catch (error) {
-      return { ok: false, error: getApiError(error, "Login failed") };
-    }
-  };
 
-  const loginStep2 = async (tempToken, code) => {
-    try {
-      const { data } = await api.post("/auth/2fa/verify", {
-        temp_token: tempToken,
-        code,
-      });
-      saveSession(data.token, data.user);
-      return { ok: true, data };
+      const profile = await hydrateProfile(data.session?.access_token);
+      return {
+        ok: true,
+        data: {
+          token: data.session?.access_token,
+          user: profile,
+        },
+      };
     } catch (error) {
-      return { ok: false, error: getApiError(error, "2FA verification failed") };
-    }
-  };
-
-  const resendOtp = async (tempToken) => {
-    try {
-      const { data } = await api.post("/auth/2fa/resend", {
-        temp_token: tempToken,
-      });
-      return { ok: true, data };
-    } catch (error) {
-      return { ok: false, error: getApiError(error, "Failed to resend verification code") };
+      const configMessage = extractAuthConfigMessage(error);
+      return { ok: false, error: configMessage || getApiError(error, error.message || "Login failed") };
     }
   };
 
   const refreshMe = async () => {
     try {
       const { data } = await api.get("/auth/me");
-      setUser(data);
-      localStorage.setItem("auth_user", JSON.stringify(data));
-      localStorage.setItem("user", JSON.stringify(data));
+      saveUser(data);
+      setAuthConfigError("");
       return { ok: true, data };
     } catch (error) {
-      return { ok: false, error: getApiError(error) };
+      const configMessage = extractAuthConfigMessage(error);
+      if (error?.response?.status === 503 && configMessage) {
+        setAuthConfigError(configMessage);
+      }
+      return { ok: false, error: configMessage || getApiError(error) };
+    }
+  };
+
+  const logout = async () => {
+    clearSession();
+    if (!isSupabaseConfigured()) return;
+
+    try {
+      const supabase = getSupabaseBrowserClient();
+      await supabase.auth.signOut();
+    } catch {
+      // ignore local logout fallback
     }
   };
 
@@ -117,14 +209,13 @@ export function AuthProvider({ children }) {
       isAuthenticated: !!token,
       isAdmin: user?.role === "admin",
       isTeacher: user?.role === "teacher",
+      isReady,
+      authConfigError,
       loginStep1,
-      loginStep2,
-      resendOtp,
       refreshMe,
-      logout: clearSession,
-      saveSession,
+      logout,
     }),
-    [token, user]
+    [authConfigError, isReady, token, user]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

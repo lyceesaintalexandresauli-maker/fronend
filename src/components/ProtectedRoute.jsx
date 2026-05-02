@@ -2,13 +2,16 @@ import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export default function ProtectedRoute({ roles = [] }) {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, isReady } = useAuth();
+
+  if (!isReady) {
+    return <div id="preloader"></div>;
+  }
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
-  // Wait for session hydration when token exists but user payload is still loading.
   if (isAuthenticated && !user) {
     return <div id="preloader"></div>;
   }

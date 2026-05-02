@@ -11,7 +11,7 @@ export default function ProfilePage() {
     phone: "",
     bio: "",
   });
-  const [pwd, setPwd] = useState({ current_password: "", new_password: "" });
+  const [pwd, setPwd] = useState({ new_password: "" });
   const [status, setStatus] = useState("");
 
   useEffect(() => {
@@ -41,7 +41,7 @@ export default function ProfilePage() {
     e.preventDefault();
     try {
       await api.put("/auth/me/password", pwd);
-      setPwd({ current_password: "", new_password: "" });
+      setPwd({ new_password: "" });
       setStatus("Password updated");
     } catch (error) {
       setStatus(getApiError(error));
@@ -84,15 +84,9 @@ export default function ProfilePage() {
         <h2>Change Password</h2>
         <input
           type="password"
-          value={pwd.current_password}
-          onChange={(e) => setPwd({ ...pwd, current_password: e.target.value })}
-          placeholder="Current password"
-        />
-        <input
-          type="password"
           value={pwd.new_password}
           onChange={(e) => setPwd({ ...pwd, new_password: e.target.value })}
-          placeholder="New password"
+          placeholder="New Supabase password"
         />
         <button className="btn">Update Password</button>
       </form>
