@@ -39,9 +39,7 @@ const purgeAuthStorage = () => {
       }
     }
     keysToRemove.forEach((key) => localStorage.removeItem(key));
-  } catch {
-    // ignore storage cleanup errors
-  }
+  } catch {}
 };
 
 const extractAuthConfigMessage = (error) => {
@@ -55,8 +53,7 @@ const extractAuthConfigMessage = (error) => {
 
 const shouldForceSignOut = (error) => {
   const status = error?.response?.status;
-  if (status === 401 || status === 403) return true;
-  return false;
+  return status === 401 || status === 403;
 };
 
 export function AuthProvider({ children }) {
@@ -93,13 +90,13 @@ export function AuthProvider({ children }) {
   const hardResetAuthState = async () => {
     clearSession();
     purgeAuthStorage();
+
     if (!isSupabaseConfigured()) return;
+
     try {
       const supabase = getSupabaseBrowserClient();
       await supabase.auth.signOut();
-    } catch {
-      // ignore hard-reset signout failures
-    }
+    } catch {}
   };
 
   const hydrateProfile = async (accessToken) => {
@@ -117,12 +114,15 @@ export function AuthProvider({ children }) {
       return data;
     } catch (error) {
       const configMessage = extractAuthConfigMessage(error);
+
       if (error?.response?.status === 503 && configMessage) {
         setAuthConfigError(configMessage);
       }
+
       if (shouldForceSignOut(error)) {
         clearSession();
       }
+
       throw error;
     }
   };
@@ -140,6 +140,7 @@ export function AuthProvider({ children }) {
 
       try {
         const supabase = getSupabaseBrowserClient();
+
         const {
           data: { session },
         } = await supabase.auth.getSession();
@@ -156,24 +157,25 @@ export function AuthProvider({ children }) {
           await hardResetAuthState();
         }
 
-        const { data } = supabase.auth.onAuthStateChange((event, nextSession) => {
-          setTimeout(async () => {
-            if (event === "SIGNED_OUT") {
-              clearSession();
-              purgeAuthStorage();
-              return;
-            }
+        // ✅ FIXED: removed setTimeout (caused logout loops)
+        const { data } = supabase.auth.onAuthStateChange(async (event, nextSession) => {
+          if (event === "SIGNED_OUT") {
+            clearSession();
+            purgeAuthStorage();
+            return;
+          }
 
-            if (nextSession?.access_token) {
-              try {
-                await hydrateProfile(nextSession.access_token);
-              } catch (error) {
-                if (shouldForceSignOut(error)) {
-                  await hardResetAuthState();
-                }
+          if (nextSession?.access_token) {
+            try {
+              await hydrateProfile(nextSession.access_token);
+            } catch (error) {
+              if (shouldForceSignOut(error)) {
+                await hardResetAuthState();
               }
             }
-          }, 0);
+          } else {
+            clearSession();
+          }
         });
 
         subscription = data.subscription;
@@ -193,13 +195,18 @@ export function AuthProvider({ children }) {
 
   const loginStep1 = async (email, password) => {
     if (!isSupabaseConfigured()) {
-      return { ok: false, error: getSupabaseConfigError() || "Supabase Auth is not configured yet." };
+      return {
+        ok: false,
+        error: getSupabaseConfigError() || "Supabase Auth is not configured yet.",
+      };
     }
 
     try {
       const supabase = getSupabaseBrowserClient();
-      // Clear stale/deleted-user session state before new login attempts.
-      await supabase.auth.signOut();
+
+      // ❌ FIX: DO NOT signOut before login (this was breaking sessions)
+      // await supabase.auth.signOut();  <-- REMOVED
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -214,6 +221,7 @@ export function AuthProvider({ children }) {
       }
 
       const profile = await hydrateProfile(data.session?.access_token);
+
       return {
         ok: true,
         data: {
@@ -223,7 +231,12 @@ export function AuthProvider({ children }) {
       };
     } catch (error) {
       const configMessage = extractAuthConfigMessage(error);
-      return { ok: false, error: configMessage || getApiError(error, error.message || "Login failed") };
+      return {
+        ok: false,
+        error:
+          configMessage ||
+          getApiError(error, error.message || "Login failed"),
+      };
     }
   };
 
