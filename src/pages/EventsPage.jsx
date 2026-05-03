@@ -250,7 +250,6 @@ export default function EventsPage() {
               ))}
             </select>
             <div className="d-flex align-items-center gap-2">
-              <label className="form-label mb-0 small">Card Color:</label>
               <input
                 type="color"
                 className="form-control form-control-color form-control-sm"
@@ -413,7 +412,7 @@ export default function EventsPage() {
                       <h5 className="card-title fw-bold mb-3" style={{ color: "#0f172a" }}>
                         {event.title}
                       </h5>
-                      <p className="card-text mb-4" style={{ color: "#334155", minHeight: "72px" }}>
+                      <p className="card-text mb-4" style={{ color: "#334155", minHeight: "56px" }}>
                         {event.description?.slice(0, 180)}
                         {event.description?.length > 180 ? "..." : ""}
                       </p>
