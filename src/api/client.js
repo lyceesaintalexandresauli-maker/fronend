@@ -1,20 +1,19 @@
 import axios from "axios";
 
-const PRODUCTION_API_BASE_URLS = [
-  "https://muhura-backend.onrender.com",
-];
 const LOCAL_API_BASE_URL = "http://localhost:5000";
+const DEFAULT_REMOTE_API_BASE_URL = "https://muhura-backend.onrender.com";
 const LOCAL_API_ORIGINS = new Set(["http://localhost:5000", "http://127.0.0.1:5000"]);
 
 const trimTrailingSlash = (value = "") => String(value).replace(/\/+$/, "");
 const isLocalValue = (value = "") => LOCAL_API_ORIGINS.has(trimTrailingSlash(value));
 const isLocalFrontend = () =>
   /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(window.location.origin);
+const getCurrentOrigin = () => trimTrailingSlash(window.location.origin || "");
 
 const resolveApiBaseUrl = () => {
   const configured = trimTrailingSlash(import.meta.env.VITE_API_BASE_URL || "");
   if (configured && (!isLocalValue(configured) || isLocalFrontend())) return configured;
-  return isLocalFrontend() ? LOCAL_API_BASE_URL : PRODUCTION_API_BASE_URLS[0];
+  return isLocalFrontend() ? LOCAL_API_BASE_URL : DEFAULT_REMOTE_API_BASE_URL;
 };
 
 const resolveAssetsBaseUrl = (apiBaseUrl) => {
@@ -32,10 +31,6 @@ export const api = axios.create({
 });
 
 const IDEMPOTENT_METHODS = new Set(["get", "head", "options"]);
-const PRIMARY_REMOTE_API_BASE_URL = PRODUCTION_API_BASE_URLS[0];
-const SECONDARY_REMOTE_API_BASE_URL = PRODUCTION_API_BASE_URLS[1];
-const isPrimaryRemoteBaseUrl = (value = "") => trimTrailingSlash(value) === PRIMARY_REMOTE_API_BASE_URL;
-const buildApiBaseUrl = (baseUrl) => `${trimTrailingSlash(baseUrl)}/api`;
 
 api.interceptors.request.use((config) => {
   // 🔥 FIX: safer token handling (prevents invalid/undefined token issues)
@@ -64,17 +59,6 @@ api.interceptors.response.use(
       config &&
       IDEMPOTENT_METHODS.has(method) &&
       (isNetworkError || status >= 500);
-
-    if (
-      shouldRetry &&
-      !config.__retryFallbackHost &&
-      !isLocalFrontend() &&
-      isPrimaryRemoteBaseUrl(config?.baseURL?.replace(/\/api$/i, ""))
-    ) {
-      config.__retryFallbackHost = true;
-      config.baseURL = buildApiBaseUrl(SECONDARY_REMOTE_API_BASE_URL);
-      return api(config);
-    }
 
     if (shouldRetry && !config.__retry) {
       config.__retry = true;
