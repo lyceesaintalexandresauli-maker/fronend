@@ -1,5 +1,5 @@
 export default function TimetablesPage() {
-  const flaskTimetableUrl = "https://admin-timetable.onrender.com";
+  const flaskTimetableUrl = "https://client-timetable.onrender.com";
 
   return (
     <div style={{ width: '100%', height: 'calc(100vh - 64px)', overflow: 'hidden' }}>
