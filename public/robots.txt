@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Keep private staff routes out of indexes
+Disallow: /admin
+Disallow: /admin/
+Disallow: /profile
+Disallow: /login
+
+Sitemap: https://lycee-muhura.onrender.com/sitemap.xml

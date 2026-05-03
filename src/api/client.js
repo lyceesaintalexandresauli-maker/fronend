@@ -31,6 +31,8 @@ export const api = axios.create({
 });
 
 const IDEMPOTENT_METHODS = new Set(["get", "head", "options"]);
+const RETRYABLE_STATUS = new Set([502, 503, 504]);
+const RETRY_BLOCKLIST = ["/api/auth/me"];
 
 api.interceptors.request.use((config) => {
   // 🔥 FIX: safer token handling (prevents invalid/undefined token issues)
@@ -54,14 +56,18 @@ api.interceptors.response.use(
     const method = String(config?.method || "").toLowerCase();
     const status = error?.response?.status || 0;
     const isNetworkError = !error?.response;
+    const requestUrl = String(config?.url || "");
+    const shouldBlockRetry = RETRY_BLOCKLIST.some((path) => requestUrl.includes(path));
 
     const shouldRetry =
       config &&
+      !shouldBlockRetry &&
       IDEMPOTENT_METHODS.has(method) &&
-      (isNetworkError || status >= 500);
+      (isNetworkError || RETRYABLE_STATUS.has(status));
 
     if (shouldRetry && !config.__retry) {
       config.__retry = true;
+      await new Promise((resolve) => setTimeout(resolve, 350));
       return api(config);
     }
 

@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { mediaUrl } from "../api/client";
 import { contentAPI } from "../api/services";
 import { getContentSections } from "../utils/helpers";
+import Seo from "../components/Seo";
+import PageLoader from "../components/PageLoader";
 
 export default function AboutPage() {
   const [sections, setSections] = useState({});
@@ -56,7 +58,7 @@ export default function AboutPage() {
 
   const getSection = (slug) => sections[slug] || {};
 
-  if (loading) return <div id="preloader"></div>;
+  if (loading) return <PageLoader label="Loading about page..." />;
 
   const whoWeAre = getSection("who_we_are");
   const mission = getSection("our_mission");
@@ -68,6 +70,11 @@ export default function AboutPage() {
 
   return (
     <main className="main">
+      <Seo
+        title="About"
+        description="Learn about Lycee Saint Alexandre Sauli de Muhura, our mission, values, and the Barnabite educational approach."
+        path="/about"
+      />
       <div className="page-title" data-aos="fade">
         <div className="heading">
           <div className="container">
@@ -104,6 +111,10 @@ integrating academic excellence, Christian morals, discipline, and practical ski
               src={mediaUrl(whoWeAre.image_path) || "/assets/img/sauli2.jpg"}
               className="img-fluid rounded"
               alt="Our School"
+              width="960"
+              height="640"
+              loading="lazy"
+              decoding="async"
             />
           </div>
         </div>
@@ -193,6 +204,10 @@ integrating academic excellence, Christian morals, discipline, and practical ski
                 className="img-fluid rounded w-100"
                 style={{ aspectRatio: "4 / 5", objectFit: "cover" }}
                 alt="Saint Alexandre Sauli"
+                width="800"
+                height="1000"
+                loading="lazy"
+                decoding="async"
               />
             </div>
           </div>
@@ -214,6 +229,10 @@ integrating academic excellence, Christian morals, discipline, and practical ski
               src={mediaUrl(fathers.image_path) || "/assets/img/saul2.jpg"}
               className="img-fluid rounded"
               alt="Barnabite Fathers"
+              width="960"
+              height="640"
+              loading="lazy"
+              decoding="async"
             />
           </div>
         </div>

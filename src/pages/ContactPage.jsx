@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { contactAPI } from "../api/services";
+import Seo from "../components/Seo";
+import PageLoader from "../components/PageLoader";
 
 const formatWhatsAppNumber = (phone = "") => String(phone).replace(/[^\d]/g, "");
 
@@ -60,11 +62,16 @@ export default function ContactPage() {
   const whatsappUrl = whatsappNumber ? `https://wa.me/${whatsappNumber}` : "";
 
   if (loading) {
-    return <div className="container py-5 text-center">Loading contact information...</div>;
+    return <PageLoader label="Loading contact information..." />;
   }
 
   return (
     <main className="main">
+      <Seo
+        title="Contact"
+        description="Contact Lycee Saint Alexandre Sauli de Muhura for admissions, programs, and school information."
+        path="/contact"
+      />
       {/* Page Title */}
       <div className="page-title" data-aos="fade">
         <div className="heading">

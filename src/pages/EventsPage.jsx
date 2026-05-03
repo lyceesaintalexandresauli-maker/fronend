@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { mediaUrl } from "../api/client";
 import { eventsAPI } from "../api/services";
+import PageLoader from "../components/PageLoader";
+import Seo from "../components/Seo";
 
 export default function EventsPage() {
   const [events, setEvents] = useState([]);
@@ -132,18 +134,18 @@ export default function EventsPage() {
   if (loading) {
     return (
       <main className="main">
-        <div className="container py-5 text-center">
-          <div className="spinner-border text-primary" role="status">
-            <span className="visually-hidden">Loading events...</span>
-          </div>
-          <p className="mt-3 text-muted">Loading events...</p>
-        </div>
+        <PageLoader label="Loading events..." />
       </main>
     );
   }
 
   return (
     <main className="main">
+      <Seo
+        title="Events"
+        description="Discover upcoming and recent school events, activities, and celebrations at Lycee Saint Alexandre Sauli de Muhura."
+        path="/events"
+      />
       {selectedEvent && (
         <div
           className="modal fade show d-block"
@@ -172,6 +174,10 @@ export default function EventsPage() {
                     alt={selectedEvent.title}
                     className="w-100 rounded mb-3"
                     style={{ maxHeight: "300px", objectFit: "cover" }}
+                    width="1200"
+                    height="675"
+                    loading="lazy"
+                    decoding="async"
                   />
                 )}
                 <div className="mb-3">
@@ -373,6 +379,8 @@ export default function EventsPage() {
                           className="card-img-top"
                           alt={event.title}
                           style={{ height: "240px", objectFit: "cover" }}
+                          width="720"
+                          height="480"
                           loading="lazy"
                           decoding="async"
                         />
@@ -488,6 +496,8 @@ export default function EventsPage() {
                           src={mediaUrl(event.image_path)}
                           alt={event.title}
                           style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                          width="128"
+                          height="128"
                           loading="lazy"
                           decoding="async"
                         />

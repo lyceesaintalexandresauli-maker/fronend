@@ -2,6 +2,8 @@ import { Suspense, lazy } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
+import RouteSeo from "./components/RouteSeo";
+import PageLoader from "./components/PageLoader";
 import { useAuth } from "./context/AuthContext";
 
 const HomePage = lazy(() => import("./pages/HomePage"));
@@ -27,11 +29,12 @@ export default function App() {
   const { isReady } = useAuth();
 
   if (!isReady) {
-    return <div style={{ padding: 20 }}>Loading...</div>;
+    return <PageLoader label="Preparing your session..." />;
   }
 
   return (
-    <Suspense fallback={<div style={{ padding: 20 }}>Loading...</div>}>
+    <Suspense fallback={<PageLoader />}>
+      <RouteSeo />
       <Routes>
         <Route element={<Layout />}>
           <Route index element={<HomePage />} />
