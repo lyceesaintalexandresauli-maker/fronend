@@ -51,9 +51,15 @@ const extractAuthConfigMessage = (error) => {
   return backendMessage;
 };
 
+const isMissingStaffProfileError = (error) => {
+  const status = error?.response?.status;
+  const backendMessage = String(error?.response?.data?.error || "").toLowerCase();
+  return status === 403 && backendMessage.includes("no staff profile is linked");
+};
+
 const shouldForceSignOut = (error) => {
   const status = error?.response?.status;
-  return status === 401 || status === 403;
+  return status === 401 || (status === 403 && !isMissingStaffProfileError(error));
 };
 
 export function AuthProvider({ children }) {
@@ -113,6 +119,32 @@ export function AuthProvider({ children }) {
       setAuthConfigError("");
       return data;
     } catch (error) {
+      if (isMissingStaffProfileError(error)) {
+        // Student accounts can authenticate with Supabase even without a staff profile row.
+        const supabase = getSupabaseBrowserClient();
+        const {
+          data: { user: sbUser },
+        } = await supabase.auth.getUser(accessToken);
+        const studentProfile = {
+          id: sbUser?.id || null,
+          auth_user_id: sbUser?.id || null,
+          username:
+            sbUser?.user_metadata?.username ||
+            (sbUser?.email ? String(sbUser.email).split("@")[0] : "student"),
+          email: sbUser?.email || "",
+          full_name: sbUser?.user_metadata?.full_name || null,
+          phone: sbUser?.user_metadata?.phone || null,
+          bio: sbUser?.user_metadata?.bio || null,
+          profile_image: null,
+          role: "student",
+          is_active: true,
+          created_at: sbUser?.created_at || null,
+        };
+        saveUser(studentProfile);
+        setAuthConfigError("");
+        return studentProfile;
+      }
+
       const configMessage = extractAuthConfigMessage(error);
 
       if (error?.response?.status === 503 && configMessage) {
@@ -242,6 +274,46 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const registerStudent = async ({ email, password, fullName }) => {
+    if (!isSupabaseConfigured()) {
+      return {
+        ok: false,
+        error: getSupabaseConfigError() || "Supabase Auth is not configured yet.",
+      };
+    }
+
+    try {
+      const supabase = getSupabaseBrowserClient();
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName || null,
+          },
+        },
+      });
+      if (error) {
+        return { ok: false, error: error.message || "Signup failed" };
+      }
+
+      // If email-confirmation is disabled, session exists immediately.
+      if (data?.session?.access_token) {
+        await hydrateProfile(data.session.access_token);
+      }
+
+      return {
+        ok: true,
+        needsEmailConfirmation: !data?.session,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: getApiError(error, error.message || "Signup failed"),
+      };
+    }
+  };
+
   const refreshMe = async () => {
     try {
       const { data } = await api.get("/auth/me");
@@ -268,9 +340,11 @@ export function AuthProvider({ children }) {
       isAuthenticated: !!token,
       isAdmin: user?.role === "admin",
       isTeacher: user?.role === "teacher",
+      isStudent: user?.role === "student",
       isReady,
       authConfigError,
       loginStep1,
+      registerStudent,
       refreshMe,
       logout,
     }),

@@ -215,7 +215,7 @@ export default function Layout() {
               to="/login"
               style={{ backgroundColor: "white", color: "#333", border: "2px solid #333", fontSize: "0.9rem" }}
             >
-              Login
+              Student Portal
             </Link>
             <i
               className={`mobile-nav-toggle d-xl-none bi ms-3 ${menuOpen ? "bi-x" : "bi-list"}`}

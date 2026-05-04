@@ -24,6 +24,7 @@ const FadPage = lazy(() => import("./pages/FadPage"));
 const AccPage = lazy(() => import("./pages/AccPage"));
 const TimetablesPage = lazy(() => import("./pages/TimetablesPage"));
 const AdminTimetablesPage = lazy(() => import("./pages/AdminTimetablesPage"));
+const StudentDashboardPage = lazy(() => import("./pages/StudentDashboardPage"));
 
 export default function App() {
   const { isReady } = useAuth();
@@ -47,6 +48,9 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route element={<ProtectedRoute roles={["admin", "teacher", "secretary"]} />}>
             <Route path="/profile" element={<ProfilePage />} />
+          </Route>
+          <Route element={<ProtectedRoute roles={["student"]} />}>
+            <Route path="/student" element={<StudentDashboardPage />} />
           </Route>
           <Route path="/about" element={<AboutPage />} />
           <Route path="/academic" element={<AcademicPage />} />

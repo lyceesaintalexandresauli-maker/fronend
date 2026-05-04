@@ -4,15 +4,23 @@ import Seo from "../components/Seo";
 import { useAuth } from "../context/AuthContext";
 
 export default function LoginPage() {
-  const { isAuthenticated, user, loginStep1, authConfigError, isReady } = useAuth();
+  const { isAuthenticated, user, loginStep1, registerStudent, authConfigError, isReady } = useAuth();
   const navigate = useNavigate();
+  const [mode, setMode] = useState("login");
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const destinationForRole = (role) => (role === "admin" ? "/admin" : "/profile");
+  const destinationForRole = (role) => {
+    if (role === "admin") return "/admin";
+    if (role === "teacher" || role === "secretary" || role === "dos") return "/profile";
+    if (role === "student") return "/student";
+    return "/";
+  };
 
   if (!isReady) {
     return null;
@@ -22,12 +30,28 @@ export default function LoginPage() {
     return <Navigate to={destinationForRole(user?.role)} replace />;
   }
 
-  const submitLogin = async (event) => {
+  const submit = async (event) => {
     event.preventDefault();
     setLoading(true);
     setError("");
+    setNotice("");
 
     try {
+      if (mode === "signup") {
+        const result = await registerStudent({ email, password, fullName });
+        if (!result.ok) {
+          setError(result.error);
+          return;
+        }
+        if (result.needsEmailConfirmation) {
+          setNotice("Account created. Check your email to confirm your student account.");
+          return;
+        }
+        setNotice("Account created successfully. You are now signed in.");
+        navigate("/student", { replace: true });
+        return;
+      }
+
       const result = await loginStep1(email, password);
 
       if (!result.ok) {
@@ -46,8 +70,8 @@ export default function LoginPage() {
   return (
     <main className="main">
       <Seo
-        title="Staff Login"
-        description="Secure staff portal access for teachers, administrators, and school personnel at Lycee Saint Alexandre Sauli de Muhura."
+        title="Student Login / Signup"
+        description="Student portal access and account registration for Lycee Saint Alexandre Sauli de Muhura."
         path="/login"
       />
 
@@ -56,8 +80,8 @@ export default function LoginPage() {
           <div className="container">
             <div className="row d-flex justify-content-center text-center">
               <div className="col-lg-8">
-                <h1>Staff Portal</h1>
-                <p className="mb-0">Secure access for teachers, administrators, and school staff.</p>
+                <h1>Student Portal</h1>
+                <p className="mb-0">Sign in or create your student account to access student services.</p>
               </div>
             </div>
           </div>
@@ -77,10 +101,31 @@ export default function LoginPage() {
                       style={{ width: "80px", borderRadius: "5px" }}
                       className="mb-3"
                     />
-                    <h3 className="fw-bold" style={{ color: "#37423b" }}>Sign In</h3>
+                    <h3 className="fw-bold" style={{ color: "#37423b" }}>
+                      {mode === "login" ? "Student Login" : "Student Signup"}
+                    </h3>
                     <p className="text-muted" style={{ fontSize: "0.9rem" }}>
-                      Use your official school account to continue.
+                      {mode === "login"
+                        ? "Use your student account to continue."
+                        : "Create a student account with your email and password."}
                     </p>
+                  </div>
+
+                  <div className="d-flex gap-2 mb-3">
+                    <button
+                      type="button"
+                      className={`btn btn-sm ${mode === "login" ? "btn-dark text-white" : "btn-outline-secondary"}`}
+                      onClick={() => setMode("login")}
+                    >
+                      Login
+                    </button>
+                    <button
+                      type="button"
+                      className={`btn btn-sm ${mode === "signup" ? "btn-dark text-white" : "btn-outline-secondary"}`}
+                      onClick={() => setMode("signup")}
+                    >
+                      Signup
+                    </button>
                   </div>
 
                   {authConfigError && (
@@ -97,7 +142,26 @@ export default function LoginPage() {
                     </div>
                   )}
 
-                  <form onSubmit={submitLogin}>
+                  {notice && (
+                    <div className="alert alert-success" role="alert">
+                      <i className="bi bi-check-circle-fill me-2"></i>
+                      {notice}
+                    </div>
+                  )}
+
+                  <form onSubmit={submit}>
+                    {mode === "signup" && (
+                      <div className="mb-3">
+                        <label className="form-label text-muted">Full name</label>
+                        <input
+                          type="text"
+                          className="form-control form-control-lg"
+                          placeholder="Student full name"
+                          value={fullName}
+                          onChange={(event) => setFullName(event.target.value)}
+                        />
+                      </div>
+                    )}
                     <div className="mb-3">
                       <label className="form-label text-muted">Email address</label>
                       <input
@@ -146,12 +210,16 @@ export default function LoginPage() {
                           </>
                         ) : (
                           <>
-                            <i className="bi bi-shield-lock me-2"></i>Login
+                            <i className={`bi ${mode === "login" ? "bi-box-arrow-in-right" : "bi-person-plus"} me-2`}></i>
+                            {mode === "login" ? "Login" : "Create account"}
                           </>
                         )}
                       </button>
                     </div>
                   </form>
+                  <p className="small text-muted mt-3 mb-0">
+                    Staff/admin accounts should use the dedicated admin portal.
+                  </p>
                 </div>
               </div>
             </div>
