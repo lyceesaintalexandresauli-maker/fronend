@@ -68,6 +68,30 @@ export const getSupabaseConfigError = () => {
 
 export const isSupabaseConfigured = () => !getSupabaseConfigError();
 
+/**
+ * Public origin used in Supabase email confirmation links (`emailRedirectTo`).
+ * Set `VITE_PUBLIC_SITE_URL` on your production build (e.g. https://www.lyceemuhura.rw)
+ * so confirmation emails never point at localhost. Must match an entry under
+ * Supabase Dashboard → Authentication → URL Configuration → Redirect URLs.
+ */
+export const getPublicSiteUrl = () => {
+  const fromEnv = readEnv(import.meta.env.VITE_PUBLIC_SITE_URL);
+  if (fromEnv) {
+    return fromEnv.replace(/\/$/, "");
+  }
+  if (typeof window !== "undefined" && window.location?.origin) {
+    return window.location.origin;
+  }
+  return "";
+};
+
+/** Where to send users after they click “confirm email” (session is applied on load). */
+export const getAuthEmailRedirectUrl = () => {
+  const base = getPublicSiteUrl();
+  if (!base) return undefined;
+  return `${base}/login`;
+};
+
 export const getSupabaseBrowserClient = () => {
   const configError = getSupabaseConfigError();
   if (configError) {

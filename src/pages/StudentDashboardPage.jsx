@@ -2,121 +2,146 @@ import { Link } from "react-router-dom";
 import Seo from "../components/Seo";
 import { useAuth } from "../context/AuthContext";
 
+const tiles = [
+  {
+    to: "/timetables",
+    title: "Timetables",
+    blurb: "Published class schedules",
+    icon: "bi-calendar3",
+  },
+  {
+    to: "/announcements",
+    title: "Announcements",
+    blurb: "News and notices",
+    icon: "bi-megaphone",
+  },
+  {
+    to: "/events",
+    title: "Events",
+    blurb: "Activities and dates",
+    icon: "bi-calendar-event",
+  },
+  {
+    to: "/academic",
+    title: "Academic",
+    blurb: "Programs and options",
+    icon: "bi-mortarboard",
+  },
+];
+
 export default function StudentDashboardPage() {
   const { user, logout } = useAuth();
+  const displayName =
+    user?.full_name?.trim() ||
+    (user?.email ? String(user.email).split("@")[0] : "Student");
+  const initial = displayName.charAt(0).toUpperCase() || "S";
 
   return (
-    <main className="main">
+    <main className="main student-portal bg-slate-100">
       <Seo
-        title="Student Dashboard"
+        title="Student Portal"
         description="Your student portal at Lycee Saint Alexandre Sauli de Muhura."
         path="/student"
       />
 
-      <div className="page-title" data-aos="fade">
-        <div className="heading">
-          <div className="container">
-            <div className="row d-flex justify-content-center text-center py-4">
-              <div className="col-lg-9">
-                <h1 className="text-white fw-bold">Student dashboard</h1>
-                <p className="text-white mb-0" style={{ opacity: 0.95 }}>
-                  Welcome back{user?.full_name ? `, ${user.full_name}` : user?.email ? `, ${user.email}` : ""}.
-                </p>
-              </div>
-            </div>
-          </div>
+      <div className="relative isolate overflow-hidden bg-gradient-to-br from-[#003d7a] via-[#004080] to-[#001f40] pb-28 pt-10 sm:pt-14">
+        <div
+          className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[#e6c56a]/20 blur-3xl"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute -bottom-16 left-1/4 h-64 w-64 rounded-full bg-white/10 blur-3xl"
+          aria-hidden
+        />
+        <div className="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-[#e6c56a]/90">
+            Student portal
+          </p>
+          <h1 className="mt-3 text-center text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+            Welcome back, {displayName}
+          </h1>
+          <p className="mx-auto mt-3 max-w-xl text-center text-sm leading-relaxed text-white/85 sm:text-base">
+            Use the shortcuts below for timetables, announcements, and school information. Your session is
+            private to this device until you sign out.
+          </p>
         </div>
       </div>
 
-      <section className="container py-5">
-        <div className="row g-4">
-          <div className="col-lg-4" data-aos="fade-up">
-            <div className="card border-0 shadow-sm h-100">
-              <div className="card-body p-4">
-                <h3 className="fw-bold mb-3" style={{ color: "#004080" }}>
-                  <i className="bi bi-person-circle me-2" style={{ color: "#E6C56A" }}></i>
-                  Your account
-                </h3>
-                <p className="text-muted small mb-2">
-                  <strong>Email:</strong> {user?.email || "—"}
+      <div className="relative z-10 mx-auto -mt-20 max-w-5xl px-4 pb-16 sm:px-6 lg:px-8">
+        <div className="grid gap-6 lg:grid-cols-12 lg:gap-8">
+          <aside className="lg:col-span-4">
+            <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-900/5">
+              <div className="h-20 bg-gradient-to-r from-[#004080] to-[#002a52]" />
+              <div className="relative -mt-12 px-6 pb-6 text-center">
+                <div
+                  className="mx-auto flex h-24 w-24 items-center justify-center rounded-2xl border-4 border-white bg-[#e6c56a] text-3xl font-bold text-[#1a1a1a] shadow-md"
+                  aria-hidden
+                >
+                  {initial}
+                </div>
+                <h2 className="mt-4 text-lg font-bold text-slate-900">{displayName}</h2>
+                <p className="mt-1 truncate text-sm text-slate-500" title={user?.email || ""}>
+                  {user?.email || "—"}
                 </p>
-                {user?.full_name && (
-                  <p className="text-muted small mb-2">
-                    <strong>Name:</strong> {user.full_name}
-                  </p>
-                )}
-                <button type="button" className="btn btn-outline-secondary btn-sm mt-2" onClick={() => logout()}>
-                  Sign out
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div className="col-lg-8" data-aos="fade-up" data-aos-delay="100">
-            <div className="card border-0 shadow-sm h-100">
-              <div className="card-body p-4">
-                <h3 className="fw-bold mb-3" style={{ color: "#004080" }}>
-                  Quick links
-                </h3>
-                <div className="row g-3">
-                  <div className="col-md-6">
-                    <Link
-                      to="/timetables"
-                      className="d-block rounded-3 border p-3 text-decoration-none h-100"
-                      style={{ borderColor: "rgba(0,64,128,0.2)" }}
-                    >
-                      <div className="fw-bold text-dark mb-1">
-                        <i className="bi bi-calendar3 me-2" style={{ color: "#E6C56A" }}></i>
-                        Timetables
-                      </div>
-                      <div className="small text-muted">View published class schedules.</div>
-                    </Link>
-                  </div>
-                  <div className="col-md-6">
-                    <Link
-                      to="/announcements"
-                      className="d-block rounded-3 border p-3 text-decoration-none h-100"
-                      style={{ borderColor: "rgba(0,64,128,0.2)" }}
-                    >
-                      <div className="fw-bold text-dark mb-1">
-                        <i className="bi bi-megaphone me-2" style={{ color: "#E6C56A" }}></i>
-                        Announcements
-                      </div>
-                      <div className="small text-muted">School news and updates.</div>
-                    </Link>
-                  </div>
-                  <div className="col-md-6">
-                    <Link
-                      to="/events"
-                      className="d-block rounded-3 border p-3 text-decoration-none h-100"
-                      style={{ borderColor: "rgba(0,64,128,0.2)" }}
-                    >
-                      <div className="fw-bold text-dark mb-1">
-                        <i className="bi bi-calendar-event me-2" style={{ color: "#E6C56A" }}></i>
-                        Events
-                      </div>
-                      <div className="small text-muted">Upcoming activities.</div>
-                    </Link>
-                  </div>
-                  <div className="col-md-6">
-                    <Link
-                      to="/academic"
-                      className="d-block rounded-3 border p-3 text-decoration-none h-100"
-                      style={{ borderColor: "rgba(0,64,128,0.2)" }}
-                    >
-                      <div className="fw-bold text-dark mb-1">
-                        <i className="bi bi-book me-2" style={{ color: "#E6C56A" }}></i>
-                        Academic
-                      </div>
-                      <div className="small text-muted">Programs and information.</div>
-                    </Link>
-                  </div>
+                <p className="mt-2 text-xs font-medium uppercase tracking-wide text-slate-400">Student account</p>
+                <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
+                  <button
+                    type="button"
+                    className="student-portal-btn-muted inline-flex items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm ring-1 ring-slate-200/80 transition hover:bg-slate-50 hover:ring-slate-300"
+                    onClick={() => logout()}
+                  >
+                    Sign out
+                  </button>
+                  <Link
+                    to="/"
+                    className="inline-flex items-center justify-center rounded-xl bg-[#e6c56a] px-4 py-2.5 text-sm font-semibold text-[#1a1a1a] shadow-sm ring-1 ring-[#c8a63e]/60 transition hover:bg-[#d6b04c]"
+                  >
+                    School home
+                  </Link>
                 </div>
               </div>
             </div>
-          </div>
+          </aside>
+
+          <section className="lg:col-span-8">
+            <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-lg shadow-slate-900/5 sm:p-8">
+              <div className="flex flex-col gap-1 border-b border-slate-100 pb-5 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900">Shortcuts</h3>
+                  <p className="text-sm text-slate-500">Jump to the most-used student pages</p>
+                </div>
+                <Link
+                  to="/login"
+                  className="text-sm font-medium text-[#004080] underline-offset-2 hover:underline"
+                >
+                  Account help
+                </Link>
+              </div>
+
+              <ul className="mt-6 grid gap-3 sm:grid-cols-2">
+                {tiles.map(({ to, title, blurb, icon }) => (
+                  <li key={to}>
+                    <Link
+                      to={to}
+                      className="group flex gap-4 rounded-xl border border-slate-100 bg-slate-50/80 p-4 transition hover:border-[#004080]/25 hover:bg-white hover:shadow-md"
+                    >
+                      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white text-xl text-[#004080] shadow-sm ring-1 ring-slate-200/80 transition group-hover:bg-[#004080] group-hover:text-[#e6c56a] group-hover:ring-[#004080]">
+                        <i className={`bi ${icon}`} aria-hidden />
+                      </span>
+                      <span className="min-w-0 text-left">
+                        <span className="block font-semibold text-slate-900 group-hover:text-[#004080]">
+                          {title}
+                        </span>
+                        <span className="mt-0.5 block text-sm text-slate-500">{blurb}</span>
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
         </div>
-      </section>
+      </div>
     </main>
   );
 }

@@ -1,6 +1,11 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { api, getApiError } from "../api/client";
-import { getSupabaseBrowserClient, getSupabaseConfigError, isSupabaseConfigured } from "../supabase";
+import {
+  getAuthEmailRedirectUrl,
+  getSupabaseBrowserClient,
+  getSupabaseConfigError,
+  isSupabaseConfigured,
+} from "../supabase";
 
 const AuthContext = createContext(null);
 
@@ -284,10 +289,12 @@ export function AuthProvider({ children }) {
 
     try {
       const supabase = getSupabaseBrowserClient();
+      const emailRedirectTo = getAuthEmailRedirectUrl();
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
+          ...(emailRedirectTo ? { emailRedirectTo } : {}),
           data: {
             full_name: fullName || null,
           },

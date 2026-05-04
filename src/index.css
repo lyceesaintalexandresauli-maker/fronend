@@ -11,7 +11,7 @@
 
 .btn,
 .adm-btn,
-button:not(.btn-close):not(.accordion-button):not(.mobile-nav-toggle) {
+button:not(.btn-close):not(.accordion-button):not(.mobile-nav-toggle):not(.student-portal-btn-muted) {
   background-color: var(--navbar-button-bg) !important;
   color: var(--navbar-button-text) !important;
   border-color: var(--navbar-button-border) !important;
@@ -21,8 +21,8 @@ button:not(.btn-close):not(.accordion-button):not(.mobile-nav-toggle) {
 .btn:focus,
 .adm-btn:hover,
 .adm-btn:focus,
-button:not(.btn-close):not(.accordion-button):not(.mobile-nav-toggle):hover,
-button:not(.btn-close):not(.accordion-button):not(.mobile-nav-toggle):focus {
+button:not(.btn-close):not(.accordion-button):not(.mobile-nav-toggle):not(.student-portal-btn-muted):hover,
+button:not(.btn-close):not(.accordion-button):not(.mobile-nav-toggle):not(.student-portal-btn-muted):focus {
   background-color: var(--navbar-button-bg-hover) !important;
   color: var(--navbar-button-text) !important;
   border-color: var(--navbar-button-border) !important;
@@ -30,7 +30,7 @@ button:not(.btn-close):not(.accordion-button):not(.mobile-nav-toggle):focus {
 
 .btn:disabled,
 .adm-btn:disabled,
-button:not(.btn-close):not(.accordion-button):not(.mobile-nav-toggle):disabled {
+button:not(.btn-close):not(.accordion-button):not(.mobile-nav-toggle):not(.student-portal-btn-muted):disabled {
   background-color: var(--navbar-button-bg) !important;
   color: rgba(31, 31, 31, 0.7) !important;
   border-color: var(--navbar-button-border) !important;
