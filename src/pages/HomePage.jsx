@@ -41,10 +41,10 @@ export default function HomePage() {
     if (window.AOS) {
       window.AOS.init({ duration: 600, easing: 'ease-in-out', once: true, mirror: false });
     }
-  }, [loading]);
+  }, []);
 
   useEffect(() => {
-    if (!loading && window.Swiper) {
+    if (window.Swiper) {
       swiperRef.current?.destroy?.(true, true);
       swiperRef.current = new window.Swiper('.heroSwiper', {
         loop: true, speed: 800,
@@ -59,7 +59,7 @@ export default function HomePage() {
       swiperRef.current?.destroy?.(true, true);
       swiperRef.current = null;
     };
-  }, [loading]);
+  }, [heroSlides.length]);
 
   // Auto-play event slider
   useEffect(() => {
@@ -70,8 +70,6 @@ export default function HomePage() {
       return () => clearInterval(interval);
     }
   }, [events.length]);
-
-  if (loading) return <div id="preloader"></div>;
 
   return (
     <main className="main">
@@ -413,7 +411,7 @@ export default function HomePage() {
             </div>
           ) : (
             <div className="col-12 text-center py-5">
-              <p className="text-muted">Loading courses...</p>
+              <p className="text-muted">{loading ? "Loading courses..." : "Courses will appear soon."}</p>
             </div>
           )}
         </div>
@@ -459,7 +457,7 @@ export default function HomePage() {
               </div>
             )) : (
               <div className="col-12 text-center py-5">
-                <p className="text-muted">Loading staff...</p>
+                <p className="text-muted">{loading ? "Loading staff..." : "Staff will appear soon."}</p>
               </div>
             )}
           </div>

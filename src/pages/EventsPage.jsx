@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { mediaUrl } from "../api/client";
 import { eventsAPI } from "../api/services";
-import PageLoader from "../components/PageLoader";
 import Seo from "../components/Seo";
 
 export default function EventsPage() {
@@ -130,14 +129,6 @@ export default function EventsPage() {
 
     return () => window.clearInterval(intervalId);
   }, [filteredEvents.length]);
-
-  if (loading) {
-    return (
-      <main className="main">
-        <PageLoader label="Loading events..." />
-      </main>
-    );
-  }
 
   return (
     <main className="main">
@@ -335,6 +326,12 @@ export default function EventsPage() {
             </div>
           )}
 
+          {loading && (
+            <div className="alert alert-info mb-4" role="status">
+              Fetching latest events...
+            </div>
+          )}
+
           <div
             ref={sliderRef}
             className="d-flex gap-4 overflow-auto pb-3"
@@ -440,7 +437,9 @@ export default function EventsPage() {
               ))
             ) : (
               <div className="w-100">
-                <div className="alert alert-info mb-0">No events available.</div>
+                <div className="alert alert-info mb-0">
+                  {loading ? "Loading events..." : "No events available."}
+                </div>
               </div>
             )}
           </div>
