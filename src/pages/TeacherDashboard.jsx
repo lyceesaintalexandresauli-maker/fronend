@@ -2,7 +2,12 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { api, getApiError } from "../api/client";
 import { useAuth } from "../context/AuthContext";
-import "../styles/timetables.css";
+import TimetableGrid, { normalizeScheduleData } from "../components/TimetableGrid";
+
+const btnPrimary =
+  "!inline-flex items-center justify-center rounded-lg !border border-slate-800 !bg-slate-800 px-3 py-2 text-sm font-semibold !text-white hover:!bg-slate-900";
+const btnSecondary =
+  "!inline-flex items-center justify-center rounded-lg !border border-slate-300 !bg-white px-3 py-2 text-sm font-semibold !text-slate-800 hover:!bg-slate-50";
 
 export default function TeacherDashboard() {
   const { user } = useAuth();
@@ -60,7 +65,8 @@ export default function TeacherDashboard() {
     if (!timetable.schedule_data) return;
 
     const printWindow = window.open("", "_blank");
-    const scheduleData = timetable.schedule_data;
+    const scheduleData = normalizeScheduleData(timetable.schedule_data);
+    if (!scheduleData) return;
     const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
     let tableHTML = `
@@ -90,22 +96,22 @@ export default function TeacherDashboard() {
           <thead>
             <tr>
               <th>Time</th>
-              ${days.map(day => `<th>${day}</th>`).join("")}
+              ${days.map((day) => `<th>${day}</th>`).join("")}
             </tr>
           </thead>
           <tbody>
     `;
 
     const sortedTimes = Object.keys(scheduleData).sort((a, b) => {
-      const timeA = parseInt(a.split(":")[0]);
-      const timeB = parseInt(b.split(":")[0]);
+      const timeA = parseInt(a.split(":")[0], 10);
+      const timeB = parseInt(b.split(":")[0], 10);
       return timeA - timeB;
     });
 
     for (const time of sortedTimes) {
       tableHTML += `<tr><td>${time}</td>`;
       for (const day of days) {
-        const cellValue = scheduleData[time][day] || "--";
+        const cellValue = scheduleData[time]?.[day] ?? "—";
         tableHTML += `<td>${cellValue}</td>`;
       }
       tableHTML += `</tr>`;
@@ -124,120 +130,117 @@ export default function TeacherDashboard() {
   };
 
   return (
-    <div className="page-container teacher-dashboard">
-      <div className="page-header">
-        <h1>Teacher Dashboard</h1>
-        <p>Welcome, {user?.full_name || user?.username}</p>
-      </div>
+    <div className="min-h-screen bg-slate-50 px-4 py-8 text-slate-900 sm:px-6">
+      <div className="mx-auto max-w-6xl">
+        <header className="mb-8 border-b border-slate-200 pb-6">
+          <h1 className="text-2xl font-bold text-slate-900">Teacher dashboard</h1>
+          <p className="mt-1 text-slate-600">Welcome, {user?.full_name || user?.username}</p>
+        </header>
 
-      <div className="dashboard-content">
-        <div className="timetables-section">
-          <div className="section-header">
-            <h2>Time Tables</h2>
-            {department && <p>Department: {department}</p>}
-            {tradeLevel && <p>Trade Level: {tradeLevel}</p>}
+        <section>
+          <div className="mb-4">
+            <h2 className="text-xl font-semibold text-slate-900">Timetables</h2>
+            {department && <p className="mt-1 text-sm text-slate-600">Department: {department}</p>}
+            {tradeLevel && <p className="text-sm text-slate-600">Trade level: {tradeLevel}</p>}
           </div>
 
-          {error && <div className="error-message">{error}</div>}
+          {error && (
+            <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800" role="alert">
+              {error}
+            </div>
+          )}
 
-          <div className="timetables-layout">
-            <div className="timetables-list">
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
+            <div className="min-h-0">
               {loading ? (
-                <p>Loading timetables...</p>
+                <p className="rounded-lg border border-slate-200 bg-white p-6 text-slate-600">Loading timetables…</p>
               ) : timetables.length === 0 ? (
-                <p>No timetables available.</p>
+                <p className="rounded-lg border border-slate-200 bg-white p-6 text-slate-600">No timetables available.</p>
               ) : (
-                <div className="timetable-cards">
+                <ul className="flex flex-col gap-4">
                   {timetables.map((timetable) => (
-                    <div key={timetable.id} className="timetable-card">
-                      <h3>{timetable.class_name}</h3>
-                      <p><strong>Department:</strong> {timetable.department}</p>
-                      <p><strong>Trade Level:</strong> {timetable.trade_level}</p>
-                      <p><strong>Academic Year:</strong> {timetable.academic_year}</p>
-                      <p><strong>Term:</strong> {timetable.term}</p>
-                      <div className="timetable-actions">
-                        <button onClick={() => handleViewTimetable(timetable)} className="btn btn-primary">
+                    <li
+                      key={timetable.id}
+                      className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+                    >
+                      <h3 className="text-lg font-bold text-slate-900">{timetable.class_name}</h3>
+                      <dl className="mt-3 space-y-1 text-sm text-slate-600">
+                        <div>
+                          <dt className="inline font-semibold text-slate-700">Department: </dt>
+                          <dd className="inline">{timetable.department}</dd>
+                        </div>
+                        <div>
+                          <dt className="inline font-semibold text-slate-700">Trade level: </dt>
+                          <dd className="inline">{timetable.trade_level}</dd>
+                        </div>
+                        <div>
+                          <dt className="inline font-semibold text-slate-700">Academic year: </dt>
+                          <dd className="inline">{timetable.academic_year}</dd>
+                        </div>
+                        <div>
+                          <dt className="inline font-semibold text-slate-700">Term: </dt>
+                          <dd className="inline">{timetable.term}</dd>
+                        </div>
+                      </dl>
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        <button type="button" onClick={() => handleViewTimetable(timetable)} className={btnPrimary}>
                           View
                         </button>
-                        <button onClick={() => handleDownloadTimetable(timetable)} className="btn btn-secondary">
+                        <button type="button" onClick={() => handleDownloadTimetable(timetable)} className={btnSecondary}>
                           Download
                         </button>
-                        <button onClick={() => handlePrintTimetable(timetable)} className="btn btn-secondary">
+                        <button type="button" onClick={() => handlePrintTimetable(timetable)} className={btnSecondary}>
                           Print
                         </button>
                       </div>
-                    </div>
+                    </li>
                   ))}
-                </div>
+                </ul>
               )}
             </div>
 
-            <div className="timetable-viewer">
+            <div className="min-h-[320px] rounded-xl border border-slate-200 bg-white p-4 shadow-sm lg:min-h-[480px]">
               {selectedTimetable ? (
-                <div className="timetable-detail">
-                  <div className="timetable-detail-header">
-                    <h2>{selectedTimetable.class_name}</h2>
-                    <button onClick={() => setSelectedTimetable(null)} className="btn btn-light">Close</button>
+                <div className="flex h-full min-h-0 flex-col">
+                  <div className="mb-4 flex flex-wrap items-start justify-between gap-2 border-b border-slate-100 pb-4">
+                    <h2 className="text-lg font-bold text-slate-900">{selectedTimetable.class_name}</h2>
+                    <button type="button" onClick={() => setSelectedTimetable(null)} className={btnSecondary}>
+                      Close
+                    </button>
                   </div>
-                  <div className="timetable-info">
-                    <p><strong>Department:</strong> {selectedTimetable.department}</p>
-                    <p><strong>Trade Level:</strong> {selectedTimetable.trade_level}</p>
-                    <p><strong>Academic Year:</strong> {selectedTimetable.academic_year}</p>
-                    <p><strong>Term:</strong> {selectedTimetable.term}</p>
+                  <dl className="mb-4 space-y-1 text-sm text-slate-600">
+                    <div>
+                      <dt className="inline font-semibold text-slate-700">Department: </dt>
+                      <dd className="inline">{selectedTimetable.department}</dd>
+                    </div>
+                    <div>
+                      <dt className="inline font-semibold text-slate-700">Trade level: </dt>
+                      <dd className="inline">{selectedTimetable.trade_level}</dd>
+                    </div>
+                    <div>
+                      <dt className="inline font-semibold text-slate-700">Academic year: </dt>
+                      <dd className="inline">{selectedTimetable.academic_year}</dd>
+                    </div>
+                    <div>
+                      <dt className="inline font-semibold text-slate-700">Term: </dt>
+                      <dd className="inline">{selectedTimetable.term}</dd>
+                    </div>
+                  </dl>
+                  <div className="min-h-0 flex-1 overflow-auto">
+                    {selectedTimetable.schedule_data && (
+                      <TimetableGrid schedule={selectedTimetable.schedule_data} />
+                    )}
                   </div>
-                  {selectedTimetable.schedule_data && (
-                    <TimetableGrid schedule={selectedTimetable.schedule_data} />
-                  )}
                 </div>
               ) : (
-                <div className="timetable-placeholder">
+                <div className="flex h-full min-h-[280px] items-center justify-center text-center text-slate-500">
                   <p>Select a timetable to view details</p>
                 </div>
               )}
             </div>
           </div>
-        </div>
+        </section>
       </div>
-    </div>
-  );
-}
-
-function TimetableGrid({ schedule }) {
-  const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-  const sortedTimes = Object.keys(schedule).sort((a, b) => {
-    const timeA = parseInt(a.split(":")[0]);
-    const timeB = parseInt(b.split(":")[0]);
-    return timeA - timeB;
-  });
-
-  return (
-    <div className="timetable-grid-container">
-      <table className="timetable-table">
-        <thead>
-          <tr>
-            <th>Time</th>
-            {days.map((day) => (
-              <th key={day}>{day}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {sortedTimes.map((time) => (
-            <tr key={time}>
-              <td className="time-cell">{time}</td>
-              {days.map((day) => {
-                const cellValue = schedule[time][day] || "--";
-                const isFixed = ["ASSEMBLY", "BREAK", "LUNCH"].includes(cellValue.toUpperCase());
-                return (
-                  <td key={day} className={isFixed ? "fixed-cell" : "schedule-cell"}>
-                    {cellValue}
-                  </td>
-                );
-              })}
-            </tr>
-          ))}
-        </tbody>
-      </table>
     </div>
   );
 }

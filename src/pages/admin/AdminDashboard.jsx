@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { api, getApiError, mediaUrl } from "../../api/client";
 import { useAuth } from "../../context/AuthContext";
-import "../../styles/timetables.css";
+import DOSTimetableManager from "./DOSTimetableManager";
 
 const SIDEBAR_ITEMS = [
   { id: "overview", label: "Dashboard", icon: "bi-grid-1x2" },
@@ -11,7 +11,7 @@ const SIDEBAR_ITEMS = [
   { id: "students", label: "Students API", icon: "bi-mortarboard" },
   { id: "staff", label: "Staff API", icon: "bi-people" },
   { id: "departments", label: "Departments API", icon: "bi-diagram-3" },
-  { id: "timetables", label: "Time Tables API", icon: "bi-calendar3" },
+  { id: "timetables", label: "Timetables API", icon: "bi-calendar3" },
   { id: "schoolWorkers", label: "School Workers API", icon: "bi-person-badge" },
   { id: "contactInfo", label: "Contact Info API", icon: "bi-telephone" },
   { id: "messages", label: "Client Messages API", icon: "bi-inbox" },
@@ -516,23 +516,11 @@ function ProfileSecurityPanel({
 }
 
 function TimetablePanel() {
-  const { user, token } = useAuth();
-  const flaskTimetableUrl = "http://127.0.0.1:5000";
-  
-
   return (
-    <div style={{ width: '100%', height: 'calc(100vh - 64px)', overflow: 'hidden' }}>
-      <iframe
-        src={`${flaskTimetableUrl}/?token=${token}&_t=${Date.now()}`}
-        style={{
-          width: '100%',
-          height: '100%',
-          border: 'none',
-          display: 'block'
-        }}
-        title="Flask Timetable Management with Chatbot"
-        allow="clipboard-read; clipboard-write"
-      />
+    <div className="adm-panel min-h-0 flex-1 overflow-hidden p-0">
+      <div className="h-[calc(100vh-11rem)] min-h-[420px] overflow-y-auto overflow-x-hidden bg-slate-50">
+        <DOSTimetableManager />
+      </div>
     </div>
   );
 }

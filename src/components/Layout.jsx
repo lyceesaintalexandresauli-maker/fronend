@@ -7,7 +7,7 @@ const fallbackNavigation = [
   { id: 1, label: "Home", href: "/", children: [] },
   { id: 2, label: "About", href: "/about", children: [] },
   { id: 3, label: "Academic", href: "/academic", children: [] },
-  { id: 15, label: "Time Tables", href: "/timetables", children: [] },
+  { id: 15, label: "Timetables", href: "/timetables", children: [] },
   { id: 4, label: "Staff", href: "/trainers", children: [] },
   { id: 5, label: "Events", href: "/events", children: [] },
   { id: 6, label: "Announcements", href: "/anouncement", children: [] },

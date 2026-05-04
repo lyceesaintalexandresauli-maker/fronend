@@ -154,7 +154,9 @@ export function AuthProvider({ children }) {
             }
           }
         } else {
-          await hardResetAuthState();
+          // Avoid a remote sign-out round trip when there is no session (faster first paint on cold loads).
+          clearSession();
+          purgeAuthStorage();
         }
 
         // ✅ FIXED: removed setTimeout (caused logout loops)

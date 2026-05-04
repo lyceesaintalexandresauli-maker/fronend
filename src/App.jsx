@@ -61,6 +61,8 @@ export default function App() {
 
         <Route element={<ProtectedRoute roles={["admin"]} />}>
           <Route path="/admin" element={<AdminDashboard />} />
+        </Route>
+        <Route element={<ProtectedRoute roles={["admin", "dos"]} />}>
           <Route path="/admin/timetables" element={<AdminTimetablesPage />} />
         </Route>
       </Routes>
