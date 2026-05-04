@@ -890,3 +890,236 @@ object {
     padding: 0.25rem 0.4rem;
   }
 }
+
+/* ============================================================
+   Professional UI normalization (palette unchanged)
+   ============================================================ */
+:root {
+  --ui-radius-sm: 0.5rem;
+  --ui-radius-md: 0.8rem;
+  --ui-radius-lg: 1rem;
+  --ui-shadow-sm: 0 3px 10px rgba(15, 23, 42, 0.08);
+  --ui-shadow-md: 0 10px 24px rgba(15, 23, 42, 0.12);
+  --ui-border: 1px solid rgba(15, 23, 42, 0.12);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  line-height: 1.55;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.main section {
+  scroll-margin-top: 84px;
+}
+
+.section-title h2,
+.section-title h1 {
+  letter-spacing: 0.2px;
+  line-height: 1.2;
+}
+
+.section-title p {
+  max-width: 68ch;
+  margin-left: auto;
+  margin-right: auto;
+  color: #64748b;
+}
+
+/* Normalize icon sizing and alignment across Bootstrap icon use */
+i.bi,
+.bi {
+  vertical-align: middle;
+  line-height: 1;
+}
+
+.icon-box i,
+.why-box i,
+.member .social i,
+.social-icons i {
+  font-size: 1.1rem;
+}
+
+/* Normalize cards and boxed UI elements */
+.card,
+.member,
+.icon-box,
+.why-box,
+.adm-panel,
+.adm-overview {
+  border-radius: var(--ui-radius-md);
+  box-shadow: var(--ui-shadow-sm);
+}
+
+.card:hover,
+.member:hover,
+.icon-box:hover {
+  box-shadow: var(--ui-shadow-md);
+  transform: translateY(-2px);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+/* Uniform interactive elements */
+.btn,
+.adm-btn,
+button:not(.btn-close):not(.accordion-button):not(.mobile-nav-toggle) {
+  border-radius: var(--ui-radius-sm) !important;
+  font-weight: 700 !important;
+  min-height: 38px;
+  padding: 0.45rem 0.8rem !important;
+  letter-spacing: 0.01em;
+  transition: transform 0.14s ease, box-shadow 0.2s ease, background-color 0.2s ease !important;
+}
+
+.btn:hover,
+.adm-btn:hover,
+button:not(.btn-close):not(.accordion-button):not(.mobile-nav-toggle):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 16px rgba(31, 31, 31, 0.18);
+}
+
+.btn:active,
+.adm-btn:active,
+button:not(.btn-close):not(.accordion-button):not(.mobile-nav-toggle):active {
+  transform: translateY(0);
+}
+
+/* Normalize form controls */
+input,
+select,
+textarea {
+  border-radius: var(--ui-radius-sm) !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(230, 197, 106, 0.22) !important;
+}
+
+/* Tighten table readability */
+table th {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+table td,
+table th {
+  vertical-align: middle;
+}
+
+/* Page-level visual rhythm */
+.ui-page-shell .page-title .heading {
+  padding: clamp(1.2rem, 2.6vw, 2.1rem) 0;
+}
+
+.ui-page-shell .page-title h1 {
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.ui-page-shell .page-title h4,
+.ui-page-shell .page-title p {
+  line-height: 1.6;
+  opacity: 0.96;
+}
+
+/* Toolbars and filter controls */
+.ui-filter-bar {
+  background: #fff;
+  border: var(--ui-border);
+  border-radius: var(--ui-radius-md);
+  padding: 0.65rem;
+  box-shadow: var(--ui-shadow-sm);
+}
+
+.ui-filter-bar .form-control,
+.ui-filter-bar .form-select,
+.ui-filter-bar .input-group-text {
+  border-color: rgba(15, 23, 42, 0.16) !important;
+}
+
+/* Staff cards */
+.ui-staff-card {
+  border: var(--ui-border) !important;
+}
+
+.ui-staff-card .badge {
+  border-radius: 999px;
+}
+
+.ui-icon-actions .ui-icon-btn {
+  border: 1px solid rgba(15, 23, 42, 0.22) !important;
+  background: #fff !important;
+  color: #1f2937 !important;
+}
+
+.ui-icon-actions .ui-icon-btn:hover {
+  background: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+/* About page visuals */
+.ui-stat-card {
+  border: var(--ui-border);
+}
+
+.ui-stat-card .card-title {
+  font-weight: 700;
+}
+
+.ui-stat-card .count {
+  font-weight: 800;
+  color: #1f2937;
+}
+
+.ui-program-tile {
+  border-radius: var(--ui-radius-md);
+  padding: 1rem 0.8rem;
+  box-shadow: var(--ui-shadow-sm);
+  border: 1px solid rgba(31, 31, 31, 0.1);
+}
+
+.ui-program-tile h5 {
+  font-weight: 800;
+  margin-bottom: 0.25rem;
+}
+
+.ui-program-tile p {
+  margin-bottom: 0;
+}
+
+/* Contact page */
+.ui-info-card {
+  background: #fff;
+  border: var(--ui-border);
+  border-radius: var(--ui-radius-md);
+  padding: 0.85rem 0.95rem;
+  box-shadow: var(--ui-shadow-sm);
+}
+
+.ui-info-card i {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.7rem;
+  background: rgba(230, 197, 106, 0.22);
+  color: #1f2937;
+}
+
+.ui-form-card {
+  background: #fff;
+  border: var(--ui-border);
+  border-radius: var(--ui-radius-md);
+  padding: 1rem;
+  box-shadow: var(--ui-shadow-sm);
+}

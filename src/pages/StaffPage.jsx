@@ -80,7 +80,7 @@ export default function StaffPage() {
   }
 
   return (
-    <main className="main">
+    <main className="main ui-page-shell">
       <Seo
         title="Our Staff"
         description="Meet the teaching staff, administrators, and support team at Lycee Saint Alexandre Sauli de Muhura."
@@ -101,7 +101,7 @@ export default function StaffPage() {
       </div>
 
       <div className="container mb-4" data-aos="fade-up">
-        <div className="d-flex flex-wrap gap-2 justify-content-between align-items-center">
+        <div className="d-flex flex-wrap gap-2 justify-content-between align-items-center ui-filter-bar">
           <div className="d-flex flex-wrap gap-2 align-items-center">
             <div className="input-group input-group-sm" style={{ maxWidth: "320px" }}>
               <span className="input-group-text bg-white border-end-0">
@@ -170,7 +170,7 @@ export default function StaffPage() {
                 data-aos-delay={index * 100}
               >
                 <div
-                  className="member-card h-100 border-0 shadow-sm rounded-3 overflow-hidden"
+                  className="member-card h-100 border-0 shadow-sm rounded-3 overflow-hidden ui-staff-card"
                   style={{ transition: "transform 0.3s, box-shadow 0.3s" }}
                 >
                   <div className="position-relative" style={{ height: "280px", backgroundColor: "#f0f0f0" }}>
@@ -208,11 +208,11 @@ export default function StaffPage() {
                       {member.bio ? `"${member.bio.slice(0, 150)}${member.bio.length > 150 ? "..." : ""}"` : "No biography available."}
                     </p>
 
-                    <div className="d-flex justify-content-center gap-2 mb-3">
+                    <div className="d-flex justify-content-center gap-2 mb-3 ui-icon-actions">
                       {member.email && (
                         <a
                           href={`mailto:${member.email}`}
-                          className="btn btn-sm btn-outline-secondary rounded-circle"
+                          className="btn btn-sm btn-outline-secondary rounded-circle ui-icon-btn"
                           style={{ width: "36px", height: "36px", padding: "0" }}
                           title="Email"
                         >
@@ -222,7 +222,7 @@ export default function StaffPage() {
                       {member.phone && (
                         <a
                           href={`tel:${member.phone}`}
-                          className="btn btn-sm btn-outline-secondary rounded-circle"
+                          className="btn btn-sm btn-outline-secondary rounded-circle ui-icon-btn"
                           style={{ width: "36px", height: "36px", padding: "0" }}
                           title="Phone"
                         >
@@ -234,7 +234,7 @@ export default function StaffPage() {
                           href={member.linkedin}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="btn btn-sm btn-outline-secondary rounded-circle"
+                          className="btn btn-sm btn-outline-secondary rounded-circle ui-icon-btn"
                           style={{ width: "36px", height: "36px", padding: "0" }}
                           title="LinkedIn"
                         >

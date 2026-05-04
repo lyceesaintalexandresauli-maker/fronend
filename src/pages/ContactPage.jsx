@@ -66,7 +66,7 @@ export default function ContactPage() {
   }
 
   return (
-    <main className="main">
+    <main className="main ui-page-shell">
       <Seo
         title="Contact"
         description="Contact Lycee Saint Alexandre Sauli de Muhura for admissions, programs, and school information."
@@ -99,7 +99,7 @@ export default function ContactPage() {
       {/* Google Maps */}
       <div className="container mb-5" data-aos="fade-up" data-aos-delay="200">
         <iframe
-          style={{ border: 0, width: "100%", height: "300px" }}
+          style={{ border: 0, width: "100%", height: "300px", borderRadius: "0.9rem", boxShadow: "0 8px 24px rgba(15,23,42,0.12)" }}
           src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d6158.434680359439!2d30.2829015!3d-1.765663!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x19db65319fe55c5b%3A0x4a78b3e725df20fe!2sLycee%20Saint%20Alexandre%20Sauli%20de%20Muhura!5e1!3m2!1sen!2srw!4v1763469805254!5m2!1sen!2srw"
           allowFullScreen=""
           loading="lazy"
@@ -113,7 +113,7 @@ export default function ContactPage() {
         <div className="container" data-aos="fade-up" data-aos-delay="100">
           <div className="row gy-4">
             <div className="col-lg-4">
-              <div className="info-item d-flex" data-aos="fade-up" data-aos-delay="300">
+              <div className="info-item d-flex ui-info-card" data-aos="fade-up" data-aos-delay="300">
                 <i className="bi bi-geo-alt flex-shrink-0"></i>
                 <div>
                   <h3>Address</h3>
@@ -121,7 +121,7 @@ export default function ContactPage() {
                 </div>
               </div>
 
-              <div className="info-item d-flex" data-aos="fade-up" data-aos-delay="400">
+              <div className="info-item d-flex ui-info-card" data-aos="fade-up" data-aos-delay="400">
                 <i className="bi bi-telephone flex-shrink-0"></i>
                 <div>
                   <h3>Call Us</h3>
@@ -129,7 +129,7 @@ export default function ContactPage() {
                 </div>
               </div>
 
-              <div className="info-item d-flex" data-aos="fade-up" data-aos-delay="500">
+              <div className="info-item d-flex ui-info-card" data-aos="fade-up" data-aos-delay="500">
                 <i className="bi bi-envelope flex-shrink-0"></i>
                 <div>
                   <h3>Email Us</h3>
@@ -137,7 +137,7 @@ export default function ContactPage() {
                 </div>
               </div>
 
-              <div className="info-item d-flex" data-aos="fade-up" data-aos-delay="600">
+              <div className="info-item d-flex ui-info-card" data-aos="fade-up" data-aos-delay="600">
                 <i className="bi bi-whatsapp flex-shrink-0"></i>
                 <div>
                   <h3>WhatsApp</h3>
@@ -160,7 +160,7 @@ export default function ContactPage() {
             </div>
 
             <div className="col-lg-8">
-              <form className="php-email-form" onSubmit={handleSubmit} data-aos="fade-up" data-aos-delay="200">
+              <form className="php-email-form ui-form-card" onSubmit={handleSubmit} data-aos="fade-up" data-aos-delay="200">
                 <div className="row gy-4">
                   <div className="col-md-6">
                     <input type="text" name="name" className="form-control" placeholder="Your Name" value={formData.name} onChange={handleChange} required />

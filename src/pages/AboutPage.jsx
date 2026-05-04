@@ -69,7 +69,7 @@ export default function AboutPage() {
   const whyChoose = getSection("why_choose_our_school");
 
   return (
-    <main className="main">
+    <main className="main ui-page-shell">
       <Seo
         title="About"
         description="Learn about Lycee Saint Alexandre Sauli de Muhura, our mission, values, and the Barnabite educational approach."
@@ -121,7 +121,7 @@ integrating academic excellence, Christian morals, discipline, and practical ski
 
         <div className="row mb-4">
           <div className="col-md-6 mb-3">
-            <div className="card shadow h-100 py-2 stats-card">
+            <div className="card shadow h-100 py-2 stats-card ui-stat-card">
               <div className="card-body text-center">
                 <h5 className="card-title text-primary">Students</h5>
                 <h2 className="card-text count" data-target="629">0</h2>
@@ -129,7 +129,7 @@ integrating academic excellence, Christian morals, discipline, and practical ski
             </div>
           </div>
           <div className="col-md-6 mb-3">
-            <div className="card shadow h-100 py-2 stats-card">
+            <div className="card shadow h-100 py-2 stats-card ui-stat-card">
               <div className="card-body text-center">
                 <h5 className="card-title text-success">Teachers / Trainers</h5>
                 <h2 className="card-text count" data-target="34">0</h2>
@@ -156,23 +156,23 @@ integrating academic excellence, Christian morals, discipline, and practical ski
         <div className="programs mb-5">
           <h2 className="text-center mb-4" data-aos="fade-up">Academic Programs Offered</h2>
           <div className="row text-center gy-4">
-            <div style={{ background: "#E6C56A" }} className="col-md-4" data-aos="fade-up">
+            <div style={{ background: "#E6C56A" }} className="col-md-4 ui-program-tile" data-aos="fade-up">
               <h5>SOD</h5>
               <p>Software Development</p>
             </div>
-            <div style={{ background: "#E6C56A" }} className="col-md-4" data-aos="fade-up" data-aos-delay="200">
+            <div style={{ background: "#E6C56A" }} className="col-md-4 ui-program-tile" data-aos="fade-up" data-aos-delay="200">
               <h5>NIT</h5>
               <p>Networking & Internet Technology</p>
             </div>
-            <div style={{ background: "#E6C56A" }} className="col-md-4" data-aos="fade-up" data-aos-delay="200">
+            <div style={{ background: "#E6C56A" }} className="col-md-4 ui-program-tile" data-aos="fade-up" data-aos-delay="200">
               <h5>CSA</h5>
               <p>Computer Systems & Architecture</p>
             </div>
-            <div style={{ background: "#E6C56A" }} className="col-md-6" data-aos="fade-up" data-aos-delay="200">
+            <div style={{ background: "#E6C56A" }} className="col-md-6 ui-program-tile" data-aos="fade-up" data-aos-delay="200">
               <h5>FAD</h5>
               <p>Fashion & Design</p>
             </div>
-            <div style={{ background: "#E6C56A" }} className="col-md-6" data-aos="fade-up" data-aos-delay="200">
+            <div style={{ background: "#E6C56A" }} className="col-md-6 ui-program-tile" data-aos="fade-up" data-aos-delay="200">
               <h5>ACC</h5>
               <p>Accounting & Business Management</p>
             </div>
