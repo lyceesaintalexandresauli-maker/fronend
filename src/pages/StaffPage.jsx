@@ -192,7 +192,7 @@ export default function StaffPage() {
                       </div>
                     )}
                     {member.department && (
-                      <span className="badge position-absolute top-0 start-0 m-2" style={{ backgroundColor: "#E6C56A" }}>
+                      <span className="badge position-absolute top-0 start-0 m-2" style={{ backgroundColor: "var(--brand-accent)" }}>
                         <i className="bi bi-building me-1"></i>
                         {member.department}
                       </span>
@@ -266,7 +266,7 @@ export default function StaffPage() {
                     setSearchTerm("");
                   }}
                   className="btn text-white fw-semibold px-4"
-                  style={{ backgroundColor: "#E6C56A" }}
+                  style={{ backgroundColor: "var(--brand-accent)" }}
                 >
                   <i className="bi bi-x-circle me-2"></i>
                   Clear All Filters

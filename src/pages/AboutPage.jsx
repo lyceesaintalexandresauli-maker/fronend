@@ -156,23 +156,23 @@ integrating academic excellence, Christian morals, discipline, and practical ski
         <div className="programs mb-5">
           <h2 className="text-center mb-4" data-aos="fade-up">Academic Programs Offered</h2>
           <div className="row text-center gy-4">
-            <div style={{ background: "#E6C56A" }} className="col-md-4 ui-program-tile" data-aos="fade-up">
+            <div style={{ background: "var(--brand-accent)" }} className="col-md-4 ui-program-tile" data-aos="fade-up">
               <h5>SOD</h5>
               <p>Software Development</p>
             </div>
-            <div style={{ background: "#E6C56A" }} className="col-md-4 ui-program-tile" data-aos="fade-up" data-aos-delay="200">
+            <div style={{ background: "var(--brand-accent)" }} className="col-md-4 ui-program-tile" data-aos="fade-up" data-aos-delay="200">
               <h5>NIT</h5>
               <p>Networking & Internet Technology</p>
             </div>
-            <div style={{ background: "#E6C56A" }} className="col-md-4 ui-program-tile" data-aos="fade-up" data-aos-delay="200">
+            <div style={{ background: "var(--brand-accent)" }} className="col-md-4 ui-program-tile" data-aos="fade-up" data-aos-delay="200">
               <h5>CSA</h5>
               <p>Computer Systems & Architecture</p>
             </div>
-            <div style={{ background: "#E6C56A" }} className="col-md-6 ui-program-tile" data-aos="fade-up" data-aos-delay="200">
+            <div style={{ background: "var(--brand-accent)" }} className="col-md-6 ui-program-tile" data-aos="fade-up" data-aos-delay="200">
               <h5>FAD</h5>
               <p>Fashion & Design</p>
             </div>
-            <div style={{ background: "#E6C56A" }} className="col-md-6 ui-program-tile" data-aos="fade-up" data-aos-delay="200">
+            <div style={{ background: "var(--brand-accent)" }} className="col-md-6 ui-program-tile" data-aos="fade-up" data-aos-delay="200">
               <h5>ACC</h5>
               <p>Accounting & Business Management</p>
             </div>
@@ -197,7 +197,7 @@ integrating academic excellence, Christian morals, discipline, and practical ski
           <div className="col-lg-6 order-lg-1" data-aos="fade-right">
             <div
               className="rounded p-3 p-sm-4 mx-auto"
-              style={{ backgroundColor: "#E6C56A", maxWidth: "460px" }}
+              style={{ backgroundColor: "var(--brand-accent)", maxWidth: "460px" }}
             >
               <img
                 src={mediaUrl(saint.image_path) || "/assets/img/sauli1.jfif"}

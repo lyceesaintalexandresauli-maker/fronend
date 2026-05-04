@@ -10,6 +10,13 @@
 # Font & Color Variables
 # Help: https://bootstrapmade.com/color-system/
 --------------------------------------------------------------*/
+/* Deep burnt orange — shared with React bundle (see src/index.css :root). */
+:root {
+  --brand-accent: #b24d12;
+  --brand-accent-hover: #983f0e;
+  --brand-accent-border: #7c340c;
+}
+
 /* Fonts */
 
 /* === Mobile Navigation Toggle === */
@@ -37,7 +44,7 @@
     left: 0;
     height: 85vh;
     width: 260px;
-    background: #E6C56A;
+    background: var(--brand-accent);
     padding: 8px 12px;
     border-right: 1px solid #ddd;
     box-shadow: 4px 0 18px rgba(0,0,0,.15);
@@ -103,7 +110,7 @@
     max-height: 0;
     overflow-y: auto;
     overflow-x: hidden;
-    background: #E6C56A;
+    background: var(--brand-accent);
     margin: 6px 0 10px 0;
     padding: 0;
     border-radius: 4px;
@@ -288,13 +295,13 @@ body {
 }
 
 a {
-  color: #E6C56A;
+  color: var(--brand-accent);
   text-decoration: none;
   transition: 0.3s;
 }
 
 a:hover {
-  color: color-mix(in srgb, #E6C56A, transparent 25%);
+  color: color-mix(in srgb, var(--brand-accent), transparent 25%);
   text-decoration: none;
 }
 
@@ -345,7 +352,7 @@ h6 {
   width: 24px;
   height: 24px;
   margin: 0 10px -6px 0;
-  border: 3px solid #E6C56A;
+  border: 3px solid var(--brand-accent);
   border-top-color: var(--surface-color);
   animation: php-email-form-loading 1s linear infinite;
 }
@@ -365,7 +372,7 @@ h6 {
 .pulsating-play-btn {
   width: 94px;
   height: 94px;
-  background: radial-gradient(#E6C56A 50%, color-mix(in srgb, #E6C56A, transparent 75%) 52%);
+  background: radial-gradient(var(--brand-accent) 50%, color-mix(in srgb, var(--brand-accent), transparent 75%) 52%);
   border-radius: 50%;
   display: block;
   position: relative;
@@ -384,7 +391,7 @@ h6 {
   animation-timing-function: steps;
   opacity: 1;
   border-radius: 50%;
-  border: 5px solid color-mix(in srgb, #E6C56A, transparent 30%);
+  border: 5px solid color-mix(in srgb, var(--brand-accent), transparent 30%);
   top: -15%;
   left: -15%;
   background: rgba(198, 16, 0, 0);
@@ -423,7 +430,7 @@ h6 {
 }
 
 .pulsating-play-btn:hover:after {
-  border-left: 15px solid #E6C56A;
+  border-left: 15px solid var(--brand-accent);
   transform: scale(20);
 }
 
@@ -441,7 +448,7 @@ h6 {
 
 /* HEADER STYLE — MINIMIZED & CLEAN */
 .header {
-  background: #E6C56A;
+  background: var(--brand-accent);
   padding: 8px 25px;
   position: sticky; top: 0; z-index: 1100;
   box-shadow: 0 2px 6px rgba(0,0,0,0.08);
@@ -566,7 +573,7 @@ h6 {
   .navmenu .dropdown ul {
     margin: 0;
     padding: 10px 0;
-    background: #E6C56A;
+    background: var(--brand-accent);
     display: block;
     position: absolute;
     visibility: hidden;
@@ -678,12 +685,12 @@ h6 {
     justify-content: center;
     border-radius: 50%;
     transition: 0.3s;
-    background-color: color-mix(in srgb, #E6C56A, transparent 90%);
+    background-color: color-mix(in srgb, var(--brand-accent), transparent 90%);
   }
 
   .navmenu a i:hover,
   .navmenu a:focus i:hover {
-    background-color: #E6C56A;
+    background-color: var(--brand-accent);
     color: whitesmoke;
   }
 
@@ -695,7 +702,7 @@ h6 {
 
   .navmenu .active i,
   .navmenu .active:focus i {
-    background-color: #E6C56A;
+    background-color: var(--brand-accent);
     color: var(--contrast-color);
     transform: rotate(180deg);
   }
@@ -706,7 +713,7 @@ h6 {
     z-index: 99;
     padding: 10px 0;
     margin: 10px 20px;
-    background-color: #E6C56A;
+    background-color: var(--brand-accent);
     transition: all 0.5s ease-in-out;
   }
 
@@ -749,9 +756,9 @@ h6 {
 /* ---------------- FOOTER STYLE (MINIMIZED) ---------------- */
 
 .footer {
-  background: #e6c56a;
+  background: var(--brand-accent);
   padding: 25px 0 10px;       /* Reduced height */
-  color: #202020;
+  color: rgba(247, 239, 232, 0.94);
   font-size: 15px;
 }
 
@@ -779,7 +786,7 @@ h6 {
   text-align: center;
   margin-top: 15px;
   padding-top: 8px;
-  border-top: 1.5px solid rgba(0,0,0,0.2);
+  border-top: 1.5px solid rgba(247, 239, 232, 0.22);
   font-size: 14px;
   font-weight: 600;
 }
@@ -838,7 +845,7 @@ h6 {
   top: calc(50% - 30px);
   left: calc(50% - 30px);
   border: 6px solid #ffffff;
-  border-color: #E6C56A transparent #E6C56A transparent;
+  border-color: var(--brand-accent) transparent var(--brand-accent) transparent;
   border-radius: 50%;
   width: 60px;
   height: 60px;
@@ -865,7 +872,7 @@ h6 {
   right: 15px;
   bottom: -15px;
   z-index: 99999;
-  background-color: #E6C56A;
+  background-color: var(--brand-accent);
   width: 44px;
   height: 44px;
   border-radius: 50px;
@@ -879,7 +886,7 @@ h6 {
 }
 
 .scroll-top:hover {
-  background-color: color-mix(in srgb, #E6C56A, transparent 20%);
+  background-color: color-mix(in srgb, var(--brand-accent), transparent 20%);
   color: var(--contrast-color);
 }
 
@@ -903,7 +910,7 @@ h6 {
 --------------------------------------------------------------*/
 .page-title {
   --default-color: var(--contrast-color);
-  --background-color: #E6C56A;
+  --background-color: var(--brand-accent);
   --heading-color: var(--contrast-color);
   color: var(--default-color);
   background-color: var(--background-color);
@@ -921,7 +928,7 @@ h6 {
 }
 
 .page-title nav {
-  background-color: color-mix(in srgb, #E6C56A 90%, black 5%);
+  background-color: color-mix(in srgb, var(--brand-accent) 88%, black 12%);
   padding: 20px 0;
 }
 
@@ -994,7 +1001,7 @@ section,
   width: 120px;
   height: 1px;
   display: inline-block;
-  background: #E6C56A;
+  background: var(--brand-accent);
   margin: 4px 10px;
 }
 
@@ -1070,8 +1077,8 @@ section,
 }
 
 .hero .btn-get-started:hover {
-  background: #E6C56A;
-  border: 2px solid #E6C56A;
+  background: var(--brand-accent);
+  border: 2px solid var(--brand-accent);
 }
 
 @media (max-width: 768px) {
@@ -1104,7 +1111,7 @@ section,
 .about .content ul i {
   font-size: 1.25rem;
   margin-right: 4px;
-  color: #E6C56A;
+  color: var(--brand-accent);
 }
 
 .about .content p:last-child {
@@ -1112,7 +1119,7 @@ section,
 }
 
 .about .content .read-more {
-  background: #E6C56A;
+  background: var(--brand-accent);
   color: var(--contrast-color);
   font-family: var(--heading-font);
   font-weight: 500;
@@ -1134,7 +1141,7 @@ section,
 }
 
 .about .content .read-more:hover {
-  background: color-mix(in srgb, #E6C56A, transparent 20%);
+  background: color-mix(in srgb, var(--brand-accent), transparent 20%);
   padding-right: 19px;
 }
 
@@ -1157,7 +1164,7 @@ section,
 .counts .stats-item span {
   font-size: 48px;
   display: block;
-  color: #E6C56A;
+  color: var(--brand-accent);
   font-weight: 700;
 }
 
@@ -1175,7 +1182,7 @@ section,
 --------------------------------------------------------------*/
 .why-us .why-box {
   color: var(--contrast-color);
-  background: #E6C56A;
+  background: var(--brand-accent);
   padding: 30px;
 }
 
@@ -1204,7 +1211,7 @@ section,
 }
 
 .why-us .why-box .more-btn:hover {
-  color: #E6C56A;
+  color: var(--brand-accent);
   background: var(--surface-color);
 }
 
@@ -1218,10 +1225,10 @@ section,
 }
 
 .why-us .icon-box i {
-  color: #E6C56A;
+  color: var(--brand-accent);
   font-size: 32px;
   margin-bottom: 30px;
-  background: color-mix(in srgb, #E6C56A, transparent 95%);
+  background: color-mix(in srgb, var(--brand-accent), transparent 95%);
   border-radius: 50px;
   display: flex;
   align-items: center;
@@ -1244,7 +1251,7 @@ section,
 
 .why-us .icon-box:hover i {
   color: var(--contrast-color);
-  background: #E6C56A;
+  background: var(--brand-accent);
 }
 
 /*--------------------------------------------------------------
@@ -1284,11 +1291,11 @@ section,
 }
 
 .features .features-item:hover {
-  border-color: #E6C56A;
+  border-color: var(--brand-accent);
 }
 
 .features .features-item:hover h3 a {
-  color: #E6C56A;
+  color: var(--brand-accent);
 }
 
 /*--------------------------------------------------------------
@@ -1315,11 +1322,11 @@ section,
 }
 
 .courses .course-content h3 a:hover {
-  color: #E6C56A;
+  color: var(--brand-accent);
 }
 
 .courses .course-content .category {
-  background: #E6C56A;
+  background: var(--brand-accent);
   color: var(--contrast-color);
   font-size: 14px;
   padding: 6px 14px;
@@ -1358,7 +1365,7 @@ section,
 }
 
 .courses .trainer .trainer-profile .trainer-link:hover {
-  color: #E6C56A;
+  color: var(--brand-accent);
 }
 
 .courses .trainer .trainer-rank {
@@ -1424,7 +1431,7 @@ section,
 }
 
 .trainers-index .member .social a:hover {
-  color: #E6C56A;
+  color: var(--brand-accent);
 }
 
 .trainers-index .member .social i {
@@ -1481,7 +1488,7 @@ section,
 .about-us .content ul i {
   font-size: 1.25rem;
   margin-right: 4px;
-  color: #E6C56A;
+  color: var(--brand-accent);
 }
 
 .about-us .content p:last-child {
@@ -1508,7 +1515,7 @@ section,
 .about-us .content ul i {
   font-size: 1.25rem;
   margin-right: 4px;
-  color: #E6C56A;
+  color: var(--brand-accent);
 }
 
 .about-us .content p:last-child {
@@ -1577,7 +1584,7 @@ section,
 
 .testimonials .testimonial-item .quote-icon-left,
 .testimonials .testimonial-item .quote-icon-right {
-  color: color-mix(in srgb, #E6C56A, transparent 60%);
+  color: color-mix(in srgb, var(--brand-accent), transparent 60%);
   font-size: 26px;
   line-height: 0;
 }
@@ -1615,11 +1622,11 @@ section,
   height: 12px;
   background-color: var(--background-color);
   opacity: 1;
-  border: 1px solid #E6C56A;
+  border: 1px solid var(--brand-accent);
 }
 
 .testimonials .swiper-pagination .swiper-pagination-bullet-active {
-  background-color: #E6C56A;
+  background-color: var(--brand-accent);
 }
 
 @media (max-width: 767px) {
@@ -1675,7 +1682,7 @@ section,
   display: block;
   width: 60px;
   height: 1px;
-  background: #E6C56A;
+  background: var(--brand-accent);
   bottom: 0;
   left: 0;
 }
@@ -1699,7 +1706,7 @@ section,
 }
 
 .courses-course-details .course-info a {
-  color: #E6C56A;
+  color: var(--brand-accent);
 }
 
 /*--------------------------------------------------------------
@@ -1726,13 +1733,13 @@ section,
 }
 
 .tabs .nav-link:hover {
-  color: #E6C56A;
+  color: var(--brand-accent);
 }
 
 .tabs .nav-link.active {
   background-color: var(--surface-color);
-  color: #E6C56A;
-  border-color: #E6C56A;
+  color: var(--brand-accent);
+  border-color: var(--brand-accent);
 }
 
 .tabs .tab-pane.active {
@@ -1760,8 +1767,8 @@ section,
   }
 
   .tabs .nav-link.active {
-    color: #E6C56A;
-    background: #E6C56A;
+    color: var(--brand-accent);
+    background: var(--brand-accent);
   }
 }
 
@@ -1812,7 +1819,7 @@ section,
 }
 
 .trainers .member .member-img .social a:hover {
-  color: #E6C56A;
+  color: var(--brand-accent);
 }
 
 .trainers .member .member-info {
@@ -1898,11 +1905,11 @@ section,
 }
 
 .events .card:hover .card-body {
-  border-color: #E6C56A;
+  border-color: var(--brand-accent);
 }
 
 .events .card:hover .card-body .card-title a {
-  color: #E6C56A;
+  color: var(--brand-accent);
 }
 
 /*--------------------------------------------------------------
@@ -1958,7 +1965,7 @@ section,
 }
 
 .pricing .pricing-item ul i {
-  color: #E6C56A;
+  color: var(--brand-accent);
   font-size: 18px;
   padding-right: 4px;
 }
@@ -1976,7 +1983,7 @@ section,
 }
 
 .pricing .btn-buy {
-  background: #E6C56A;
+  background: var(--brand-accent);
   color: var(--contrast-color);
   display: inline-block;
   padding: 8px 35px 10px 35px;
@@ -1990,16 +1997,16 @@ section,
 }
 
 .pricing .btn-buy:hover {
-  background: color-mix(in srgb, #E6C56A, transparent 20%);
+  background: color-mix(in srgb, var(--brand-accent), transparent 20%);
 }
 
 .pricing .featured h3 {
-  background: #E6C56A;
+  background: var(--brand-accent);
   color: var(--contrast-color);
 }
 
 .pricing .advanced {
-  background: #E6C56A;
+  background: var(--brand-accent);
   color: var(--contrast-color);
   width: 200px;
   position: absolute;
@@ -2025,7 +2032,7 @@ section,
 
 .contact .info-item i {
   color: var(--contrast-color);
-  background: #E6C56A;
+  background: var(--brand-accent);
   font-size: 20px;
   width: 48px;
   height: 48px;
@@ -2069,7 +2076,7 @@ section,
 .contact .php-email-form input[type=text]:focus,
 .contact .php-email-form input[type=email]:focus,
 .contact .php-email-form textarea:focus {
-  border-color: #E6C56A;
+  border-color: var(--brand-accent);
 }
 
 .contact .php-email-form input[type=text]::placeholder,
@@ -2080,7 +2087,7 @@ section,
 
 .contact .php-email-form button[type=submit] {
   color: var(--contrast-color);
-  background: #E6C56A;
+  background: var(--brand-accent);
   border: 0;
   padding: 10px 30px 12px 30px;
   transition: 0.4s;
@@ -2088,7 +2095,7 @@ section,
 }
 
 .contact .php-email-form button[type=submit]:hover {
-  background: color-mix(in srgb, #E6C56A, transparent 20%);
+  background: color-mix(in srgb, var(--brand-accent), transparent 20%);
 }
 
 /*--------------------------------------------------------------
@@ -2223,7 +2230,7 @@ section,
 
 /* === FOOTER STYLING === */
 .footer {
-  background: #E6C56A;   /* your wall yellow */
+  background: var(--brand-accent);   /* your wall yellow */
   color: #1b1b1b;        /* dark text for contrast */
   padding: 60px 0 30px 0;
   font-size: 15px;

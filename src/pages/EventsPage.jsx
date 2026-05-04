@@ -9,7 +9,7 @@ export default function EventsPage() {
   const [error, setError] = useState(null);
   const [filterCategory, setFilterCategory] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
-  const [eventBgColor, setEventBgColor] = useState("#E6C56A");
+  const [eventBgColor, setEventBgColor] = useState("var(--brand-accent)");
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [activeSlide, setActiveSlide] = useState(0);
   const sliderRef = useRef(null);
@@ -172,18 +172,18 @@ export default function EventsPage() {
                   />
                 )}
                 <div className="mb-3">
-                  <span className="badge" style={{ backgroundColor: "#E6C56A" }}>
+                  <span className="badge" style={{ backgroundColor: "var(--brand-accent)" }}>
                     {selectedEvent.category || "General"}
                   </span>
                 </div>
                 <div className="mb-3 small text-muted">
                   <div className="d-flex align-items-center mb-2">
-                    <i className="bi bi-calendar-event me-2" style={{ color: "#E6C56A" }}></i>
+                    <i className="bi bi-calendar-event me-2" style={{ color: "var(--brand-accent)" }}></i>
                     <span>{formatEventDate(selectedEvent.created_at || selectedEvent.date)}</span>
                   </div>
                   {selectedEvent.location && (
                     <div className="d-flex align-items-center mb-2">
-                      <i className="bi bi-geo-alt me-2" style={{ color: "#E6C56A" }}></i>
+                      <i className="bi bi-geo-alt me-2" style={{ color: "var(--brand-accent)" }}></i>
                       <span>{selectedEvent.location}</span>
                     </div>
                   )}
@@ -197,7 +197,7 @@ export default function EventsPage() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn fw-semibold text-white"
-                    style={{ backgroundColor: "#E6C56A" }}
+                    style={{ backgroundColor: "var(--brand-accent)" }}
                   >
                     Register Now
                   </a>
@@ -208,7 +208,7 @@ export default function EventsPage() {
         </div>
       )}
 
-      <div className="page-title" data-aos="fade" style={{ backgroundColor: "#E6C56A" }}>
+      <div className="page-title" data-aos="fade" style={{ backgroundColor: "var(--brand-accent)" }}>
         <div className="heading">
           <div className="container">
             <div className="row d-flex justify-content-center text-center py-5">
@@ -261,7 +261,7 @@ export default function EventsPage() {
               onClick={() => {
                 setFilterCategory("all");
                 setSearchTerm("");
-                setEventBgColor("#E6C56A");
+                setEventBgColor("var(--brand-accent)");
               }}
             >
               Reset
@@ -294,7 +294,7 @@ export default function EventsPage() {
                 style={{
                   width: "46px",
                   height: "46px",
-                  backgroundColor: "#E6C56A",
+                  backgroundColor: "var(--brand-accent)",
                   color: "#000",
                   boxShadow: "0 10px 24px rgba(230,197,106,0.35)",
                 }}
@@ -309,7 +309,7 @@ export default function EventsPage() {
                 style={{
                   width: "46px",
                   height: "46px",
-                  backgroundColor: "#E6C56A",
+                  backgroundColor: "var(--brand-accent)",
                   color: "#000",
                   boxShadow: "0 10px 24px rgba(230,197,106,0.35)",
                 }}
@@ -362,7 +362,7 @@ export default function EventsPage() {
                       cursor: "pointer",
                       borderRadius: "1.5rem",
                       backgroundColor: eventBgColor,
-                      border: "2px solid #E6C56A",
+                      border: "2px solid var(--brand-accent)",
                       boxShadow: index === activeSlide
                         ? "0 24px 50px rgba(0,0,0,0.22)"
                         : "0 16px 32px rgba(0,0,0,0.12)",
@@ -402,7 +402,7 @@ export default function EventsPage() {
                       <div className="position-absolute top-0 start-0 p-3">
                         <span
                           className="badge text-dark fw-semibold px-3 py-2"
-                          style={{ backgroundColor: "#E6C56A", borderRadius: "999px" }}
+                          style={{ backgroundColor: "var(--brand-accent)", borderRadius: "999px" }}
                         >
                           {event.category || "General"}
                         </span>
@@ -424,7 +424,7 @@ export default function EventsPage() {
                       <button
                         className="btn btn-sm fw-semibold mt-auto align-self-start px-4 py-2"
                         style={{
-                          backgroundColor: "#E6C56A",
+                          backgroundColor: "var(--brand-accent)",
                           color: "#000",
                           borderRadius: "999px",
                         }}

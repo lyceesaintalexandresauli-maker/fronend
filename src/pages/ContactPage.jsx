@@ -183,7 +183,7 @@ export default function ContactPage() {
                     <div className="error-message">{error}</div>
                     <div className="sent-message">{status === "sent" && "Your message has been sent. Thank you!"}</div>
 
-                    <button type="submit" className="btn" style={{ backgroundColor: '#E6C56A', color: 'white', fontWeight: '600' }} disabled={status === "loading"}>
+                    <button type="submit" className="btn" style={{ backgroundColor: "var(--brand-accent)", color: "#f7efe8", fontWeight: "600" }} disabled={status === "loading"}>
                       Send Message
                     </button>
                   </div>

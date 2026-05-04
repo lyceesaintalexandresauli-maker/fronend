@@ -4,7 +4,7 @@ export default function PageLoader({ label = "Loading..." }) {
       <div
         className="spinner-border"
         style={{
-          color: "#E6C56A",
+          color: "var(--brand-accent)",
           width: "2.25rem",
           height: "2.25rem",
           borderWidth: "0.22em",

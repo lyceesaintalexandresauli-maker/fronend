@@ -46,7 +46,8 @@ export default function StudentDashboardPage() {
 
       <div className="relative isolate overflow-hidden bg-gradient-to-br from-[#003d7a] via-[#004080] to-[#001f40] pb-28 pt-10 sm:pt-14">
         <div
-          className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[#e6c56a]/20 blur-3xl"
+          className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full blur-3xl"
+          style={{ backgroundColor: "var(--brand-accent-soft)" }}
           aria-hidden
         />
         <div
@@ -54,7 +55,7 @@ export default function StudentDashboardPage() {
           aria-hidden
         />
         <div className="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-[#e6c56a]/90">
+          <p className="text-brand-muted text-center text-xs font-semibold uppercase tracking-[0.2em]">
             Student portal
           </p>
           <h1 className="mt-3 text-center text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
@@ -74,7 +75,8 @@ export default function StudentDashboardPage() {
               <div className="h-20 bg-gradient-to-r from-[#004080] to-[#002a52]" />
               <div className="relative -mt-12 px-6 pb-6 text-center">
                 <div
-                  className="mx-auto flex h-24 w-24 items-center justify-center rounded-2xl border-4 border-white bg-[#e6c56a] text-3xl font-bold text-[#1a1a1a] shadow-md"
+                  className="mx-auto flex h-24 w-24 items-center justify-center rounded-2xl border-4 border-white text-3xl font-bold shadow-md"
+                  style={{ backgroundColor: "var(--brand-accent)", color: "#f7efe8" }}
                   aria-hidden
                 >
                   {initial}
@@ -94,7 +96,7 @@ export default function StudentDashboardPage() {
                   </button>
                   <Link
                     to="/"
-                    className="inline-flex items-center justify-center rounded-xl bg-[#e6c56a] px-4 py-2.5 text-sm font-semibold text-[#1a1a1a] shadow-sm ring-1 ring-[#c8a63e]/60 transition hover:bg-[#d6b04c]"
+                    className="link-brand-accent inline-flex items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold transition"
                   >
                     School home
                   </Link>
@@ -125,7 +127,7 @@ export default function StudentDashboardPage() {
                       to={to}
                       className="group flex gap-4 rounded-xl border border-slate-100 bg-slate-50/80 p-4 transition hover:border-[#004080]/25 hover:bg-white hover:shadow-md"
                     >
-                      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white text-xl text-[#004080] shadow-sm ring-1 ring-slate-200/80 transition group-hover:bg-[#004080] group-hover:text-[#e6c56a] group-hover:ring-[#004080]">
+                      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white text-xl text-[#004080] shadow-sm ring-1 ring-slate-200/80 transition group-hover:bg-[#004080] group-hover:text-[color:var(--brand-on-dark)] group-hover:ring-[#004080]">
                         <i className={`bi ${icon}`} aria-hidden />
                       </span>
                       <span className="min-w-0 text-left">

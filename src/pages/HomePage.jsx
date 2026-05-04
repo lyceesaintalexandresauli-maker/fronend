@@ -156,7 +156,7 @@ export default function HomePage() {
 
       {/* Events Section */}
       {events.length > 0 && (
-        <section className="py-2" style={{ backgroundColor: '#E6C56A' }}>
+        <section className="py-2" style={{ backgroundColor: 'var(--brand-accent)' }}>
           <div className="container" data-aos="fade-up">
             <div className="mb-2">
               <h2 className="fw-bold mb-1 text-white" style={{ fontSize: '1.5rem' }}>Recent Events</h2>
@@ -185,7 +185,7 @@ export default function HomePage() {
                           />
                         )}
                       </div>
-                      <div className="p-2 d-flex flex-column justify-content-center" style={{ flex: 1, backgroundColor: '#E6C56A' }}>
+                      <div className="p-2 d-flex flex-column justify-content-center" style={{ flex: 1, backgroundColor: 'var(--brand-accent)' }}>
                         <span className="badge d-inline-block mb-0 px-2 py-1" style={{ backgroundColor: 'white', color: '#333', fontSize: '0.7rem', borderRadius: '4px', width: 'fit-content' }}>
                           {event.category || 'General'}
                         </span>
@@ -282,7 +282,7 @@ export default function HomePage() {
         <div className="container" data-aos="fade-up">
           <div className="row gy-4 align-items-center">
             <div className="col-lg-5 order-lg-2" data-aos="fade-left" data-aos-delay="100">
-              <div className="about-img position-relative" style={{ backgroundColor: '#E6C56A', padding: '2rem', borderRadius: '8px' }}>
+              <div className="about-img position-relative" style={{ backgroundColor: 'var(--brand-accent)', padding: '2rem', borderRadius: '8px' }}>
                 <img
                   src={mediaUrl(content['about']?.[0]?.image_path) || "/assets/img/saul2.jpg"}
                   className="img-fluid rounded"
@@ -301,15 +301,15 @@ export default function HomePage() {
               
               <ul className="list-unstyled mb-4">
                 <li className="mb-3 d-flex align-items-start">
-                  <i className="bi bi-check-circle-circle me-2" style={{ color: '#E6C56A', fontSize: '1.3rem', marginTop: '2px' }}></i>
+                  <i className="bi bi-check-circle-circle me-2" style={{ color: 'var(--brand-accent)', fontSize: '1.3rem', marginTop: '2px' }}></i>
                   <span style={{ fontSize: '1.05rem' }}>Strong discipline and character formation.</span>
                 </li>
                 <li className="mb-3 d-flex align-items-start">
-                  <i className="bi bi-check-circle-circle me-2" style={{ color: '#E6C56A', fontSize: '1.3rem', marginTop: '2px' }}></i>
+                  <i className="bi bi-check-circle-circle me-2" style={{ color: 'var(--brand-accent)', fontSize: '1.3rem', marginTop: '2px' }}></i>
                   <span style={{ fontSize: '1.05rem' }}>High-quality technical and vocational training.</span>
                 </li>
                 <li className="mb-3 d-flex align-items-start">
-                  <i className="bi bi-check-circle-circle me-2" style={{ color: '#E6C56A', fontSize: '1.3rem', marginTop: '2px' }}></i>
+                  <i className="bi bi-check-circle-circle me-2" style={{ color: 'var(--brand-accent)', fontSize: '1.3rem', marginTop: '2px' }}></i>
                   <span style={{ fontSize: '1.05rem' }}>Catholic education rooted in moral and spiritual values.</span>
                 </li>
               </ul>
@@ -327,7 +327,7 @@ export default function HomePage() {
         <div className="container" data-aos="fade-up">
           <div className="row gy-4">
             <div className="col-lg-4" data-aos="fade-up" data-aos-delay="100">
-              <div className="why-box h-100 p-5" style={{ backgroundColor: '#E6C56A', color: 'white', borderRadius: '8px' }}>
+              <div className="why-box h-100 p-5" style={{ backgroundColor: 'var(--brand-accent)', color: 'white', borderRadius: '8px' }}>
                 <h3 className="mb-4" style={{ fontSize: '2rem', fontWeight: '700' }}>
                   {content['index']?.[0]?.title || 'Why Choose Our School?'}
                 </h3>
@@ -344,7 +344,7 @@ export default function HomePage() {
                 <div className="col-md-4" data-aos="fade-up" data-aos-delay="200">
                   <div className="icon-box text-center h-100 p-4" style={{ border: '1px solid #e0e0e0', borderRadius: '8px', backgroundColor: 'white' }}>
                     <div className="mb-3" style={{ width: '60px', height: '60px', margin: '0 auto', borderRadius: '50%', backgroundColor: '#FFF8E7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <i className="bi bi-clipboard-data" style={{ fontSize: '1.8rem', color: '#E6C56A' }}></i>
+                      <i className="bi bi-clipboard-data" style={{ fontSize: '1.8rem', color: 'var(--brand-accent)' }}></i>
                     </div>
                     <h4 className="mb-3" style={{ fontSize: '1.3rem', fontWeight: '700', color: '#333' }}>Technical Excellence</h4>
                     <p className="text-muted mb-0" style={{ fontSize: '0.95rem' }}>Quality training in ICT, Fashion Design, and Accounting.</p>
@@ -353,7 +353,7 @@ export default function HomePage() {
                 <div className="col-md-4" data-aos="fade-up" data-aos-delay="300">
                   <div className="icon-box text-center h-100 p-4" style={{ border: '1px solid #e0e0e0', borderRadius: '8px', backgroundColor: 'white' }}>
                     <div className="mb-3" style={{ width: '60px', height: '60px', margin: '0 auto', borderRadius: '50%', backgroundColor: '#FFF8E7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <i className="bi bi-gem" style={{ fontSize: '1.8rem', color: '#E6C56A' }}></i>
+                      <i className="bi bi-gem" style={{ fontSize: '1.8rem', color: 'var(--brand-accent)' }}></i>
                     </div>
                     <h4 className="mb-3" style={{ fontSize: '1.3rem', fontWeight: '700', color: '#333' }}>Discipline & Integrity</h4>
                     <p className="text-muted mb-0" style={{ fontSize: '0.95rem' }}>We mold students into confident, disciplined citizens.</p>
@@ -362,7 +362,7 @@ export default function HomePage() {
                 <div className="col-md-4" data-aos="fade-up" data-aos-delay="400">
                   <div className="icon-box text-center h-100 p-4" style={{ border: '1px solid #e0e0e0', borderRadius: '8px', backgroundColor: 'white' }}>
                     <div className="mb-3" style={{ width: '60px', height: '60px', margin: '0 auto', borderRadius: '50%', backgroundColor: '#FFF8E7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <i className="bi bi-book" style={{ fontSize: '1.8rem', color: '#E6C56A' }}></i>
+                      <i className="bi bi-book" style={{ fontSize: '1.8rem', color: 'var(--brand-accent)' }}></i>
                     </div>
                     <h4 className="mb-3" style={{ fontSize: '1.3rem', fontWeight: '700', color: '#333' }}>Faith & Moral Formation</h4>
                     <p className="text-muted mb-0" style={{ fontSize: '0.95rem' }}>Daily spiritual guidance from Barnabite Fathers.</p>
@@ -395,7 +395,7 @@ export default function HomePage() {
                       loading="lazy"
                       decoding="async"
                       />
-                      <span className="badge position-absolute top-0 start-0 m-2" style={{ backgroundColor: '#E6C56A' }}>
+                      <span className="badge position-absolute top-0 start-0 m-2" style={{ backgroundColor: 'var(--brand-accent)' }}>
                         {dep.code || dep.name?.substring(0,3).toUpperCase() || "N/A"}
                       </span>
                     </div>

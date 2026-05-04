@@ -161,7 +161,7 @@ export default function Layout() {
         id="header"
         className="header fixed-top"
         style={{
-          backgroundColor: "#E6C56A",
+          backgroundColor: "var(--brand-accent)",
           padding: "10px 0",
           position: "fixed",
           top: "0",
@@ -213,13 +213,13 @@ export default function Layout() {
             <Link
               className="ms-3 d-none d-xl-inline-block rounded-pill px-3 py-2 fw-bold text-decoration-none flex-shrink-0"
               to="/login"
-              style={{ backgroundColor: "white", color: "#333", border: "2px solid #333", fontSize: "0.9rem" }}
+              style={{ backgroundColor: "white", color: "#2a1810", border: "2px solid rgba(247,239,232,0.85)", fontSize: "0.9rem" }}
             >
               Student Portal
             </Link>
             <i
               className={`mobile-nav-toggle d-xl-none bi ms-3 ${menuOpen ? "bi-x" : "bi-list"}`}
-              style={{ fontSize: "1.5rem", cursor: "pointer", color: "#333", flexShrink: "0" }}
+              style={{ fontSize: "1.5rem", cursor: "pointer", color: "#f7efe8", flexShrink: "0" }}
               onClick={() => setMenuOpen((value) => !value)}
             ></i>
           </nav>

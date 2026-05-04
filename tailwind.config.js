@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        'wall-yellow': '#E6C56A',
+        'wall-yellow': '#b24d12',
       },
     },
   },
