@@ -474,7 +474,7 @@ function ProfileSecurityPanel({
     <div className="adm-panel">
       <div className="adm-panel-head">
         <h3>Admin Profile & Security</h3>
-        <p>Connected to `/auth/me`, `/auth/me/password`, `/auth/me/profile-image` using Supabase Auth</p>
+        <p>Update your profile, password, and profile image below.</p>
       </div>
 
       <div className="adm-profile-grid">
@@ -505,7 +505,7 @@ function ProfileSecurityPanel({
             <h4>Security Status</h4>
             <p>Role: <strong>{user?.role || "admin"}</strong></p>
             <p>Account: <strong>{user?.is_active === false ? "Disabled" : "Active"}</strong></p>
-            <p>Authentication: <strong>Supabase email/password</strong></p>
+            <p>Authentication: <strong>Email and password</strong></p>
             {user?.profile_image && <img className="adm-avatar" src={mediaUrl(user.profile_image)} alt="Profile" />}
           </div>
         </div>
@@ -772,7 +772,7 @@ export default function AdminDashboard() {
     if (!nextPassword) return;
     try {
       await api.put(`/users/${userId}/password`, { password: nextPassword });
-      setStatus("User password reset in Supabase Auth.");
+      setStatus("User password was reset.");
       await loadEverything();
     } catch (error) {
       setStatus(getApiError(error, "Failed to reset password"));

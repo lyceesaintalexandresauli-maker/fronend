@@ -138,19 +138,10 @@
 
 
 function login() {
-  const username = document.querySelector('.username').value.trim();
-  const password = document.querySelector('.password').value.trim();
-
-  // Static credentials for different roles
-  if (username === 'admin' && password === '12345') {
-    // Admin login successful, redirect to admin dashboard
-    window.location.href = '../lsasdm/staff/index.html'; // Admin page
-  } else if (username === 'secretary' && password === '12345') {
-    // Secretary login successful, redirect to secretary page
-    window.location.href = '../lsasdm/Secretary/index.html'; // Secretary page
-  } else {
-    // Credentials do not match
-    document.getElementById('loginError').style.display = 'block';
+  const err = document.getElementById("loginError");
+  if (err) {
+    err.textContent = "This page is not used for sign-in. Use the main website login.";
+    err.style.display = "block";
   }
 }
 

@@ -1,7 +1,7 @@
+import { useMemo } from "react";
 import { useLocation } from "react-router-dom";
+import { resolveSiteUrl } from "../config/publicOrigin";
 import Seo from "./Seo";
-
-const SITE_URL = (import.meta.env.VITE_SITE_URL || "https://lycee-muhura.onrender.com").replace(/\/+$/, "");
 
 const PAGE_META = {
   "/": {
@@ -46,7 +46,7 @@ const PAGE_META = {
   },
   "/login": {
     title: "Login",
-    description: "Secure staff portal login for Lycee Saint Alexandre Sauli de Muhura.",
+    description: "Secure portal login for Lycee Saint Alexandre Sauli de Muhura.",
     robots: "noindex,nofollow",
   },
   "/timetables": {
@@ -55,26 +55,19 @@ const PAGE_META = {
   },
 };
 
-const structuredData = {
-  "@context": "https://schema.org",
-  "@type": "EducationalOrganization",
-  name: "Lycee Saint Alexandre Sauli de Muhura",
-  url: SITE_URL,
-  logo: `${SITE_URL}/assets/img/logo1.jpg`,
-  sameAs: [SITE_URL],
-  address: {
-    "@type": "PostalAddress",
-    addressCountry: "RW",
-    addressRegion: "Eastern Province",
-    addressLocality: "Gatsibo District",
-  },
-};
-
 const buildFallbackMeta = (pathname) => {
   if (pathname.startsWith("/admin") || pathname === "/profile") {
     return {
       title: "Staff Portal",
       description: "Staff-only portal page for Lycee Saint Alexandre Sauli de Muhura.",
+      robots: "noindex,nofollow",
+    };
+  }
+
+  if (pathname.startsWith("/student")) {
+    return {
+      title: "Student Portal",
+      description: "Student portal for Lycee Saint Alexandre Sauli de Muhura.",
       robots: "noindex,nofollow",
     };
   }
@@ -97,6 +90,28 @@ export default function RouteSeo() {
   const { pathname } = useLocation();
   const normalizedPath = pathname === "/index" ? "/" : pathname;
   const meta = PAGE_META[normalizedPath] || buildFallbackMeta(normalizedPath);
+  const siteUrl = resolveSiteUrl();
+
+  const structuredData = useMemo(() => {
+    const base = {
+      "@context": "https://schema.org",
+      "@type": "EducationalOrganization",
+      name: "Lycee Saint Alexandre Sauli de Muhura",
+      address: {
+        "@type": "PostalAddress",
+        addressCountry: "RW",
+        addressRegion: "Eastern Province",
+        addressLocality: "Gatsibo District",
+      },
+    };
+    if (!siteUrl) return base;
+    return {
+      ...base,
+      url: siteUrl,
+      logo: `${siteUrl.replace(/\/$/, "")}/assets/img/logo1.jpg`,
+      sameAs: [siteUrl],
+    };
+  }, [siteUrl]);
 
   return (
     <Seo

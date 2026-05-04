@@ -86,7 +86,7 @@ export default function ProfilePage() {
           type="password"
           value={pwd.new_password}
           onChange={(e) => setPwd({ ...pwd, new_password: e.target.value })}
-          placeholder="New Supabase password"
+          placeholder="New password (min. 8 characters)"
         />
         <button className="btn">Update Password</button>
       </form>

@@ -1,32 +1,40 @@
 import axios from "axios";
 
 const LOCAL_API_BASE_URL = "http://localhost:5000";
-const DEFAULT_REMOTE_API_BASE_URL = "https://muhura-backend.onrender.com";
 const LOCAL_API_ORIGINS = new Set(["http://localhost:5000", "http://127.0.0.1:5000"]);
 
 const trimTrailingSlash = (value = "") => String(value).replace(/\/+$/, "");
 const isLocalValue = (value = "") => LOCAL_API_ORIGINS.has(trimTrailingSlash(value));
 const isLocalFrontend = () =>
   /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(window.location.origin);
-const getCurrentOrigin = () => trimTrailingSlash(window.location.origin || "");
 
 const resolveApiBaseUrl = () => {
   const configured = trimTrailingSlash(import.meta.env.VITE_API_BASE_URL || "");
-  if (configured && (!isLocalValue(configured) || isLocalFrontend())) return configured;
-  return isLocalFrontend() ? LOCAL_API_BASE_URL : DEFAULT_REMOTE_API_BASE_URL;
+  if (configured && (!isLocalValue(configured) || isLocalFrontend())) {
+    return configured;
+  }
+  if (isLocalFrontend()) {
+    return LOCAL_API_BASE_URL;
+  }
+  return "";
 };
 
 const resolveAssetsBaseUrl = (apiBaseUrl) => {
   const configured = trimTrailingSlash(import.meta.env.VITE_ASSETS_BASE_URL || "");
-  if (configured && (!isLocalValue(configured) || isLocalFrontend())) return configured;
-  return isLocalFrontend() ? "" : apiBaseUrl;
+  if (configured && (!isLocalValue(configured) || isLocalFrontend())) {
+    return configured;
+  }
+  if (isLocalFrontend()) {
+    return "";
+  }
+  return apiBaseUrl;
 };
 
 export const API_BASE_URL = resolveApiBaseUrl();
 export const ASSETS_BASE_URL = resolveAssetsBaseUrl(API_BASE_URL);
 
 export const api = axios.create({
-  baseURL: `${API_BASE_URL}/api`,
+  baseURL: API_BASE_URL ? `${API_BASE_URL}/api` : "/api",
   timeout: 10000,
 });
 
@@ -35,7 +43,6 @@ const RETRYABLE_STATUS = new Set([502, 503, 504]);
 const RETRY_BLOCKLIST = ["/api/auth/me"];
 
 api.interceptors.request.use((config) => {
-  // 🔥 FIX: safer token handling (prevents invalid/undefined token issues)
   const token =
     localStorage.getItem("auth_token") ||
     localStorage.getItem("sb-access-token");
@@ -85,13 +92,14 @@ export const mediaUrl = (inputPath) => {
     if (!isLocalFrontend()) {
       return inputPath.replace(
         /^https?:\/\/(localhost|127\.0\.0\.1):5000/i,
-        API_BASE_URL
+        API_BASE_URL || ""
       );
     }
     return inputPath;
   }
 
-  if (inputPath.startsWith("/uploads")) return `${API_BASE_URL}${inputPath}`;
+  const base = API_BASE_URL || "";
+  if (inputPath.startsWith("/uploads")) return `${base}${inputPath}`;
   if (inputPath.startsWith("/assets")) return `${ASSETS_BASE_URL}${inputPath}`;
   if (inputPath.startsWith("assets/")) return `${ASSETS_BASE_URL}/${inputPath}`;
 

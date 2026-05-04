@@ -67,6 +67,22 @@ const shouldForceSignOut = (error) => {
   return status === 401 || (status === 403 && !isMissingStaffProfileError(error));
 };
 
+/** Avoid surfacing provider-specific or technical strings to end users in production. */
+const safeClientAuthMessage = (message, fallback) => {
+  const m = String(message || "").trim();
+  if (!m) return fallback;
+  if (import.meta.env.DEV) return m;
+  if (m.length > 220) return fallback;
+  if (
+    /invalid login credentials|invalid email or password|email not confirmed|already registered|user already|password|email address|rate limit|too many requests|signup|sign up|weak password/i.test(
+      m
+    )
+  ) {
+    return m;
+  }
+  return fallback;
+};
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(safeGetStoredUser());
   const [token, setToken] = useState(safeGetStoredToken());
@@ -125,7 +141,6 @@ export function AuthProvider({ children }) {
       return data;
     } catch (error) {
       if (isMissingStaffProfileError(error)) {
-        // Student accounts can authenticate with Supabase even without a staff profile row.
         const supabase = getSupabaseBrowserClient();
         const {
           data: { user: sbUser },
@@ -191,12 +206,10 @@ export function AuthProvider({ children }) {
             }
           }
         } else {
-          // Avoid a remote sign-out round trip when there is no session (faster first paint on cold loads).
           clearSession();
           purgeAuthStorage();
         }
 
-        // ✅ FIXED: removed setTimeout (caused logout loops)
         const { data } = supabase.auth.onAuthStateChange(async (event, nextSession) => {
           if (event === "SIGNED_OUT") {
             clearSession();
@@ -219,7 +232,11 @@ export function AuthProvider({ children }) {
 
         subscription = data.subscription;
       } catch (error) {
-        setAuthConfigError(error.message || "Failed to initialize Supabase Auth");
+        setAuthConfigError(
+          import.meta.env.DEV && error?.message
+            ? error.message
+            : "Sign-in is temporarily unavailable. Please try again later."
+        );
       } finally {
         setIsReady(true);
       }
@@ -236,15 +253,12 @@ export function AuthProvider({ children }) {
     if (!isSupabaseConfigured()) {
       return {
         ok: false,
-        error: getSupabaseConfigError() || "Supabase Auth is not configured yet.",
+        error: getSupabaseConfigError() || "Sign-in is temporarily unavailable.",
       };
     }
 
     try {
       const supabase = getSupabaseBrowserClient();
-
-      // ❌ FIX: DO NOT signOut before login (this was breaking sessions)
-      // await supabase.auth.signOut();  <-- REMOVED
 
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -256,7 +270,10 @@ export function AuthProvider({ children }) {
         if (/invalid login credentials/i.test(message)) {
           return { ok: false, error: "Invalid email or password." };
         }
-        return { ok: false, error: message || "Login failed" };
+        return {
+          ok: false,
+          error: safeClientAuthMessage(message, "Invalid email or password."),
+        };
       }
 
       const profile = await hydrateProfile(data.session?.access_token);
@@ -272,9 +289,7 @@ export function AuthProvider({ children }) {
       const configMessage = extractAuthConfigMessage(error);
       return {
         ok: false,
-        error:
-          configMessage ||
-          getApiError(error, error.message || "Login failed"),
+        error: configMessage || getApiError(error, "Login failed"),
       };
     }
   };
@@ -283,7 +298,7 @@ export function AuthProvider({ children }) {
     if (!isSupabaseConfigured()) {
       return {
         ok: false,
-        error: getSupabaseConfigError() || "Supabase Auth is not configured yet.",
+        error: getSupabaseConfigError() || "Sign-in is temporarily unavailable.",
       };
     }
 
@@ -301,7 +316,10 @@ export function AuthProvider({ children }) {
         },
       });
       if (error) {
-        return { ok: false, error: error.message || "Signup failed" };
+        return {
+          ok: false,
+          error: safeClientAuthMessage(error.message, "Unable to complete registration. Please try again."),
+        };
       }
 
       // If email-confirmation is disabled, session exists immediately.
@@ -316,7 +334,7 @@ export function AuthProvider({ children }) {
     } catch (error) {
       return {
         ok: false,
-        error: getApiError(error, error.message || "Signup failed"),
+        error: getApiError(error, "Signup failed"),
       };
     }
   };
