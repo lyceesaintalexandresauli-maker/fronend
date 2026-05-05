@@ -13,7 +13,6 @@ const AnnouncementsPage = lazy(() => import("./pages/AnnouncementsPage"));
 const StaffPage = lazy(() => import("./pages/StaffPage"));
 const ContactPage = lazy(() => import("./pages/ContactPage"));
 const LoginPage = lazy(() => import("./pages/LoginPage"));
-const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const AboutPage = lazy(() => import("./pages/AboutPage"));
 const AcademicPage = lazy(() => import("./pages/AcademicPage"));
@@ -63,12 +62,8 @@ export default function App() {
           <Route path="/:slug" element={<ContentPage />} />
         </Route>
 
-        <Route element={<ProtectedRoute roles={["admin"]} />}>
-          <Route path="/admin" element={<AdminDashboard />} />
-        </Route>
-        <Route element={<ProtectedRoute roles={["admin", "dos"]} />}>
-          <Route path="/admin/timetables" element={<AdminTimetablesPage />} />
-        </Route>
+       
+   
       </Routes>
     </Suspense>
   );
