@@ -65,7 +65,7 @@ export default function AcademicPage() {
       link: '/fad',
       fallbackTitle: 'Fashion Design',
       fallbackContent: 'Students learn creative design, pattern making, and garment construction. Develop skills in fashion illustration, textiles, and professional portfolio creation.',
-      fallbackImage: '/assets/photos/img/fad2.jpg',
+      fallbackImage: '/assets/photos/img/fad2_resized.jpg',
     },
     {
       section: 'ict',
@@ -73,7 +73,7 @@ export default function AcademicPage() {
       link: '/sod',
       fallbackTitle: 'Information & Communication Technology',
       fallbackContent: 'Includes Software Development, Computer Systems Servicing, and Programming. Master modern web technologies, databases, and software engineering practices.',
-      fallbackImage: '/assets/photos/img/sod1.jpg',
+      fallbackImage: '/assets/photos/img/sod1_resized.jpg',
     },
     {
       section: 'accounting',
@@ -81,7 +81,7 @@ export default function AcademicPage() {
       link: '/acc',
       fallbackTitle: 'Accounting',
       fallbackContent: 'Students learn bookkeeping, financial management, taxation, and accounting principles. Gain practical skills in financial reporting and business administration.',
-      fallbackImage: '/assets/photos/img/acc1.jpg',
+      fallbackImage: '/assets/photos/img/acc1_resized.jpg',
     },
   ];
 
