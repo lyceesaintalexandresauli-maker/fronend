@@ -108,7 +108,7 @@ integrating academic excellence, Christian morals, discipline, and practical ski
           </div>
           <div className="col-lg-6" data-aos="fade-left">
             <img
-              src={mediaUrl(whoWeAre.image_path) || "/assets/img/sauli2.jpg"}
+              src={mediaUrl(whoWeAre.image_path) || "/assets/img/sauli2.jfif"}
               className="img-fluid rounded"
               alt="Our School"
               width="960"
@@ -226,7 +226,7 @@ integrating academic excellence, Christian morals, discipline, and practical ski
           </div>
           <div className="col-lg-6" data-aos="fade-left">
             <img
-              src={mediaUrl(fathers.image_path) || "/assets/img/saul2.jpg"}
+              src={mediaUrl(fathers.image_path) || "/assets/img/sauli.jfif"}
               className="img-fluid rounded"
               alt="Barnabite Fathers"
               width="960"
