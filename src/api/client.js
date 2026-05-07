@@ -88,8 +88,10 @@ export const getApiError = (error, fallback = "Request failed") =>
 export const mediaUrl = (inputPath) => {
   if (!inputPath) return "";
 
+  // If it's already a full URL, return it as-is
   if (/^https?:\/\//i.test(inputPath)) {
-    if (!isLocalFrontend()) {
+    // If it's a localhost URL and we're in production, replace with API_BASE_URL
+    if (!isLocalFrontend() && /^https?:\/\/(localhost|127\.0\.0\.1):5000/i.test(inputPath)) {
       return inputPath.replace(
         /^https?:\/\/(localhost|127\.0\.0\.1):5000/i,
         API_BASE_URL || ""
@@ -98,8 +100,15 @@ export const mediaUrl = (inputPath) => {
     return inputPath;
   }
 
+  // For relative paths, always prepend API_BASE_URL if it's set
   const base = API_BASE_URL || "";
-  if (inputPath.startsWith("/uploads")) return `${base}${inputPath}`;
+  
+  // Handle /uploads paths - these are served by backend
+  if (inputPath.startsWith("/uploads")) {
+    return `${base}${inputPath}`;
+  }
+  
+  // Handle /assets paths - these may be served separately
   if (inputPath.startsWith("/assets")) return `${ASSETS_BASE_URL}${inputPath}`;
   if (inputPath.startsWith("assets/")) return `${ASSETS_BASE_URL}/${inputPath}`;
 
