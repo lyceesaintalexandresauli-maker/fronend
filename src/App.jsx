@@ -13,7 +13,6 @@ const AnnouncementsPage = lazy(() => import("./pages/AnnouncementsPage"));
 const StaffPage = lazy(() => import("./pages/StaffPage"));
 const ContactPage = lazy(() => import("./pages/ContactPage"));
 const LoginPage = lazy(() => import("./pages/LoginPage"));
-const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const AboutPage = lazy(() => import("./pages/AboutPage"));
 const AcademicPage = lazy(() => import("./pages/AcademicPage"));
 const SodPage = lazy(() => import("./pages/SodPage"));
@@ -23,7 +22,7 @@ const FadPage = lazy(() => import("./pages/FadPage"));
 const AccPage = lazy(() => import("./pages/AccPage"));
 const TimetablesPage = lazy(() => import("./pages/TimetablesPage"));
 
-const StudentDashboardPage = lazy(() => import("./pages/StudentDashboardPage"));
+
 
 export default function App() {
   const { isReady } = useAuth();

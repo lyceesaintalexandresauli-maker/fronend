@@ -15,7 +15,7 @@ export default function ProtectedRoute({ roles = [] }) {
   }
 
   // 🔥 FIX 3: IMPORTANT FIX (prevents logout loop)
-  // wait until user profile is fully loaded
+
   if (isAuthenticated && !user) {
     return <div id="preloader"></div>;
   }

@@ -1,77 +1,19 @@
 import { useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
 import Seo from "../components/Seo";
-import { useAuth } from "../context/AuthContext";
 
 export default function LoginPage() {
-  const { isAuthenticated, user, loginStep1, registerStudent, authConfigError, isReady } = useAuth();
-  const navigate = useNavigate();
-  const [mode, setMode] = useState("login");
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [notice, setNotice] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-
-  const destinationForRole = (role) => {
-    if (role === "admin") return "/admin";
-    if (role === "teacher" || role === "secretary" || role === "dos") return "/profile";
-    if (role === "student") return "/student";
-    return "/";
-  };
-
-  if (!isReady) {
-    return null;
-  }
-
-  if (isAuthenticated) {
-    return <Navigate to={destinationForRole(user?.role)} replace />;
-  }
-
-  const submit = async (event) => {
-    event.preventDefault();
-    setLoading(true);
-    setError("");
-    setNotice("");
-
-    try {
-      if (mode === "signup") {
-        const result = await registerStudent({ email, password, fullName });
-        if (!result.ok) {
-          setError(result.error);
-          return;
-        }
-        if (result.needsEmailConfirmation) {
-          setNotice("Account created. Check your email to confirm your student account.");
-          return;
-        }
-        setNotice("Account created successfully. You are now signed in.");
-        navigate("/student", { replace: true });
-        return;
-      }
-
-      const result = await loginStep1(email, password);
-
-      if (!result.ok) {
-        setError(result.error);
-        return;
-      }
-
-      navigate(destinationForRole(result.data.user.role), { replace: true });
-    } catch {
-      setError("Login failed. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Sample gallery data - replace with actual data from your backend
+  const [galleryItems] = useState([
+    { id: 1, type: "image", src: "/assets/img/sauli.jfif", title: "Campus View 1" },
+    { id: 2, type: "image", src: "/assets/img/sauli1.jfif", title: "Campus View 2" },
+    { id: 3, type: "image", src: "/assets/img/sauli2.jfif", title: "Campus View 3" },
+  ]);
 
   return (
     <main className="main">
       <Seo
-        title="Student Login / Signup"
-        description="Student portal access and account registration for Lycee Saint Alexandre Sauli de Muhura."
+        title="Gallery"
+        description="Gallery of images and videos from Lycee Saint Alexandre Sauli de Muhura."
         path="/login"
       />
 
@@ -80,149 +22,73 @@ export default function LoginPage() {
           <div className="container">
             <div className="row d-flex justify-content-center text-center">
               <div className="col-lg-8">
-                <h1>Student Portal</h1>
-                <p className="mb-0">Sign in or create your student account to access student services.</p>
+                <h1>Gallery</h1>
+                <p className="mb-0">Explore our collection of images and videos.</p>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <section className="login section py-5">
+      <section className="gallery section py-5">
         <div className="container">
-          <div className="row justify-content-center" data-aos="fade-up">
-            <div className="col-lg-5 col-md-8">
-              <div className="card shadow-lg border-0 rounded-lg">
-                <div className="card-body p-5">
-                  <div className="text-center mb-4">
-                    <img
-                      src="/assets/img/logo1.jpg"
-                      alt="School Logo"
-                      style={{ width: "80px", borderRadius: "5px" }}
-                      className="mb-3"
-                    />
-                    <h3 className="fw-bold" style={{ color: "#37423b" }}>
-                      {mode === "login" ? "Student Login" : "Student Signup"}
-                    </h3>
-                    <p className="text-muted" style={{ fontSize: "0.9rem" }}>
-                      {mode === "login"
-                        ? "Use your student account to continue."
-                        : "Create a student account with your email and password."}
+          <div className="row g-4" data-aos="fade-up">
+            {galleryItems.map((item) => (
+              <div key={item.id} className="col-lg-4 col-md-6">
+                <div className="card shadow-sm border-0 overflow-hidden h-100">
+                  <div className="position-relative overflow-hidden" style={{ height: "250px" }}>
+                    {item.type === "image" ? (
+                      <img
+                        src={item.src}
+                        alt={item.title}
+                        className="w-100 h-100 object-fit-cover"
+                        style={{ objectFit: "cover" }}
+                      />
+                    ) : (
+                      <video
+                        src={item.src}
+                        className="w-100 h-100"
+                        style={{ objectFit: "cover" }}
+                        controls
+                      />
+                    )}
+                    <div
+                      className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+                      style={{
+                        backgroundColor: "rgba(0, 0, 0, 0)",
+                        transition: "background-color 0.3s",
+                      }}
+                      onMouseEnter={(e) =>
+                        (e.currentTarget.style.backgroundColor = "rgba(0, 0, 0, 0.5)")
+                      }
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.backgroundColor = "rgba(0, 0, 0, 0)")
+                      }
+                    >
+                      {item.type === "image" && (
+                        <i
+                          className="bi bi-search"
+                          style={{
+                            fontSize: "2rem",
+                            color: "white",
+                            opacity: 0,
+                            transition: "opacity 0.3s",
+                          }}
+                        />
+                      )}
+                    </div>
+                  </div>
+                  <div className="card-body">
+                    <h5 className="card-title" style={{ color: "#37423b" }}>
+                      {item.title}
+                    </h5>
+                    <p className="card-text text-muted small">
+                      {item.type === "image" ? "📷 Image" : "🎥 Video"}
                     </p>
                   </div>
-
-                  <div className="d-flex gap-2 mb-3">
-                    <button
-                      type="button"
-                      className={`btn btn-sm ${mode === "login" ? "btn-dark text-white" : "btn-outline-secondary"}`}
-                      onClick={() => setMode("login")}
-                    >
-                      Login
-                    </button>
-                    <button
-                      type="button"
-                      className={`btn btn-sm ${mode === "signup" ? "btn-dark text-white" : "btn-outline-secondary"}`}
-                      onClick={() => setMode("signup")}
-                    >
-                      Signup
-                    </button>
-                  </div>
-
-                  {authConfigError && (
-                    <div className="alert alert-warning" role="alert">
-                      <i className="bi bi-exclamation-triangle-fill me-2"></i>
-                      {authConfigError}
-                    </div>
-                  )}
-
-                  {error && (
-                    <div className="alert alert-danger" role="alert">
-                      <i className="bi bi-exclamation-triangle-fill me-2"></i>
-                      {error}
-                    </div>
-                  )}
-
-                  {notice && (
-                    <div className="alert alert-success" role="alert">
-                      <i className="bi bi-check-circle-fill me-2"></i>
-                      {notice}
-                    </div>
-                  )}
-
-                  <form onSubmit={submit}>
-                    {mode === "signup" && (
-                      <div className="mb-3">
-                        <label className="form-label text-muted">Full name</label>
-                        <input
-                          type="text"
-                          className="form-control form-control-lg"
-                          placeholder="Student full name"
-                          value={fullName}
-                          onChange={(event) => setFullName(event.target.value)}
-                        />
-                      </div>
-                    )}
-                    <div className="mb-3">
-                      <label className="form-label text-muted">Email address</label>
-                      <input
-                        type="email"
-                        className="form-control form-control-lg"
-                        placeholder="name@example.com"
-                        value={email}
-                        onChange={(event) => setEmail(event.target.value)}
-                        required
-                      />
-                    </div>
-
-                    <div className="mb-4">
-                      <label className="form-label text-muted">Password</label>
-                      <div className="input-group">
-                        <input
-                          type={showPassword ? "text" : "password"}
-                          className="form-control form-control-lg border-end-0"
-                          placeholder="Enter your password"
-                          value={password}
-                          onChange={(event) => setPassword(event.target.value)}
-                          required
-                        />
-                        <button
-                          className="btn btn-outline-secondary border-start-0 bg-transparent"
-                          type="button"
-                          onClick={() => setShowPassword((value) => !value)}
-                          style={{ borderColor: "#dee2e6" }}
-                        >
-                          <i className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"}`}></i>
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="d-grid mt-4">
-                      <button
-                        className="btn btn-lg text-white"
-                        style={{ backgroundColor: "#004080" }}
-                        type="submit"
-                        disabled={loading || !!authConfigError}
-                      >
-                        {loading ? (
-                          <>
-                            <span className="spinner-border spinner-border-sm me-2"></span>
-                            Authenticating...
-                          </>
-                        ) : (
-                          <>
-                            <i className={`bi ${mode === "login" ? "bi-box-arrow-in-right" : "bi-person-plus"} me-2`}></i>
-                            {mode === "login" ? "Login" : "Create account"}
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  </form>
-                  <p className="small text-muted mt-3 mb-0">
-                    Staff/admin accounts should use the dedicated admin portal.
-                  </p>
                 </div>
               </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
