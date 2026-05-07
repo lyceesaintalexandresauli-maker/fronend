@@ -21,6 +21,7 @@ const NitPage = lazy(() => import("./pages/NitPage"));
 const FadPage = lazy(() => import("./pages/FadPage"));
 const AccPage = lazy(() => import("./pages/AccPage"));
 const TimetablesPage = lazy(() => import("./pages/TimetablesPage"));
+const GalleryPage = lazy(() => import("./pages/GalleryPage"));
 
 
 
@@ -48,8 +49,9 @@ export default function App() {
            
           </Route>
 
-          <Route path="/about" element={<AboutPage />} />
+        <Route path="/about" element={<AboutPage />} />
           <Route path="/academic" element={<AcademicPage />} />
+          <Route path="/gallery" element={<GalleryPage />} />
           <Route path="/sod" element={<SodPage />} />
           <Route path="/csa" element={<CsaPage />} />
           <Route path="/nit" element={<NitPage />} />
