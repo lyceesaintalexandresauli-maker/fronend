@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { mediaUrl } from "../api/client";
 import { contentAPI } from "../api/services";
 import { getContentSections } from "../utils/helpers";
+import SafeImage from "../components/SafeImage";
 
 export default function AcademicPage() {
   const [content, setContent] = useState({});
@@ -106,7 +106,7 @@ export default function AcademicPage() {
               const section = getSection(program.section);
               const title = section.title || program.fallbackTitle;
               const description = cleanContent(section.content) || program.fallbackContent;
-              const imageSrc = mediaUrl(section.image_path || program.fallbackImage);
+              const imageSrc = section.image_path || program.fallbackImage;
 
               return (
                 <div
@@ -116,7 +116,7 @@ export default function AcademicPage() {
                   data-aos-delay={index * 150}
                 >
                   <div className="card h-100">
-                    <img src={imageSrc} className="card-img-top" alt={title} />
+                    <SafeImage src={imageSrc} className="card-img-top" alt={title} />
                     <div className="card-body">
                       <h5 className="card-title">{title}</h5>
                       <p className="card-text">{description}</p>
