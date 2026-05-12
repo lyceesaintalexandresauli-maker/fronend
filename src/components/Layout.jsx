@@ -82,7 +82,6 @@ export default function Layout() {
   });
   const [menuOpen, setMenuOpen] = useState(false);
   const { pathname } = useLocation();
-  const isTimetablePage = pathname === "/timetables";
 
   useEffect(() => {
     const load = async () => {
@@ -231,51 +230,47 @@ export default function Layout() {
 
       <Outlet />
 
-      {!isTimetablePage && (
-        <>
-          <footer id="footer" className="footer">
-            <div className="footer-content">
-              <div className="footer-section">
-                <h4>School Contact</h4>
-                <p className="mb-2">
-                  Quality education, moral formation, and practical training for future leaders.
-                </p>
-                <p><strong>Email:</strong> {boot.settings.primary_email || "lycemuhur@gmail.com"}</p>
-                {boot.settings.primary_phone && <p><strong>Phone:</strong> {boot.settings.primary_phone}</p>}
-              </div>
+      <footer id="footer" className="footer">
+        <div className="footer-content">
+          <div className="footer-section">
+            <h4>School Contact</h4>
+            <p className="mb-2">
+              Quality education, moral formation, and practical training for future leaders.
+            </p>
+            <p><strong>Email:</strong> {boot.settings.primary_email || "lycemuhur@gmail.com"}</p>
+            {boot.settings.primary_phone && <p><strong>Phone:</strong> {boot.settings.primary_phone}</p>}
+          </div>
 
-              <div className="footer-section">
-                <h4>School Location</h4>
-                <div
-                  dangerouslySetInnerHTML={{
-                    __html:
-                      boot.settings.location ||
-                      "Rwanda, Eastern Province<br/>Gatsibo District<br/>Muhura Sector, Taba Cell<br/>Kanyinya Village",
-                  }}
-                />
-              </div>
+          <div className="footer-section">
+            <h4>School Location</h4>
+            <div
+              dangerouslySetInnerHTML={{
+                __html:
+                  boot.settings.location ||
+                  "Rwanda, Eastern Province<br/>Gatsibo District<br/>Muhura Sector, Taba Cell<br/>Kanyinya Village",
+              }}
+            />
+          </div>
 
-              <div className="footer-section">
-                <h4>Follow Us</h4>
-                <div className="social-icons">
-                  <a href="#" target="_blank" rel="noopener"><i className="bi bi-facebook"></i></a>
-                  <a href="#" target="_blank" rel="noopener"><i className="bi bi-twitter"></i></a>
-                  <a href="#" target="_blank" rel="noopener"><i className="bi bi-instagram"></i></a>
-                  <a href="#" target="_blank" rel="noopener"><i className="bi bi-linkedin"></i></a>
-                  <a href="#" target="_blank" rel="noopener"><i className="bi bi-youtube"></i></a>
-                </div>
-              </div>
+          <div className="footer-section">
+            <h4>Follow Us</h4>
+            <div className="social-icons">
+              <a href="#" target="_blank" rel="noopener"><i className="bi bi-facebook"></i></a>
+              <a href="#" target="_blank" rel="noopener"><i className="bi bi-twitter"></i></a>
+              <a href="#" target="_blank" rel="noopener"><i className="bi bi-instagram"></i></a>
+              <a href="#" target="_blank" rel="noopener"><i className="bi bi-linkedin"></i></a>
+              <a href="#" target="_blank" rel="noopener"><i className="bi bi-youtube"></i></a>
             </div>
-            <div className="footer-bottom">
-              &copy; {new Date().getFullYear()} <strong>LYCEE SAINT ALEXANDRE SAULI DE MUHURA</strong> All Rights Reserved
-            </div>
-          </footer>
+          </div>
+        </div>
+        <div className="footer-bottom">
+          &copy; {new Date().getFullYear()} <strong>LYCEE SAINT ALEXANDRE SAULI DE MUHURA</strong> All Rights Reserved
+        </div>
+      </footer>
 
-          <a href="#" id="scroll-top" className="scroll-top d-flex align-items-center justify-content-center">
-            <i className="bi bi-arrow-up-short"></i>
-          </a>
-        </>
-      )}
+      <a href="#" id="scroll-top" className="scroll-top d-flex align-items-center justify-content-center">
+        <i className="bi bi-arrow-up-short"></i>
+      </a>
     </div>
   );
 }
