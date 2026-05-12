@@ -7,7 +7,7 @@ export default function TimetablesPage() {
         <iframe
           src={timetableUrl}
           title="Client Timetable"
-          className="block h-[calc(100vh-5rem)] min-h-[calc(100vh-5rem)] w-full border-0"
+          className="block h-[calc(100vh-65px)] min-h-[calc(100vh-65px)] w-full border-0"
           referrerPolicy="strict-origin-when-cross-origin"
         />
       ) : (
