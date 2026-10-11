@@ -94,11 +94,11 @@ export default function HomePage() {
                   decoding="async"
                 />
                 <div className="container position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
-                  <div className="text-center px-4" style={{ color: '#ffffff' }}>
-                    <h2 className="fw-bold mb-4" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', lineHeight: '1.3', color: '#ffffff', textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }} data-aos="fade-up" data-aos-delay="50">
+                  <div className="glass-panel text-center px-4" style={{ color: '#ffffff', borderRadius: '28px', padding: '2.5rem 2rem', maxWidth: '880px' }}>
+                    <h2 className="fw-bold mb-4" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', lineHeight: '1.3', color: '#ffffff', textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }} data-aos="fade-up" data-aos-delay="100">
                       {slide.title || 'Welcome to Lycee saint Alexandre Sauli'}
                     </h2>
-                    <h3 className="mb-0" style={{ fontSize: 'clamp(1.2rem, 3vw, 2rem)', fontWeight: '400', color: '#ffffff', textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }} data-aos="fade-up" data-aos-delay="100">
+                    <h3 className="mb-0" style={{ fontSize: 'clamp(1.2rem, 3vw, 2rem)', fontWeight: '400', color: '#ffffff', textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }} data-aos="fade-up" data-aos-delay="200">
                       {slide.content || 'De Muhura Barnabites School'}
                     </h3>
                   </div>
@@ -109,11 +109,11 @@ export default function HomePage() {
                 <div className="swiper-slide position-relative">
                   <img src="/assets/img/photos/sod10.jpg" className="w-100 h-100" style={{ objectFit: 'cover', width: '100%', height: '100vh' }} alt="Welcome" fetchPriority="high" loading="eager" decoding="async" />
                   <div className="container position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
-                    <div className="text-center px-4" style={{ color: '#ffffff' }}>
-                      <h2 className="fw-bold mb-4" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', lineHeight: '1.3', color: '#ffffff', textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }} data-aos="fade-up" data-aos-delay="50">
+                    <div className="glass-panel text-center px-4" style={{ color: '#ffffff', borderRadius: '28px', padding: '2.5rem 2rem', maxWidth: '880px' }}>
+                      <h2 className="fw-bold mb-4" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', lineHeight: '1.3', color: '#ffffff', textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }} data-aos="fade-up" data-aos-delay="100">
                         Welcome to Lycee saint Alexandre Sauli
                       </h2>
-                      <h3 className="mb-0" style={{ fontSize: 'clamp(1.2rem, 3vw, 2rem)', fontWeight: '400', color: '#ffffff', textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }} data-aos="fade-up" data-aos-delay="100">
+                      <h3 className="mb-0" style={{ fontSize: 'clamp(1.2rem, 3vw, 2rem)', fontWeight: '400', color: '#ffffff', textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }} data-aos="fade-up" data-aos-delay="200">
                         De Muhura Barnabites's School
                       </h3>
                     </div>
@@ -122,11 +122,11 @@ export default function HomePage() {
                 <div className="swiper-slide position-relative">
                   <img src="/assets/img/photos/sod0.jpg" className="w-100 h-100" style={{ objectFit: 'cover', width: '100%', height: '100vh' }} alt="Education" loading="lazy" decoding="async" />
                   <div className="container position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
-                    <div className="text-center px-4" style={{ color: '#ffffff' }}>
-                      <h2 className="fw-bold mb-4" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', lineHeight: '1.3', color: '#ffffff', textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }} data-aos="fade-up" data-aos-delay="50">
+                    <div className="glass-panel text-center px-4" style={{ color: '#ffffff', borderRadius: '28px', padding: '2.5rem 2rem', maxWidth: '880px' }}>
+                      <h2 className="fw-bold mb-4" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', lineHeight: '1.3', color: '#ffffff', textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }} data-aos="fade-up" data-aos-delay="100">
                         Quality Education & Moral Formation
                       </h2>
-                      <h3 className="mb-0" style={{ fontSize: 'clamp(1.2rem, 3vw, 2rem)', fontWeight: '400', color: '#ffffff', textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }} data-aos="fade-up" data-aos-delay="100">
+                      <h3 className="mb-0" style={{ fontSize: 'clamp(1.2rem, 3vw, 2rem)', fontWeight: '400', color: '#ffffff', textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }} data-aos="fade-up" data-aos-delay="200">
                         Building Tomorrow's Leaders Today
                       </h3>
                     </div>
@@ -135,11 +135,11 @@ export default function HomePage() {
                 <div className="swiper-slide position-relative">
                   <img src="/assets/img/photos/sod1.jpg" className="w-100 h-100" style={{ objectFit: 'cover', width: '100%', height: '100vh' }} alt="Excellence" loading="lazy" decoding="async" />
                   <div className="container position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
-                    <div className="text-center px-4" style={{ color: '#ffffff' }}>
-                      <h2 className="fw-bold mb-4" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', lineHeight: '1.3', color: '#ffffff', textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }} data-aos="fade-up" data-aos-delay="50">
+                    <div className="glass-panel text-center px-4" style={{ color: '#ffffff', borderRadius: '28px', padding: '2.5rem 2rem', maxWidth: '880px' }}>
+                      <h2 className="fw-bold mb-4" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', lineHeight: '1.3', color: '#ffffff', textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }} data-aos="fade-up" data-aos-delay="100">
                         Excellence in Technical Education
                       </h2>
-                      <h3 className="mb-0" style={{ fontSize: 'clamp(1.2rem, 3vw, 2rem)', fontWeight: '400', color: '#ffffff', textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }} data-aos="fade-up" data-aos-delay="100">
+                      <h3 className="mb-0" style={{ fontSize: 'clamp(1.2rem, 3vw, 2rem)', fontWeight: '400', color: '#ffffff', textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }} data-aos="fade-up" data-aos-delay="200">
                         ICT, Fashion Design, and Accounting Programs
                       </h3>
                     </div>
@@ -156,7 +156,7 @@ export default function HomePage() {
 
       {/* Events Section */}
       {events.length > 0 && (
-        <section className="py-2" style={{ backgroundColor: 'var(--brand-accent)' }}>
+        <section className="py-2" style={{ backgroundColor: 'rgba(178, 77, 18, 0.12)' }}>
           <div className="container" data-aos="fade-up">
             <div className="mb-2">
               <h2 className="fw-bold mb-1 text-white" style={{ fontSize: '1.5rem' }}>Recent Events</h2>
@@ -172,7 +172,7 @@ export default function HomePage() {
               >
                 {events.map((event) => (
                   <div key={event.id} style={{ minWidth: '100%', height: '100%', position: 'relative' }}>
-                    <div className="card h-100 border-0 shadow-sm" style={{ overflow: 'hidden', display: 'flex', flexDirection: 'row' }}>
+                    <div className="card h-100 border-0 glass-card" style={{ overflow: 'hidden', display: 'flex', flexDirection: 'row' }}>
                       <div style={{ width: '220px', flexShrink: 0, overflow: 'hidden' }}>
                         {event.image_path && (
                           <img
@@ -185,7 +185,7 @@ export default function HomePage() {
                           />
                         )}
                       </div>
-                      <div className="p-2 d-flex flex-column justify-content-center" style={{ flex: 1, backgroundColor: 'var(--brand-accent)' }}>
+                      <div className="p-2 d-flex flex-column justify-content-center" style={{ flex: 1, backgroundColor: 'rgba(178, 77, 18, 0.8)' }}>
                         <span className="badge d-inline-block mb-0 px-2 py-1" style={{ backgroundColor: 'white', color: '#333', fontSize: '0.7rem', borderRadius: '4px', width: 'fit-content' }}>
                           {event.category || 'General'}
                         </span>
@@ -267,8 +267,8 @@ export default function HomePage() {
             <div className="text-end mt-2">
               <Link
                 to="/events"
-                className="btn fw-bold text-white"
-                style={{ backgroundColor: '#004080', color: 'white', padding: '0.6rem 2rem', borderRadius: '8px', fontSize: '1rem', boxShadow: '0 4px 12px rgba(0,0,0,0.3)', border: '2px solid white' }}
+                className="btn fw-bold text-white glass-button"
+                style={{ color: 'white', padding: '0.6rem 2rem', borderRadius: '999px', fontSize: '1rem', border: '1px solid rgba(255,255,255,0.35)' }}
               >
                 View All Events <i className="bi bi-arrow-right ms-2"></i>
               </Link>
@@ -282,41 +282,43 @@ export default function HomePage() {
         <div className="container" data-aos="fade-up">
           <div className="row gy-4 align-items-center">
             <div className="col-lg-5 order-lg-2" data-aos="fade-left" data-aos-delay="100">
-              <div className="about-img position-relative" style={{ backgroundColor: 'var(--brand-accent)', padding: '2rem', borderRadius: '8px' }}>
+              <div className="about-img position-relative glass-panel" style={{ padding: '2rem', borderRadius: '24px' }}>
                 <img
                   src={mediaUrl(content['about']?.[0]?.image_path) || "/assets/img/saul2.jpg"}
                   className="img-fluid rounded"
                   alt="About Our School"
-                  style={{ maxHeight: '450px', objectFit: 'cover', width: '100%', display: 'block', margin: '0 auto' }}
+                  style={{ maxHeight: '450px', objectFit: 'cover', width: '100%', display: 'block', margin: '0 auto', borderRadius: '20px' }}
                   loading="lazy"
                   decoding="async"
                 />
               </div>
             </div>
             <div className="col-lg-7 order-lg-1" data-aos="fade-right" data-aos-delay="200">
-              <h3 className="mb-3" style={{ fontSize: '2.5rem', fontWeight: '700', color: '#333' }}>
-                {content['about']?.[0]?.title || 'Who We Are'}
-              </h3>
-              <div className="fst-italic mb-4" style={{ fontSize: '1.1rem', lineHeight: '1.8', color: '#555' }} dangerouslySetInnerHTML={{ __html: content['about']?.[0]?.content || '' }} />
-              
-              <ul className="list-unstyled mb-4">
-                <li className="mb-3 d-flex align-items-start">
-                  <i className="bi bi-check-circle-circle me-2" style={{ color: 'var(--brand-accent)', fontSize: '1.3rem', marginTop: '2px' }}></i>
-                  <span style={{ fontSize: '1.05rem' }}>Strong discipline and character formation.</span>
-                </li>
-                <li className="mb-3 d-flex align-items-start">
-                  <i className="bi bi-check-circle-circle me-2" style={{ color: 'var(--brand-accent)', fontSize: '1.3rem', marginTop: '2px' }}></i>
-                  <span style={{ fontSize: '1.05rem' }}>High-quality technical and vocational training.</span>
-                </li>
-                <li className="mb-3 d-flex align-items-start">
-                  <i className="bi bi-check-circle-circle me-2" style={{ color: 'var(--brand-accent)', fontSize: '1.3rem', marginTop: '2px' }}></i>
-                  <span style={{ fontSize: '1.05rem' }}>Catholic education rooted in moral and spiritual values.</span>
-                </li>
-              </ul>
-              
-              <Link to="/about" className="btn btn-wall-yellow btn-lg rounded-pill px-4">
-                <span>Read More</span> <i className="bi bi-arrow-right ms-2"></i>
-              </Link>
+              <div className="glass-card p-4 p-lg-5" style={{ borderRadius: '24px' }}>
+                <h3 className="mb-3" style={{ fontSize: '2.5rem', fontWeight: '700', color: '#333' }}>
+                  {content['about']?.[0]?.title || 'Who We Are'}
+                </h3>
+                <div className="fst-italic mb-4" style={{ fontSize: '1.1rem', lineHeight: '1.8', color: '#555' }} dangerouslySetInnerHTML={{ __html: content['about']?.[0]?.content || '' }} />
+                
+                <ul className="list-unstyled mb-4">
+                  <li className="mb-3 d-flex align-items-start">
+                    <i className="bi bi-check-circle-circle me-2" style={{ color: 'var(--brand-accent)', fontSize: '1.3rem', marginTop: '2px' }}></i>
+                    <span style={{ fontSize: '1.05rem' }}>Strong discipline and character formation.</span>
+                  </li>
+                  <li className="mb-3 d-flex align-items-start">
+                    <i className="bi bi-check-circle-circle me-2" style={{ color: 'var(--brand-accent)', fontSize: '1.3rem', marginTop: '2px' }}></i>
+                    <span style={{ fontSize: '1.05rem' }}>High-quality technical and vocational training.</span>
+                  </li>
+                  <li className="mb-3 d-flex align-items-start">
+                    <i className="bi bi-check-circle-circle me-2" style={{ color: 'var(--brand-accent)', fontSize: '1.3rem', marginTop: '2px' }}></i>
+                    <span style={{ fontSize: '1.05rem' }}>Catholic education rooted in moral and spiritual values.</span>
+                  </li>
+                </ul>
+                
+                <Link to="/about" className="btn btn-wall-yellow btn-lg rounded-pill px-4 glass-button">
+                  <span>Read More</span> <i className="bi bi-arrow-right ms-2"></i>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
@@ -327,13 +329,13 @@ export default function HomePage() {
         <div className="container" data-aos="fade-up">
           <div className="row gy-4">
             <div className="col-lg-4" data-aos="fade-up" data-aos-delay="100">
-              <div className="why-box h-100 p-5" style={{ backgroundColor: 'var(--brand-accent)', color: 'white', borderRadius: '8px' }}>
+              <div className="why-box h-100 p-5 glass-card" style={{ color: 'white', borderRadius: '28px', background: 'linear-gradient(135deg, rgba(178,77,18,0.9), rgba(96,42,17,0.85))' }}>
                 <h3 className="mb-4" style={{ fontSize: '2rem', fontWeight: '700' }}>
                   {content['index']?.[0]?.title || 'Why Choose Our School?'}
                 </h3>
-                <p className="mb-4" style={{ fontSize: '1.05rem', lineHeight: '1.7' }} dangerouslySetInnerHTML={{ __html: content['index']?.[0]?.content || '' }} />
+                <p className="mb-4" style={{ fontSize: '1.05rem', lineHeight: '1.7', color: 'rgba(255,255,255,0.9)' }} dangerouslySetInnerHTML={{ __html: content['index']?.[0]?.content || '' }} />
                 <div className="text-center">
-                  <Link to="/about" className="btn btn-light rounded-pill px-4 py-2">
+                  <Link to="/about" className="btn btn-light rounded-pill px-4 py-2 glass-button" style={{ color: '#1f2937' }}>
                     <span>Learn More</span> <i className="bi bi-chevron-right ms-1"></i>
                   </Link>
                 </div>
@@ -342,8 +344,8 @@ export default function HomePage() {
             <div className="col-lg-8">
               <div className="row gy-4">
                 <div className="col-md-4" data-aos="fade-up" data-aos-delay="200">
-                  <div className="icon-box text-center h-100 p-4" style={{ border: '1px solid #e0e0e0', borderRadius: '8px', backgroundColor: 'white' }}>
-                    <div className="mb-3" style={{ width: '60px', height: '60px', margin: '0 auto', borderRadius: '50%', backgroundColor: '#FFF8E7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div className="icon-box text-center h-100 p-4 glass-card" style={{ borderRadius: '24px' }}>
+                    <div className="mb-3" style={{ width: '60px', height: '60px', margin: '0 auto', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.28)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <i className="bi bi-clipboard-data" style={{ fontSize: '1.8rem', color: 'var(--brand-accent)' }}></i>
                     </div>
                     <h4 className="mb-3" style={{ fontSize: '1.3rem', fontWeight: '700', color: '#333' }}>Technical Excellence</h4>
@@ -351,8 +353,8 @@ export default function HomePage() {
                   </div>
                 </div>
                 <div className="col-md-4" data-aos="fade-up" data-aos-delay="300">
-                  <div className="icon-box text-center h-100 p-4" style={{ border: '1px solid #e0e0e0', borderRadius: '8px', backgroundColor: 'white' }}>
-                    <div className="mb-3" style={{ width: '60px', height: '60px', margin: '0 auto', borderRadius: '50%', backgroundColor: '#FFF8E7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div className="icon-box text-center h-100 p-4 glass-card" style={{ borderRadius: '24px' }}>
+                    <div className="mb-3" style={{ width: '60px', height: '60px', margin: '0 auto', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.28)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <i className="bi bi-gem" style={{ fontSize: '1.8rem', color: 'var(--brand-accent)' }}></i>
                     </div>
                     <h4 className="mb-3" style={{ fontSize: '1.3rem', fontWeight: '700', color: '#333' }}>Discipline & Integrity</h4>
@@ -360,8 +362,8 @@ export default function HomePage() {
                   </div>
                 </div>
                 <div className="col-md-4" data-aos="fade-up" data-aos-delay="400">
-                  <div className="icon-box text-center h-100 p-4" style={{ border: '1px solid #e0e0e0', borderRadius: '8px', backgroundColor: 'white' }}>
-                    <div className="mb-3" style={{ width: '60px', height: '60px', margin: '0 auto', borderRadius: '50%', backgroundColor: '#FFF8E7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div className="icon-box text-center h-100 p-4 glass-card" style={{ borderRadius: '24px' }}>
+                    <div className="mb-3" style={{ width: '60px', height: '60px', margin: '0 auto', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.28)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <i className="bi bi-book" style={{ fontSize: '1.8rem', color: 'var(--brand-accent)' }}></i>
                     </div>
                     <h4 className="mb-3" style={{ fontSize: '1.3rem', fontWeight: '700', color: '#333' }}>Faith & Moral Formation</h4>
@@ -385,15 +387,15 @@ export default function HomePage() {
             <div className="row gy-4">
               {departments.map((dep, index) => (
                 <div key={dep.id} className="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-delay={index * 100}>
-                  <div className="card h-100 border-0 shadow-sm" style={{ transition: 'transform 0.3s, box-shadow 0.3s' }}>
+                  <div className="card h-100 border-0 glass-card" style={{ transition: 'transform 0.3s, box-shadow 0.3s', borderRadius: '24px' }}>
                     <div className="position-relative overflow-hidden" style={{ height: '180px' }}>
                       <img
                         src={mediaUrl(dep.image_path) || "/assets/img/photos/sod1.jpg"}
-                      className="w-100 h-100 object-fit-cover"
-                      style={{ transition: 'transform 0.5s' }}
-                      alt={dep.name}
-                      loading="lazy"
-                      decoding="async"
+                        className="w-100 h-100 object-fit-cover"
+                        style={{ transition: 'transform 0.5s' }}
+                        alt={dep.name}
+                        loading="lazy"
+                        decoding="async"
                       />
                       <span className="badge position-absolute top-0 start-0 m-2" style={{ backgroundColor: 'var(--brand-accent)' }}>
                         {dep.code || dep.name?.substring(0,3).toUpperCase() || "N/A"}
@@ -427,7 +429,7 @@ export default function HomePage() {
           <div className="row gy-4">
             {staff.length > 0 ? staff.map((member, index) => (
               <div key={member.id} className="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay={index * 100}>
-                <div className="member">
+                <div className="member glass-card" style={{ borderRadius: '24px', overflow: 'hidden' }}>
                   <div className="member-img" style={{ height: '250px', overflow: 'hidden' }}>
                     {member.image_path ? (
                       <img 
@@ -464,8 +466,8 @@ export default function HomePage() {
           <div className="text-end mt-4">
             <Link
               to="/trainers"
-              className="btn fw-semibold text-white"
-              style={{ backgroundColor: '#004080', borderRadius: '8px', padding: '0.7rem 1.6rem' }}
+              className="btn fw-semibold text-white glass-button"
+              style={{ borderRadius: '999px', padding: '0.7rem 1.6rem' }}
             >
               View All Staff <i className="bi bi-arrow-right ms-2"></i>
             </Link>

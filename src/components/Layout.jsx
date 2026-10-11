@@ -159,9 +159,12 @@ export default function Layout() {
     <div className="app-shell index-page">
       <header
         id="header"
-        className="header fixed-top"
+        className="header fixed-top glass-panel"
         style={{
-          backgroundColor: "var(--brand-accent)",
+          backgroundColor: "rgba(17, 24, 39, 0.42)",
+          backdropFilter: "blur(18px)",
+          WebkitBackdropFilter: "blur(18px)",
+          borderBottom: "1px solid rgba(255,255,255,0.18)",
           padding: "10px 0",
           position: "fixed",
           top: "0",
@@ -169,7 +172,7 @@ export default function Layout() {
           right: "0",
           width: "100%",
           zIndex: "9999",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          boxShadow: "0 12px 30px rgba(15, 23, 42, 0.1)",
         }}
       >
         <div className="container-fluid px-3 px-sm-4 d-flex align-items-center justify-content-between">
@@ -181,9 +184,11 @@ export default function Layout() {
                 width: "clamp(32px, 6vw, 40px)",
                 height: "clamp(32px, 6vw, 40px)",
                 objectFit: "contain",
-                backgroundColor: "white",
+                backgroundColor: "rgba(255,255,255,0.9)",
                 padding: "2px",
-                borderRadius: "6px",
+                borderRadius: "12px",
+                border: "1px solid rgba(255,255,255,0.45)",
+                boxShadow: "0 8px 18px rgba(0,0,0,0.12)",
               }}
             />
             <div className="d-block" style={{ minWidth: 0 }}>
@@ -211,9 +216,9 @@ export default function Layout() {
           <nav id="navmenu" className={`navmenu d-flex align-items-center ${menuOpen ? "nav-open" : ""}`}>
             <NavTree items={boot.navigation} onNavigate={() => setMenuOpen(false)} includeMobileClose />
             <Link
-              className="ms-3 d-none d-xl-inline-block rounded-pill px-3 py-2 fw-bold text-decoration-none flex-shrink-0"
+              className="ms-3 d-none d-xl-inline-block rounded-pill px-3 py-2 fw-bold text-decoration-none flex-shrink-0 glass-button"
               to="/login"
-              style={{ backgroundColor: "white", color: "#2a1810", border: "2px solid rgba(247,239,232,0.85)", fontSize: "0.9rem" }}
+              style={{ color: "#1f2937", border: "1px solid rgba(255,255,255,0.38)", fontSize: "0.9rem" }}
             >
               Student Portal
             </Link>
@@ -230,7 +235,7 @@ export default function Layout() {
 
       <Outlet />
 
-      <footer id="footer" className="footer">
+      <footer id="footer" className="footer glass-panel">
         <div className="footer-content">
           <div className="footer-section">
             <h4>School Contact</h4>
