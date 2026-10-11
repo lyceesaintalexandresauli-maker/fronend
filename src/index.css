@@ -108,7 +108,8 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(15,23,42,0.18), rgba(15,23,42,0.65));
+  background: none;
+  display: none;
 }
 
 .hero-center {
@@ -154,6 +155,7 @@ body {
   
   .hero-img {
     @apply w-full h-full object-cover transition-transform duration-1000;
+    opacity: 0.95;
   }
   
   .hero-swiper-active .hero-img {
@@ -248,6 +250,7 @@ body {
   height: 400px;
   object-fit: cover;
   transition: transform 1s ease;
+  opacity: 0.95;
 }
 
 .heroSwiper .swiper-slide-active .hero-img {
@@ -272,6 +275,7 @@ body {
   height: 100vh;
   object-fit: cover;
   transition: transform 1s ease;
+  opacity: 0.95;
 }
 
 .heroSwiper .swiper-slide-active .hero-img {
@@ -997,74 +1001,6 @@ i.bi,
 /* Normalize cards and boxed UI elements */
 .card,
 .member,
-.icon-box,
-.why-box,
-.adm-panel,
-.adm-overview {
-  border-radius: var(--ui-radius-md);
-  box-shadow: var(--ui-shadow-sm);
-}
-
-.card:hover,
-.member:hover,
-.icon-box:hover {
-  box-shadow: var(--ui-shadow-md);
-  transform: translateY(-2px);
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
-}
-
-/* Uniform interactive elements */
-.btn,
-.adm-btn,
-button:not(.btn-close):not(.accordion-button):not(.mobile-nav-toggle) {
-  border-radius: var(--ui-radius-sm) !important;
-  font-weight: 700 !important;
-  min-height: 38px;
-  padding: 0.45rem 0.8rem !important;
-  letter-spacing: 0.01em;
-  transition: transform 0.14s ease, box-shadow 0.2s ease, background-color 0.2s ease !important;
-}
-
-button:hover,
-.btn:hover,
-.adm-btn:hover {
-  transform: translateY(-1px);
-}
-
-.footer {
-  background: linear-gradient(135deg, rgba(11, 29, 51, 0.92), rgba(34, 52, 80, 0.9));
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 -10px 30px rgba(15, 23, 42, 0.12);
-}
-
-.footer-section p,
-.footer-section div,
-.footer-bottom {
-  color: rgba(255,255,255,0.8);
-}
-
-.footer-section h4 {
-  color: #fff;
-}
-
-.social-icons a {
-  background: rgba(255,255,255,0.2);
-  border-color: rgba(255,255,255,0.35);
-  color: #fff;
-}
-
-.social-icons a:hover {
-  background: rgba(255,255,255,0.32);
-}
-
-@media (max-width: 768px) {
-  .hero-center {
-    padding: 1.25rem 1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .hero-center {
-    padding: 1rem 0.85rem;
-  }
+.icon-box {
+  transition: box-shadow 0.3s, transform 0.3s;
 }
