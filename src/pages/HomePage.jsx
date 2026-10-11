@@ -12,8 +12,8 @@ export default function HomePage() {
   const [departments, setDepartments] = useState([]);
   const [content, setContent] = useState({});
   const [heroSlides, setHeroSlides] = useState([]);
+  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [currentEventIndex, setCurrentEventIndex] = useState(0);
-  const swiperRef = useRef(null);
 
   useEffect(() => {
     const load = async () => {
@@ -43,22 +43,14 @@ export default function HomePage() {
     }
   }, []);
 
+  // Auto-play hero slider
   useEffect(() => {
-    if (window.Swiper) {
-      swiperRef.current?.destroy?.(true, true);
-      swiperRef.current = new window.Swiper('.heroSwiper', {
-        loop: true, speed: 800,
-        autoplay: { delay: 4000, disableOnInteraction: false },
-        slidesPerView: 1, spaceBetween: 0,
-        pagination: { el: '.swiper-pagination', clickable: true },
-        navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
-        effect: 'slide'
-      });
+    if (heroSlides.length > 1) {
+      const interval = setInterval(() => {
+        setCurrentSlideIndex((prev) => (prev + 1) % heroSlides.length);
+      }, 5000);
+      return () => clearInterval(interval);
     }
-    return () => {
-      swiperRef.current?.destroy?.(true, true);
-      swiperRef.current = null;
-    };
   }, [heroSlides.length]);
 
   // Auto-play event slider
@@ -71,6 +63,13 @@ export default function HomePage() {
     }
   }, [events.length]);
 
+  const currentSlide = heroSlides.length > 0 ? heroSlides[currentSlideIndex] : null;
+  const displaySlides = heroSlides.length > 0 ? heroSlides : [
+    { id: 1, title: 'Welcome to Lycee saint Alexandre Sauli', content: 'De Muhura Barnabites School', image_path: '/assets/img/photos/sod10.jpg' },
+    { id: 2, title: 'Quality Education & Moral Formation', content: 'Building Tomorrow\'s Leaders Today', image_path: '/assets/img/photos/sod0.jpg' },
+    { id: 3, title: 'Excellence in Technical Education', content: 'ICT, Fashion Design, and Accounting Programs', image_path: '/assets/img/photos/sod1.jpg' }
+  ];
+
   return (
     <main className="main">
       <Seo
@@ -79,143 +78,175 @@ export default function HomePage() {
         path="/"
       />
 
-      <section id="hero" className="hero section position-relative" style={{ paddingTop: '110px', background: 'linear-gradient(180deg, #0d3b74 0%, #0c2950 100%)' }}>
-        <div className="container" style={{ maxWidth: '1400px' }}>
-          <div className="swiper heroSwiper" style={{ width: '100%', height: '620px', borderRadius: '18px', overflow: 'hidden', boxShadow: '0 28px 70px rgba(2, 6, 23, 0.25)' }}>
-            <div className="swiper-wrapper">
-              {heroSlides.length > 0 ? heroSlides.map((slide, index) => (
-                <div key={slide.id || index} className="swiper-slide position-relative" style={{ background: '#081d39' }}>
-                  <div className="d-flex align-items-stretch h-100 gap-3 p-3" style={{ background: 'linear-gradient(180deg, #0d3b74 0%, #0a2b4f 100%)' }}>
-                    <div className="position-relative overflow-hidden" style={{ flex: '1 1 68%', minHeight: '100%', borderRadius: '18px' }}>
+      {/* Hero Section - Grid Layout */}
+      <section id="hero" className="hero section" style={{ paddingTop: '120px', paddingBottom: '2rem', backgroundColor: '#f8f9fa' }}>
+        <div className="container-lg" style={{ maxWidth: '1400px' }}>
+          <div className="row gap-3" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+            
+            {/* Left Column - Main Image Slider */}
+            <div data-aos="fade-right">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                {/* Main Image */}
+                <div className="position-relative overflow-hidden" style={{ height: '420px', borderRadius: '12px', boxShadow: '0 10px 40px rgba(0,0,0,0.12)', backgroundColor: '#e9ecef' }}>
+                  {displaySlides.length > 0 && (
+                    <>
                       <img
-                        src={mediaUrl(slide.image_path) || `/assets/img/photos/sod${10 - index}.jpg`}
-                        className="w-100 h-100"
-                        style={{ objectFit: 'cover', width: '100%', height: '100%', filter: 'saturate(1.05) contrast(1.08)' }}
-                        alt={slide.title || `Slide ${index + 1}`}
-                        fetchPriority={index === 0 ? "high" : "auto"}
-                        loading={index === 0 ? "eager" : "lazy"}
+                        src={mediaUrl(displaySlides[currentSlideIndex]?.image_path) || `/assets/img/photos/sod${10 - currentSlideIndex}.jpg`}
+                        alt={displaySlides[currentSlideIndex]?.title || 'Slide'}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'opacity 0.6s ease-in-out' }}
+                        fetchPriority={currentSlideIndex === 0 ? "high" : "auto"}
+                        loading="lazy"
                         decoding="async"
                       />
-
-                      <div className="position-absolute bottom-0 start-0 end-0" style={{ background: 'linear-gradient(180deg, rgba(10, 10, 15, 0) 0%, rgba(10, 14, 22, 0.82) 100%)', padding: '1.2rem 1.5rem 1.1rem' }}>
-                        <h2 className="fw-bold mb-2 text-white" style={{ fontSize: 'clamp(1.8rem, 2.8vw, 3.1rem)', lineHeight: '1.2', textShadow: '0 4px 18px rgba(0,0,0,0.5)' }}>
-                          {slide.title || 'Welcome to Lycee saint Alexandre Sauli'}
-                        </h2>
-                        <p className="mb-0 text-white-50" style={{ fontSize: 'clamp(1rem, 1.5vw, 1.5rem)', lineHeight: '1.4' }}>
-                          {slide.content || 'De Muhura Barnabites School'}
+                      
+                      {/* Text Overlay */}
+                      <div className="position-absolute bottom-0 start-0 end-0" style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.7) 100%)', padding: '2rem 1.5rem', color: 'white' }}>
+                        <h3 className="fw-bold mb-2" style={{ fontSize: '1.3rem', lineHeight: '1.3' }}>
+                          {displaySlides[currentSlideIndex]?.title}
+                        </h3>
+                        <p className="mb-0" style={{ fontSize: '0.9rem', opacity: 0.9 }}>
+                          {displaySlides[currentSlideIndex]?.content}
                         </p>
                       </div>
-                    </div>
 
-                    <div className="d-none d-lg-flex flex-column" style={{ flex: '0 0 32%', minHeight: '100%' }}>
-                      <div className="bg-white w-100 h-100 rounded-4 shadow-sm border overflow-hidden" style={{ border: '1px solid rgba(15, 23, 42, 0.08)' }}>
-                        <div className="px-3 py-2 border-bottom bg-light small fw-semibold text-dark">Shakisha</div>
-                        <div className="p-3 h-100" style={{ background: 'linear-gradient(180deg, #f8fafc 0%, #edf2f7 100%)' }}>
-                          <div className="w-100 h-100 rounded-3 border border-dashed d-flex align-items-center justify-content-center text-muted" style={{ backgroundColor: '#ffffff', minHeight: '300px' }}>
-                            <div className="text-center">
-                              <i className="bi bi-image" style={{ fontSize: '2.4rem' }}></i>
-                              <div className="small mt-2">Preview</div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                      {/* Navigation Buttons */}
+                      <button
+                        onClick={() => setCurrentSlideIndex((prev) => (prev - 1 + displaySlides.length) % displaySlides.length)}
+                        style={{
+                          position: 'absolute',
+                          left: '12px',
+                          top: '50%',
+                          transform: 'translateY(-50%)',
+                          backgroundColor: 'rgba(255,255,255,0.9)',
+                          border: 'none',
+                          borderRadius: '50%',
+                          width: '40px',
+                          height: '40px',
+                          cursor: 'pointer',
+                          zIndex: 10,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        <i className="bi bi-chevron-left" style={{ fontSize: '1rem' }}></i>
+                      </button>
+
+                      <button
+                        onClick={() => setCurrentSlideIndex((prev) => (prev + 1) % displaySlides.length)}
+                        style={{
+                          position: 'absolute',
+                          right: '12px',
+                          top: '50%',
+                          transform: 'translateY(-50%)',
+                          backgroundColor: 'rgba(255,255,255,0.9)',
+                          border: 'none',
+                          borderRadius: '50%',
+                          width: '40px',
+                          height: '40px',
+                          cursor: 'pointer',
+                          zIndex: 10,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        <i className="bi bi-chevron-right" style={{ fontSize: '1rem' }}></i>
+                      </button>
+                    </>
+                  )}
+                </div>
+
+                {/* Thumbnail Strip */}
+                <div style={{ display: 'flex', gap: '0.6rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
+                  {displaySlides.map((slide, index) => (
+                    <button
+                      key={slide.id || index}
+                      onClick={() => setCurrentSlideIndex(index)}
+                      style={{
+                        minWidth: '80px',
+                        height: '60px',
+                        border: currentSlideIndex === index ? '3px solid #0d3b74' : '2px solid #ccc',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        backgroundColor: '#f0f0f0',
+                        overflow: 'hidden',
+                        transition: 'all 0.3s ease'
+                      }}
+                    >
+                      <img
+                        src={mediaUrl(slide.image_path) || `/assets/img/photos/sod${10 - index}.jpg`}
+                        alt={`Thumbnail ${index + 1}`}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column - Stacked Cards */}
+            <div data-aos="fade-left" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              
+              {/* Card 1 - Featured Content */}
+              {events.length > 0 && (
+                <div className="card border-0 shadow-sm" style={{ borderRadius: '12px', overflow: 'hidden', background: '#fff' }}>
+                  <div style={{ height: '180px', overflow: 'hidden', backgroundColor: '#e9ecef' }}>
+                    {events[currentEventIndex]?.image_path && (
+                      <img
+                        src={mediaUrl(events[currentEventIndex].image_path)}
+                        alt={events[currentEventIndex].title}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    )}
+                  </div>
+                  <div className="p-3" style={{ backgroundColor: 'rgba(178, 77, 18, 0.05)' }}>
+                    <div className="small mb-2" style={{ color: '#666', fontSize: '0.75rem' }}>
+                      <i className="bi bi-calendar-event me-2"></i>
+                      {events[currentEventIndex]?.created_at ? new Date(events[currentEventIndex].created_at).toLocaleDateString() : 'TBD'}
                     </div>
+                    <h5 className="fw-bold mb-2" style={{ fontSize: '1.1rem', lineHeight: '1.3', color: '#333' }}>
+                      {events[currentEventIndex]?.title}
+                    </h5>
+                    <p className="text-muted small mb-0" style={{ lineHeight: '1.4', color: '#666' }}>
+                      {events[currentEventIndex]?.description?.substring(0, 100)}...
+                    </p>
                   </div>
                 </div>
-              )) : (
-                <>
-                  <div className="swiper-slide position-relative" style={{ background: '#081d39' }}>
-                    <div className="d-flex align-items-stretch h-100 gap-3 p-3" style={{ background: 'linear-gradient(180deg, #0d3b74 0%, #0a2b4f 100%)' }}>
-                      <div className="position-relative overflow-hidden" style={{ flex: '1 1 68%', minHeight: '100%', borderRadius: '18px' }}>
-                        <img src="/assets/img/photos/sod10.jpg" className="w-100 h-100" style={{ objectFit: 'cover', width: '100%', height: '100%', filter: 'saturate(1.05) contrast(1.08)' }} alt="Welcome" fetchPriority="high" loading="eager" decoding="async" />
-                        <div className="position-absolute bottom-0 start-0 end-0" style={{ background: 'linear-gradient(180deg, rgba(10, 10, 15, 0) 0%, rgba(10, 14, 22, 0.82) 100%)', padding: '1.2rem 1.5rem 1.1rem' }}>
-                          <h2 className="fw-bold mb-2 text-white" style={{ fontSize: 'clamp(1.8rem, 2.8vw, 3.1rem)', lineHeight: '1.2', textShadow: '0 4px 18px rgba(0,0,0,0.5)' }}>
-                            Welcome to Lycee saint Alexandre Sauli
-                          </h2>
-                          <p className="mb-0 text-white-50" style={{ fontSize: 'clamp(1rem, 1.5vw, 1.5rem)', lineHeight: '1.4' }}>
-                            De Muhura Barnabites's School
-                          </p>
-                        </div>
-                      </div>
-                      <div className="d-none d-lg-flex flex-column" style={{ flex: '0 0 32%', minHeight: '100%' }}>
-                        <div className="bg-white w-100 h-100 rounded-4 shadow-sm border overflow-hidden" style={{ border: '1px solid rgba(15, 23, 42, 0.08)' }}>
-                          <div className="px-3 py-2 border-bottom bg-light small fw-semibold text-dark">Shakisha</div>
-                          <div className="p-3 h-100" style={{ background: 'linear-gradient(180deg, #f8fafc 0%, #edf2f7 100%)' }}>
-                            <div className="w-100 h-100 rounded-3 border border-dashed d-flex align-items-center justify-content-center text-muted" style={{ backgroundColor: '#ffffff', minHeight: '300px' }}>
-                              <div className="text-center">
-                                <i className="bi bi-image" style={{ fontSize: '2.4rem' }}></i>
-                                <div className="small mt-2">Preview</div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="swiper-slide position-relative" style={{ background: '#081d39' }}>
-                    <div className="d-flex align-items-stretch h-100 gap-3 p-3" style={{ background: 'linear-gradient(180deg, #0d3b74 0%, #0a2b4f 100%)' }}>
-                      <div className="position-relative overflow-hidden" style={{ flex: '1 1 68%', minHeight: '100%', borderRadius: '18px' }}>
-                        <img src="/assets/img/photos/sod0.jpg" className="w-100 h-100" style={{ objectFit: 'cover', width: '100%', height: '100%', filter: 'saturate(1.05) contrast(1.08)' }} alt="Education" loading="lazy" decoding="async" />
-                        <div className="position-absolute bottom-0 start-0 end-0" style={{ background: 'linear-gradient(180deg, rgba(10, 10, 15, 0) 0%, rgba(10, 14, 22, 0.82) 100%)', padding: '1.2rem 1.5rem 1.1rem' }}>
-                          <h2 className="fw-bold mb-2 text-white" style={{ fontSize: 'clamp(1.8rem, 2.8vw, 3.1rem)', lineHeight: '1.2', textShadow: '0 4px 18px rgba(0,0,0,0.5)' }}>
-                            Quality Education & Moral Formation
-                          </h2>
-                          <p className="mb-0 text-white-50" style={{ fontSize: 'clamp(1rem, 1.5vw, 1.5rem)', lineHeight: '1.4' }}>
-                            Building Tomorrow's Leaders Today
-                          </p>
-                        </div>
-                      </div>
-                      <div className="d-none d-lg-flex flex-column" style={{ flex: '0 0 32%', minHeight: '100%' }}>
-                        <div className="bg-white w-100 h-100 rounded-4 shadow-sm border overflow-hidden" style={{ border: '1px solid rgba(15, 23, 42, 0.08)' }}>
-                          <div className="px-3 py-2 border-bottom bg-light small fw-semibold text-dark">Shakisha</div>
-                          <div className="p-3 h-100" style={{ background: 'linear-gradient(180deg, #f8fafc 0%, #edf2f7 100%)' }}>
-                            <div className="w-100 h-100 rounded-3 border border-dashed d-flex align-items-center justify-content-center text-muted" style={{ backgroundColor: '#ffffff', minHeight: '300px' }}>
-                              <div className="text-center">
-                                <i className="bi bi-image" style={{ fontSize: '2.4rem' }}></i>
-                                <div className="small mt-2">Preview</div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="swiper-slide position-relative" style={{ background: '#081d39' }}>
-                    <div className="d-flex align-items-stretch h-100 gap-3 p-3" style={{ background: 'linear-gradient(180deg, #0d3b74 0%, #0a2b4f 100%)' }}>
-                      <div className="position-relative overflow-hidden" style={{ flex: '1 1 68%', minHeight: '100%', borderRadius: '18px' }}>
-                        <img src="/assets/img/photos/sod1.jpg" className="w-100 h-100" style={{ objectFit: 'cover', width: '100%', height: '100%', filter: 'saturate(1.05) contrast(1.08)' }} alt="Excellence" loading="lazy" decoding="async" />
-                        <div className="position-absolute bottom-0 start-0 end-0" style={{ background: 'linear-gradient(180deg, rgba(10, 10, 15, 0) 0%, rgba(10, 14, 22, 0.82) 100%)', padding: '1.2rem 1.5rem 1.1rem' }}>
-                          <h2 className="fw-bold mb-2 text-white" style={{ fontSize: 'clamp(1.8rem, 2.8vw, 3.1rem)', lineHeight: '1.2', textShadow: '0 4px 18px rgba(0,0,0,0.5)' }}>
-                            Excellence in Technical Education
-                          </h2>
-                          <p className="mb-0 text-white-50" style={{ fontSize: 'clamp(1rem, 1.5vw, 1.5rem)', lineHeight: '1.4' }}>
-                            ICT, Fashion Design, and Accounting Programs
-                          </p>
-                        </div>
-                      </div>
-                      <div className="d-none d-lg-flex flex-column" style={{ flex: '0 0 32%', minHeight: '100%' }}>
-                        <div className="bg-white w-100 h-100 rounded-4 shadow-sm border overflow-hidden" style={{ border: '1px solid rgba(15, 23, 42, 0.08)' }}>
-                          <div className="px-3 py-2 border-bottom bg-light small fw-semibold text-dark">Shakisha</div>
-                          <div className="p-3 h-100" style={{ background: 'linear-gradient(180deg, #f8fafc 0%, #edf2f7 100%)' }}>
-                            <div className="w-100 h-100 rounded-3 border border-dashed d-flex align-items-center justify-content-center text-muted" style={{ backgroundColor: '#ffffff', minHeight: '300px' }}>
-                              <div className="text-center">
-                                <i className="bi bi-image" style={{ fontSize: '2.4rem' }}></i>
-                                <div className="small mt-2">Preview</div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </>
               )}
+
+              {/* Card 2 - Info Box */}
+              <div className="card border-0 shadow-sm" style={{ borderRadius: '12px', background: 'linear-gradient(135deg, #0d3b74 0%, #0a2b4f 100%)', color: 'white', padding: '1.5rem' }}>
+                <h5 className="fw-bold mb-2" style={{ fontSize: '1.1rem' }}>Shakisha</h5>
+                <p className="mb-0 small" style={{ lineHeight: '1.5', opacity: 0.9 }}>
+                  Quality education, moral formation, and strong technical programs in ICT, fashion design, and accounting.
+                </p>
+              </div>
+
+              {/* Card 3 - Call to Action */}
+              <div className="card border-0 shadow-sm" style={{ borderRadius: '12px', background: '#fff', padding: '1.5rem', textAlign: 'center' }}>
+                <h6 className="fw-bold mb-3" style={{ fontSize: '1rem', color: '#333' }}>Learn More</h6>
+                <Link 
+                  to="/about" 
+                  className="btn btn-sm" 
+                  style={{ 
+                    backgroundColor: '#0d3b74', 
+                    color: 'white', 
+                    borderRadius: '8px', 
+                    padding: '0.6rem 1.2rem',
+                    textDecoration: 'none',
+                    fontSize: '0.9rem',
+                    fontWeight: '600'
+                  }}
+                >
+                  Explore <i className="bi bi-arrow-right ms-2"></i>
+                </Link>
+              </div>
             </div>
-            <div className="swiper-pagination" style={{ bottom: '18px' }}></div>
-            <div className="swiper-button-next" style={{ color: 'white', right: '18px' }}></div>
-            <div className="swiper-button-prev" style={{ color: 'white', left: '18px' }}></div>
           </div>
         </div>
       </section>
