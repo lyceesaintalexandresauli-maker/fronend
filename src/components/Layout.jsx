@@ -161,9 +161,11 @@ export default function Layout() {
         id="header"
         className="header fixed-top"
         style={{
-          background: "#b24d12",
-          borderBottom: "1px solid rgba(255,255,255,0.10)",
-          boxShadow: "0 2px 0 rgba(0,0,0,0.05)",
+          background: "rgba(178, 77, 18, 0.8)",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+          borderBottom: "1px solid rgba(255,255,255,0.18)",
+          boxShadow: "0 8px 22px rgba(15, 23, 42, 0.12)",
           padding: "10px 0",
           position: "fixed",
           top: "0",
@@ -171,8 +173,6 @@ export default function Layout() {
           right: "0",
           width: "100%",
           zIndex: "9999",
-          backdropFilter: "none",
-          WebkitBackdropFilter: "none",
         }}
       >
         <div className="container-fluid px-3 px-sm-4 d-flex align-items-center justify-content-between">
