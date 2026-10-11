@@ -78,79 +78,145 @@ export default function HomePage() {
         description="Lycee Saint Alexandre Sauli de Muhura offers quality education, moral formation, and strong technical programs in ICT, fashion design, and accounting."
         path="/"
       />
-      {/* Hero Section - Full Screen Slider */}
-      <section id="hero" className="hero section position-relative">
-        <div className="swiper heroSwiper" style={{ width: '100%', height: '100vh' }}>
-          <div className="swiper-wrapper">
-            {heroSlides.length > 0 ? heroSlides.map((slide, index) => (
-              <div key={slide.id || index} className="swiper-slide position-relative">
-                <img
-                  src={mediaUrl(slide.image_path) || `/assets/img/photos/sod${10 - index}.jpg`}
-                  className="w-100 h-100"
-                  style={{ objectFit: 'cover', width: '100%', height: '100vh' }}
-                  alt={slide.title || `Slide ${index + 1}`}
-                  fetchPriority={index === 0 ? "high" : "auto"}
-                  loading={index === 0 ? "eager" : "lazy"}
-                  decoding="async"
-                />
-                <div className="container position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
-                  <div className="glass-panel text-center px-4" style={{ color: '#ffffff', borderRadius: '28px', padding: '2.5rem 2rem', maxWidth: '880px' }}>
-                    <h2 className="fw-bold mb-4" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', lineHeight: '1.3', color: '#ffffff', textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }} data-aos="fade-up" data-aos-delay="100">
-                      {slide.title || 'Welcome to Lycee saint Alexandre Sauli'}
-                    </h2>
-                    <h3 className="mb-0" style={{ fontSize: 'clamp(1.2rem, 3vw, 2rem)', fontWeight: '400', color: '#ffffff', textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }} data-aos="fade-up" data-aos-delay="200">
-                      {slide.content || 'De Muhura Barnabites School'}
-                    </h3>
-                  </div>
-                </div>
-              </div>
-            )) : (
-              <>
-                <div className="swiper-slide position-relative">
-                  <img src="/assets/img/photos/sod10.jpg" className="w-100 h-100" style={{ objectFit: 'cover', width: '100%', height: '100vh' }} alt="Welcome" fetchPriority="high" loading="eager" decoding="async" />
-                  <div className="container position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
-                    <div className="glass-panel text-center px-4" style={{ color: '#ffffff', borderRadius: '28px', padding: '2.5rem 2rem', maxWidth: '880px' }}>
-                      <h2 className="fw-bold mb-4" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', lineHeight: '1.3', color: '#ffffff', textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }} data-aos="fade-up" data-aos-delay="100">
-                        Welcome to Lycee saint Alexandre Sauli
-                      </h2>
-                      <h3 className="mb-0" style={{ fontSize: 'clamp(1.2rem, 3vw, 2rem)', fontWeight: '400', color: '#ffffff', textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }} data-aos="fade-up" data-aos-delay="200">
-                        De Muhura Barnabites's School
-                      </h3>
+
+      <section id="hero" className="hero section position-relative" style={{ paddingTop: '110px', background: 'linear-gradient(180deg, #0d3b74 0%, #0c2950 100%)' }}>
+        <div className="container" style={{ maxWidth: '1400px' }}>
+          <div className="swiper heroSwiper" style={{ width: '100%', height: '620px', borderRadius: '18px', overflow: 'hidden', boxShadow: '0 28px 70px rgba(2, 6, 23, 0.25)' }}>
+            <div className="swiper-wrapper">
+              {heroSlides.length > 0 ? heroSlides.map((slide, index) => (
+                <div key={slide.id || index} className="swiper-slide position-relative" style={{ background: '#081d39' }}>
+                  <div className="d-flex align-items-stretch h-100 gap-3 p-3" style={{ background: 'linear-gradient(180deg, #0d3b74 0%, #0a2b4f 100%)' }}>
+                    <div className="position-relative overflow-hidden" style={{ flex: '1 1 68%', minHeight: '100%', borderRadius: '18px' }}>
+                      <img
+                        src={mediaUrl(slide.image_path) || `/assets/img/photos/sod${10 - index}.jpg`}
+                        className="w-100 h-100"
+                        style={{ objectFit: 'cover', width: '100%', height: '100%', filter: 'saturate(1.05) contrast(1.08)' }}
+                        alt={slide.title || `Slide ${index + 1}`}
+                        fetchPriority={index === 0 ? "high" : "auto"}
+                        loading={index === 0 ? "eager" : "lazy"}
+                        decoding="async"
+                      />
+
+                      <div className="position-absolute bottom-0 start-0 end-0" style={{ background: 'linear-gradient(180deg, rgba(10, 10, 15, 0) 0%, rgba(10, 14, 22, 0.82) 100%)', padding: '1.2rem 1.5rem 1.1rem' }}>
+                        <h2 className="fw-bold mb-2 text-white" style={{ fontSize: 'clamp(1.8rem, 2.8vw, 3.1rem)', lineHeight: '1.2', textShadow: '0 4px 18px rgba(0,0,0,0.5)' }}>
+                          {slide.title || 'Welcome to Lycee saint Alexandre Sauli'}
+                        </h2>
+                        <p className="mb-0 text-white-50" style={{ fontSize: 'clamp(1rem, 1.5vw, 1.5rem)', lineHeight: '1.4' }}>
+                          {slide.content || 'De Muhura Barnabites School'}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="d-none d-lg-flex flex-column" style={{ flex: '0 0 32%', minHeight: '100%' }}>
+                      <div className="bg-white w-100 h-100 rounded-4 shadow-sm border overflow-hidden" style={{ border: '1px solid rgba(15, 23, 42, 0.08)' }}>
+                        <div className="px-3 py-2 border-bottom bg-light small fw-semibold text-dark">Shakisha</div>
+                        <div className="p-3 h-100" style={{ background: 'linear-gradient(180deg, #f8fafc 0%, #edf2f7 100%)' }}>
+                          <div className="w-100 h-100 rounded-3 border border-dashed d-flex align-items-center justify-content-center text-muted" style={{ backgroundColor: '#ffffff', minHeight: '300px' }}>
+                            <div className="text-center">
+                              <i className="bi bi-image" style={{ fontSize: '2.4rem' }}></i>
+                              <div className="small mt-2">Preview</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div className="swiper-slide position-relative">
-                  <img src="/assets/img/photos/sod0.jpg" className="w-100 h-100" style={{ objectFit: 'cover', width: '100%', height: '100vh' }} alt="Education" loading="lazy" decoding="async" />
-                  <div className="container position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
-                    <div className="glass-panel text-center px-4" style={{ color: '#ffffff', borderRadius: '28px', padding: '2.5rem 2rem', maxWidth: '880px' }}>
-                      <h2 className="fw-bold mb-4" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', lineHeight: '1.3', color: '#ffffff', textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }} data-aos="fade-up" data-aos-delay="100">
-                        Quality Education & Moral Formation
-                      </h2>
-                      <h3 className="mb-0" style={{ fontSize: 'clamp(1.2rem, 3vw, 2rem)', fontWeight: '400', color: '#ffffff', textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }} data-aos="fade-up" data-aos-delay="200">
-                        Building Tomorrow's Leaders Today
-                      </h3>
+              )) : (
+                <>
+                  <div className="swiper-slide position-relative" style={{ background: '#081d39' }}>
+                    <div className="d-flex align-items-stretch h-100 gap-3 p-3" style={{ background: 'linear-gradient(180deg, #0d3b74 0%, #0a2b4f 100%)' }}>
+                      <div className="position-relative overflow-hidden" style={{ flex: '1 1 68%', minHeight: '100%', borderRadius: '18px' }}>
+                        <img src="/assets/img/photos/sod10.jpg" className="w-100 h-100" style={{ objectFit: 'cover', width: '100%', height: '100%', filter: 'saturate(1.05) contrast(1.08)' }} alt="Welcome" fetchPriority="high" loading="eager" decoding="async" />
+                        <div className="position-absolute bottom-0 start-0 end-0" style={{ background: 'linear-gradient(180deg, rgba(10, 10, 15, 0) 0%, rgba(10, 14, 22, 0.82) 100%)', padding: '1.2rem 1.5rem 1.1rem' }}>
+                          <h2 className="fw-bold mb-2 text-white" style={{ fontSize: 'clamp(1.8rem, 2.8vw, 3.1rem)', lineHeight: '1.2', textShadow: '0 4px 18px rgba(0,0,0,0.5)' }}>
+                            Welcome to Lycee saint Alexandre Sauli
+                          </h2>
+                          <p className="mb-0 text-white-50" style={{ fontSize: 'clamp(1rem, 1.5vw, 1.5rem)', lineHeight: '1.4' }}>
+                            De Muhura Barnabites's School
+                          </p>
+                        </div>
+                      </div>
+                      <div className="d-none d-lg-flex flex-column" style={{ flex: '0 0 32%', minHeight: '100%' }}>
+                        <div className="bg-white w-100 h-100 rounded-4 shadow-sm border overflow-hidden" style={{ border: '1px solid rgba(15, 23, 42, 0.08)' }}>
+                          <div className="px-3 py-2 border-bottom bg-light small fw-semibold text-dark">Shakisha</div>
+                          <div className="p-3 h-100" style={{ background: 'linear-gradient(180deg, #f8fafc 0%, #edf2f7 100%)' }}>
+                            <div className="w-100 h-100 rounded-3 border border-dashed d-flex align-items-center justify-content-center text-muted" style={{ backgroundColor: '#ffffff', minHeight: '300px' }}>
+                              <div className="text-center">
+                                <i className="bi bi-image" style={{ fontSize: '2.4rem' }}></i>
+                                <div className="small mt-2">Preview</div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="swiper-slide position-relative">
-                  <img src="/assets/img/photos/sod1.jpg" className="w-100 h-100" style={{ objectFit: 'cover', width: '100%', height: '100vh' }} alt="Excellence" loading="lazy" decoding="async" />
-                  <div className="container position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
-                    <div className="glass-panel text-center px-4" style={{ color: '#ffffff', borderRadius: '28px', padding: '2.5rem 2rem', maxWidth: '880px' }}>
-                      <h2 className="fw-bold mb-4" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', lineHeight: '1.3', color: '#ffffff', textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }} data-aos="fade-up" data-aos-delay="100">
-                        Excellence in Technical Education
-                      </h2>
-                      <h3 className="mb-0" style={{ fontSize: 'clamp(1.2rem, 3vw, 2rem)', fontWeight: '400', color: '#ffffff', textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }} data-aos="fade-up" data-aos-delay="200">
-                        ICT, Fashion Design, and Accounting Programs
-                      </h3>
+
+                  <div className="swiper-slide position-relative" style={{ background: '#081d39' }}>
+                    <div className="d-flex align-items-stretch h-100 gap-3 p-3" style={{ background: 'linear-gradient(180deg, #0d3b74 0%, #0a2b4f 100%)' }}>
+                      <div className="position-relative overflow-hidden" style={{ flex: '1 1 68%', minHeight: '100%', borderRadius: '18px' }}>
+                        <img src="/assets/img/photos/sod0.jpg" className="w-100 h-100" style={{ objectFit: 'cover', width: '100%', height: '100%', filter: 'saturate(1.05) contrast(1.08)' }} alt="Education" loading="lazy" decoding="async" />
+                        <div className="position-absolute bottom-0 start-0 end-0" style={{ background: 'linear-gradient(180deg, rgba(10, 10, 15, 0) 0%, rgba(10, 14, 22, 0.82) 100%)', padding: '1.2rem 1.5rem 1.1rem' }}>
+                          <h2 className="fw-bold mb-2 text-white" style={{ fontSize: 'clamp(1.8rem, 2.8vw, 3.1rem)', lineHeight: '1.2', textShadow: '0 4px 18px rgba(0,0,0,0.5)' }}>
+                            Quality Education & Moral Formation
+                          </h2>
+                          <p className="mb-0 text-white-50" style={{ fontSize: 'clamp(1rem, 1.5vw, 1.5rem)', lineHeight: '1.4' }}>
+                            Building Tomorrow's Leaders Today
+                          </p>
+                        </div>
+                      </div>
+                      <div className="d-none d-lg-flex flex-column" style={{ flex: '0 0 32%', minHeight: '100%' }}>
+                        <div className="bg-white w-100 h-100 rounded-4 shadow-sm border overflow-hidden" style={{ border: '1px solid rgba(15, 23, 42, 0.08)' }}>
+                          <div className="px-3 py-2 border-bottom bg-light small fw-semibold text-dark">Shakisha</div>
+                          <div className="p-3 h-100" style={{ background: 'linear-gradient(180deg, #f8fafc 0%, #edf2f7 100%)' }}>
+                            <div className="w-100 h-100 rounded-3 border border-dashed d-flex align-items-center justify-content-center text-muted" style={{ backgroundColor: '#ffffff', minHeight: '300px' }}>
+                              <div className="text-center">
+                                <i className="bi bi-image" style={{ fontSize: '2.4rem' }}></i>
+                                <div className="small mt-2">Preview</div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </>
-            )}
+
+                  <div className="swiper-slide position-relative" style={{ background: '#081d39' }}>
+                    <div className="d-flex align-items-stretch h-100 gap-3 p-3" style={{ background: 'linear-gradient(180deg, #0d3b74 0%, #0a2b4f 100%)' }}>
+                      <div className="position-relative overflow-hidden" style={{ flex: '1 1 68%', minHeight: '100%', borderRadius: '18px' }}>
+                        <img src="/assets/img/photos/sod1.jpg" className="w-100 h-100" style={{ objectFit: 'cover', width: '100%', height: '100%', filter: 'saturate(1.05) contrast(1.08)' }} alt="Excellence" loading="lazy" decoding="async" />
+                        <div className="position-absolute bottom-0 start-0 end-0" style={{ background: 'linear-gradient(180deg, rgba(10, 10, 15, 0) 0%, rgba(10, 14, 22, 0.82) 100%)', padding: '1.2rem 1.5rem 1.1rem' }}>
+                          <h2 className="fw-bold mb-2 text-white" style={{ fontSize: 'clamp(1.8rem, 2.8vw, 3.1rem)', lineHeight: '1.2', textShadow: '0 4px 18px rgba(0,0,0,0.5)' }}>
+                            Excellence in Technical Education
+                          </h2>
+                          <p className="mb-0 text-white-50" style={{ fontSize: 'clamp(1rem, 1.5vw, 1.5rem)', lineHeight: '1.4' }}>
+                            ICT, Fashion Design, and Accounting Programs
+                          </p>
+                        </div>
+                      </div>
+                      <div className="d-none d-lg-flex flex-column" style={{ flex: '0 0 32%', minHeight: '100%' }}>
+                        <div className="bg-white w-100 h-100 rounded-4 shadow-sm border overflow-hidden" style={{ border: '1px solid rgba(15, 23, 42, 0.08)' }}>
+                          <div className="px-3 py-2 border-bottom bg-light small fw-semibold text-dark">Shakisha</div>
+                          <div className="p-3 h-100" style={{ background: 'linear-gradient(180deg, #f8fafc 0%, #edf2f7 100%)' }}>
+                            <div className="w-100 h-100 rounded-3 border border-dashed d-flex align-items-center justify-content-center text-muted" style={{ backgroundColor: '#ffffff', minHeight: '300px' }}>
+                              <div className="text-center">
+                                <i className="bi bi-image" style={{ fontSize: '2.4rem' }}></i>
+                                <div className="small mt-2">Preview</div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+            <div className="swiper-pagination" style={{ bottom: '18px' }}></div>
+            <div className="swiper-button-next" style={{ color: 'white', right: '18px' }}></div>
+            <div className="swiper-button-prev" style={{ color: 'white', left: '18px' }}></div>
           </div>
-          <div className="swiper-pagination" style={{ bottom: '30px' }}></div>
-          <div className="swiper-button-next" style={{ color: 'white' }}></div>
-          <div className="swiper-button-prev" style={{ color: 'white' }}></div>
         </div>
       </section>
 
@@ -299,7 +365,7 @@ export default function HomePage() {
                   {content['about']?.[0]?.title || 'Who We Are'}
                 </h3>
                 <div className="fst-italic mb-4" style={{ fontSize: '1.1rem', lineHeight: '1.8', color: '#555' }} dangerouslySetInnerHTML={{ __html: content['about']?.[0]?.content || '' }} />
-                
+
                 <ul className="list-unstyled mb-4">
                   <li className="mb-3 d-flex align-items-start">
                     <i className="bi bi-check-circle-circle me-2" style={{ color: 'var(--brand-accent)', fontSize: '1.3rem', marginTop: '2px' }}></i>
@@ -314,7 +380,7 @@ export default function HomePage() {
                     <span style={{ fontSize: '1.05rem' }}>Catholic education rooted in moral and spiritual values.</span>
                   </li>
                 </ul>
-                
+
                 <Link to="/about" className="btn btn-wall-yellow btn-lg rounded-pill px-4 glass-button">
                   <span>Read More</span> <i className="bi bi-arrow-right ms-2"></i>
                 </Link>
