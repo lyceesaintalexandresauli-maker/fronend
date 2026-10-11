@@ -161,11 +161,9 @@ export default function Layout() {
         id="header"
         className="header fixed-top"
         style={{
-          background: "rgba(10, 15, 24, 0.52)",
-          backdropFilter: "blur(18px)",
-          WebkitBackdropFilter: "blur(18px)",
-          borderBottom: "1px solid rgba(255,255,255,0.14)",
-          boxShadow: "0 16px 32px rgba(2, 6, 23, 0.18)",
+          background: "#b24d12",
+          borderBottom: "1px solid rgba(255,255,255,0.10)",
+          boxShadow: "0 2px 0 rgba(0,0,0,0.05)",
           padding: "10px 0",
           position: "fixed",
           top: "0",
@@ -173,6 +171,8 @@ export default function Layout() {
           right: "0",
           width: "100%",
           zIndex: "9999",
+          backdropFilter: "none",
+          WebkitBackdropFilter: "none",
         }}
       >
         <div className="container-fluid px-3 px-sm-4 d-flex align-items-center justify-content-between">
@@ -218,7 +218,13 @@ export default function Layout() {
             <Link
               className="ms-3 d-none d-xl-inline-block rounded-pill px-3 py-2 fw-bold text-decoration-none flex-shrink-0"
               to="/login"
-              style={{ color: "#1f2937", border: "1px solid rgba(255,255,255,0.36)", fontSize: "0.9rem", background: "rgba(255,255,255,0.18)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)" }}
+              style={{
+                color: "#1f2937",
+                background: "rgba(255,255,255,0.96)",
+                border: "1px solid rgba(255,255,255,0.38)",
+                fontSize: "0.9rem",
+                boxShadow: "0 2px 8px rgba(15, 23, 42, 0.08)",
+              }}
             >
               Student Portal
             </Link>
