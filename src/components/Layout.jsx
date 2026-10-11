@@ -159,12 +159,13 @@ export default function Layout() {
     <div className="app-shell index-page">
       <header
         id="header"
-        className="header fixed-top glass-panel"
+        className="header fixed-top"
         style={{
-          backgroundColor: "rgba(17, 24, 39, 0.42)",
+          background: "rgba(15, 23, 42, 0.38)",
           backdropFilter: "blur(18px)",
           WebkitBackdropFilter: "blur(18px)",
           borderBottom: "1px solid rgba(255,255,255,0.18)",
+          boxShadow: "0 12px 30px rgba(15, 23, 42, 0.1)",
           padding: "10px 0",
           position: "fixed",
           top: "0",
@@ -172,7 +173,6 @@ export default function Layout() {
           right: "0",
           width: "100%",
           zIndex: "9999",
-          boxShadow: "0 12px 30px rgba(15, 23, 42, 0.1)",
         }}
       >
         <div className="container-fluid px-3 px-sm-4 d-flex align-items-center justify-content-between">
@@ -235,7 +235,7 @@ export default function Layout() {
 
       <Outlet />
 
-      <footer id="footer" className="footer glass-panel">
+      <footer id="footer" className="footer">
         <div className="footer-content">
           <div className="footer-section">
             <h4>School Contact</h4>
