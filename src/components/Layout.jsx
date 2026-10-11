@@ -161,11 +161,11 @@ export default function Layout() {
         id="header"
         className="header fixed-top"
         style={{
-          background: "rgba(15, 23, 42, 0.38)",
+          background: "rgba(10, 15, 24, 0.52)",
           backdropFilter: "blur(18px)",
           WebkitBackdropFilter: "blur(18px)",
-          borderBottom: "1px solid rgba(255,255,255,0.18)",
-          boxShadow: "0 12px 30px rgba(15, 23, 42, 0.1)",
+          borderBottom: "1px solid rgba(255,255,255,0.14)",
+          boxShadow: "0 16px 32px rgba(2, 6, 23, 0.18)",
           padding: "10px 0",
           position: "fixed",
           top: "0",
@@ -216,9 +216,9 @@ export default function Layout() {
           <nav id="navmenu" className={`navmenu d-flex align-items-center ${menuOpen ? "nav-open" : ""}`}>
             <NavTree items={boot.navigation} onNavigate={() => setMenuOpen(false)} includeMobileClose />
             <Link
-              className="ms-3 d-none d-xl-inline-block rounded-pill px-3 py-2 fw-bold text-decoration-none flex-shrink-0 glass-button"
+              className="ms-3 d-none d-xl-inline-block rounded-pill px-3 py-2 fw-bold text-decoration-none flex-shrink-0"
               to="/login"
-              style={{ color: "#1f2937", border: "1px solid rgba(255,255,255,0.38)", fontSize: "0.9rem" }}
+              style={{ color: "#1f2937", border: "1px solid rgba(255,255,255,0.36)", fontSize: "0.9rem", background: "rgba(255,255,255,0.18)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)" }}
             >
               Student Portal
             </Link>
