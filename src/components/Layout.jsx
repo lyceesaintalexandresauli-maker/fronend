@@ -11,6 +11,7 @@ const fallbackNavigation = [
   { id: 4, label: "Staff", href: "/trainers", children: [] },
   { id: 5, label: "Events", href: "/events", children: [] },
   { id: 6, label: "Announcements", href: "/anouncement", children: [] },
+  { id: 16, label: "Gallery", href: "/gallery", children: [] },
   {
     id: 7,
     label: "Departments",
@@ -161,15 +162,18 @@ export default function Layout() {
         id="header"
         className="header fixed-top"
         style={{
-          backgroundColor: "var(--brand-accent)",
-          padding: "10px 0",
+          backgroundColor: "var(--brand-accent-glass)",
+          padding: "clamp(6px, 1.4vw, 10px) 0",
           position: "fixed",
           top: "0",
           left: "0",
           right: "0",
           width: "100%",
           zIndex: "9999",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          borderBottom: "1px solid rgba(255, 255, 255, 0.28)",
+          boxShadow: "0 6px 26px rgba(15, 23, 42, 0.18)",
+          backdropFilter: "blur(var(--glass-blur)) saturate(var(--glass-saturate))",
+          WebkitBackdropFilter: "blur(var(--glass-blur)) saturate(var(--glass-saturate))",
         }}
       >
         <div className="container-fluid px-3 px-sm-4 d-flex align-items-center justify-content-between">
@@ -230,45 +234,58 @@ export default function Layout() {
 
       <Outlet />
 
-      <footer id="footer" className="footer">
+      <footer id="footer" className="footer" style={{
+        background: "var(--brand-accent-glass)",
+        backdropFilter: "blur(var(--glass-blur)) saturate(var(--glass-saturate))",
+        WebkitBackdropFilter: "blur(var(--glass-blur)) saturate(var(--glass-saturate))",
+        borderTop: "1px solid rgba(255, 255, 255, 0.24)",
+        boxShadow: "0 -6px 26px rgba(15, 23, 42, 0.16)",
+      }}>
         <div className="footer-content">
           <div className="footer-section">
-            <h4>School Contact</h4>
-            <p className="mb-2">
+            <h4 style={{ fontFamily: "var(--font-display)", color: "#fff" }}>School Contact</h4>
+            <p className="mb-2" style={{ color: "rgba(255,255,255,0.92)" }}>
               Quality education, moral formation, and practical training for future leaders.
             </p>
-            <p><strong>Email:</strong> {boot.settings.primary_email || "lycemuhur@gmail.com"}</p>
-            {boot.settings.primary_phone && <p><strong>Phone:</strong> {boot.settings.primary_phone}</p>}
+            <p style={{ color: "rgba(255,255,255,0.92)" }}><strong>Email:</strong> {boot.settings.primary_email || "lycemuhur@gmail.com"}</p>
+            {boot.settings.primary_phone && <p style={{ color: "rgba(255,255,255,0.92)" }}><strong>Phone:</strong> {boot.settings.primary_phone}</p>}
           </div>
 
           <div className="footer-section">
-            <h4>School Location</h4>
+            <h4 style={{ fontFamily: "var(--font-display)", color: "#fff" }}>School Location</h4>
             <div
               dangerouslySetInnerHTML={{
                 __html:
                   boot.settings.location ||
                   "Rwanda, Eastern Province<br/>Gatsibo District<br/>Muhura Sector, Taba Cell<br/>Kanyinya Village",
               }}
+              style={{ color: "rgba(255,255,255,0.92)" }}
             />
           </div>
 
           <div className="footer-section">
-            <h4>Follow Us</h4>
+            <h4 style={{ fontFamily: "var(--font-display)", color: "#fff" }}>Follow Us</h4>
             <div className="social-icons">
-              <a href="#" target="_blank" rel="noopener"><i className="bi bi-facebook"></i></a>
-              <a href="#" target="_blank" rel="noopener"><i className="bi bi-twitter"></i></a>
-              <a href="#" target="_blank" rel="noopener"><i className="bi bi-instagram"></i></a>
-              <a href="#" target="_blank" rel="noopener"><i className="bi bi-linkedin"></i></a>
-              <a href="#" target="_blank" rel="noopener"><i className="bi bi-youtube"></i></a>
+              <a href="#" target="_blank" rel="noopener" style={{ background: "rgba(255,255,255,0.9)", color: "#1f2937", borderColor: "rgba(255,255,255,0.6)" }}><i className="bi bi-facebook"></i></a>
+              <a href="#" target="_blank" rel="noopener" style={{ background: "rgba(255,255,255,0.9)", color: "#1f2937", borderColor: "rgba(255,255,255,0.6)" }}><i className="bi bi-twitter"></i></a>
+              <a href="#" target="_blank" rel="noopener" style={{ background: "rgba(255,255,255,0.9)", color: "#1f2937", borderColor: "rgba(255,255,255,0.6)" }}><i className="bi bi-instagram"></i></a>
+              <a href="#" target="_blank" rel="noopener" style={{ background: "rgba(255,255,255,0.9)", color: "#1f2937", borderColor: "rgba(255,255,255,0.6)" }}><i className="bi bi-linkedin"></i></a>
+              <a href="#" target="_blank" rel="noopener" style={{ background: "rgba(255,255,255,0.9)", color: "#1f2937", borderColor: "rgba(255,255,255,0.6)" }}><i className="bi bi-youtube"></i></a>
             </div>
           </div>
         </div>
-        <div className="footer-bottom">
-          &copy; {new Date().getFullYear()} <strong>LYCEE SAINT ALEXANDRE SAULI DE MUHURA</strong> All Rights Reserved
+        <div className="footer-bottom" style={{ color: "rgba(255,255,255,0.85)", borderTop: "1px solid rgba(255, 255, 255, 0.22)" }}>
+          &copy; {new Date().getFullYear()} <strong style={{ color: "#fff" }}>LYCEE SAINT ALEXANDRE SAULI DE MUHURA</strong> All Rights Reserved
         </div>
       </footer>
 
-      <a href="#" id="scroll-top" className="scroll-top d-flex align-items-center justify-content-center">
+      <a href="#" id="scroll-top" className="scroll-top d-flex align-items-center justify-content-center" style={{
+        background: "var(--brand-accent-glass)",
+        backdropFilter: "blur(var(--glass-blur)) saturate(var(--glass-saturate))",
+        WebkitBackdropFilter: "blur(var(--glass-blur)) saturate(var(--glass-saturate))",
+        border: "1px solid rgba(255, 255, 255, 0.28)",
+        boxShadow: "0 8px 32px rgba(15, 23, 42, 0.16)",
+      }}>
         <i className="bi bi-arrow-up-short"></i>
       </a>
     </div>

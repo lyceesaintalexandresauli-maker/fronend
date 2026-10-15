@@ -1,231 +1,111 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { galleryAPI } from "../api/services";
 import { mediaUrl } from "../api/client";
 import Seo from "../components/Seo";
+
+const ceremonyCaptions = [
+  ["A ceremonial procession", "Participants in flowing pink and white wraps make their way together through the school grounds."],
+  ["Smiles along the way", "Two participants share a joyful moment as fellow students accompany the procession."],
+  ["A welcome from the stage", "A guest raises his hand beneath the bright ceremony drapery to greet the gathering."],
+  ["A warm greeting", "A smiling guest waves to the audience during the celebration."],
+  ["The school gathers", "Students and guests fill the hall to share the Saint Alexandre Sauli Day program."],
+  ["Dance and movement", "A performer in traditional-inspired dress dances before the assembled school community."],
+  ["A moment on stage", "Two students stand together in front of the colorful ceremony setting."],
+  ["Celebrating cultural dress", "A participant wears a vivid patterned outfit as part of the day's celebration."],
+  ["Rhythm of the celebration", "Drummers and performers bring live rhythm to the gathering."],
+  ["A special occasion", "A guest in a red dress stands before the decorated stage during the festivities."],
+  ["Community leaders together", "Clergy and guests pose together outside the school building."],
+  ["Words for the occasion", "A speaker addresses the audience with a microphone during the ceremony."],
+  ["A portrait on campus", "A guest in a red jacket pauses for a portrait on the school grounds."],
+  ["Dancers in procession", "A line of performers in lilac and pink outfits moves together through the hall."],
+  ["A graceful entrance", "A participant in a white gown stands among the audience during the celebration."],
+  ["Together in celebration", "Participants in coordinated ceremonial dress gather before taking part in the program."],
+  ["Tradition in motion", "Students and guests walk together outdoors in ceremonial clothing."],
+  ["A joyful response", "A guest at the front table raises both hands as the gathering responds with applause."],
+  ["A shared portrait", "Clergy and guests stand together outside after the day's celebration."]
+];
+
+const itemDescription = (item, index = 0) =>
+  item.description || item.caption || item.content || ceremonyCaptions[index % ceremonyCaptions.length]?.[1] ||
+  "A treasured moment shared by the Lycée Saint Alexandre Sauli community.";
+const itemTitle = (item, index = 0) => item.title || ceremonyCaptions[index % ceremonyCaptions.length]?.[0] || "A school memory";
 
 export default function GalleryPage() {
   const [gallery, setGallery] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState(false);
   const [filterType, setFilterType] = useState("all");
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
 
   useEffect(() => {
-    const loadGallery = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch("/api/gallery");
-        if (!response.ok) throw new Error("Failed to load gallery");
-        const data = await response.json();
-        setGallery(data || []);
-      } catch (err) {
-        console.error("Error loading gallery:", err);
-        setError(err.message || "Failed to load gallery");
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadGallery();
+    let alive = true;
+    galleryAPI.getAll()
+      .then(({ data }) => { if (alive) setGallery(Array.isArray(data) ? data : data?.items || []); })
+      .catch((err) => { console.error("Error loading gallery:", err); if (alive) setError(true); })
+      .finally(() => { if (alive) setLoading(false); });
+    return () => { alive = false; };
   }, []);
 
-  const filteredGallery = filterType === "all" 
-    ? gallery 
-    : gallery.filter(item => item.media_type === filterType);
+  const photos = useMemo(() => gallery.filter((item) => item.media_type === "image"), [gallery]);
+  const visibleItems = useMemo(() => filterType === "all" ? gallery : gallery.filter((item) => item.media_type === filterType), [gallery, filterType]);
+  const activePhoto = photos[activeIndex];
+  const moveSlide = (direction) => setActiveIndex((index) => (index + direction + photos.length) % photos.length);
 
-  if (loading) {
-    return (
-      <main className="main">
-        <section className="section py-5">
-          <div className="container text-center">
-            <div className="spinner-border text-primary" role="status" />
-            <p className="mt-3 mb-0">Loading gallery...</p>
-          </div>
-        </section>
-      </main>
-    );
-  }
+  useEffect(() => {
+    if (paused || photos.length < 2) return undefined;
+    const timer = window.setInterval(() => setActiveIndex((index) => (index + 1) % photos.length), 6500);
+    return () => window.clearInterval(timer);
+  }, [paused, photos.length]);
+
+  useEffect(() => {
+    const handleKey = (event) => {
+      if (event.key === "Escape") setSelectedItem(null);
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [selectedItem]);
+
+  const setFilter = (type) => { setFilterType(type); setActiveIndex(0); };
+
+  if (loading) return <main className="main"><section className="section py-5"><div className="container text-center"><div className="spinner-border text-primary" role="status" /><p className="mt-3">Opening the school memories…</p></div></section></main>;
 
   return (
-    <main className="main">
-      <Seo
-        title="Gallery - Lycee Saint Alexandre Sauli de Muhura"
-        description="View our school gallery with photos and videos from events and activities."
-        path="/gallery"
-      />
-
-      <div className="page-title" data-aos="fade" style={{ backgroundColor: "var(--brand-accent)" }}>
-        <div className="heading">
-          <div className="container">
-            <div className="row d-flex justify-content-center text-center py-5">
-              <div className="col-lg-8">
-                <h1 className="text-white fw-bold">Gallery</h1>
-                <p className="text-white" style={{ opacity: 0.9 }}>
-                  Explore photos and videos from our school activities, events, and moments.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <section className="section py-5">
+    <main className="main ceremony-gallery">
+      <Seo title="Gallery - Lycee Saint Alexandre Sauli de Muhura" description="Stories and photographs from school life, celebrations, and community events at Lycée Saint Alexandre Sauli de Muhura." path="/gallery" />
+      <header className="gallery-intro">
         <div className="container">
-          {/* Filter buttons */}
-          <div className="d-flex justify-content-center gap-2 mb-5" data-aos="fade-up">
-            <button
-              className={`btn ${filterType === "all" ? "btn-primary" : "btn-outline-primary"}`}
-              onClick={() => setFilterType("all")}
-            >
-              All
-            </button>
-            <button
-              className={`btn ${filterType === "image" ? "btn-primary" : "btn-outline-primary"}`}
-              onClick={() => setFilterType("image")}
-            >
-              <i className="bi bi-image me-2"></i>Photos
-            </button>
-            <button
-              className={`btn ${filterType === "video" ? "btn-primary" : "btn-outline-primary"}`}
-              onClick={() => setFilterType("video")}
-            >
-              <i className="bi bi-play-circle me-2"></i>Videos
-            </button>
-          </div>
-
-          {error && (
-            <div className="alert alert-warning" role="alert">
-              {error}
-            </div>
-          )}
-
-          {filteredGallery.length === 0 ? (
-            <div className="text-center py-5">
-              <p className="text-muted fs-5">No gallery items found.</p>
-            </div>
-          ) : (
-            <div className="row g-4">
-              {filteredGallery.map((item, index) => (
-                <div
-                  key={item.id}
-                  className="col-md-6 col-lg-4"
-                  data-aos="fade-up"
-                  data-aos-delay={index * 100}
-                >
-                  {item.media_type === "image" ? (
-                    <div
-                      className="gallery-item position-relative overflow-hidden rounded"
-                      style={{ cursor: "pointer", height: "300px" }}
-                      onClick={() => setSelectedItem(item)}
-                    >
-                      <img
-                        src={mediaUrl(item.media_path)}
-                        alt={item.title || "Gallery image"}
-                        className="w-100 h-100"
-                        style={{ objectFit: "cover" }}
-                        onError={(e) => {
-                          e.target.src = "/assets/img/placeholder.jpg";
-                        }}
-                      />
-                      <div
-                        className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
-                        style={{
-                          backgroundColor: "rgba(0,0,0,0.3)",
-                          opacity: 0,
-                          transition: "opacity 0.3s",
-                        }}
-                        onMouseEnter={(e) => (e.currentTarget.style.opacity = "1")}
-                        onMouseLeave={(e) => (e.currentTarget.style.opacity = "0")}
-                      >
-                        <i className="bi bi-zoom-in text-white fs-3"></i>
-                      </div>
-                      {item.title && (
-                        <div className="position-absolute bottom-0 start-0 w-100 p-3 bg-dark bg-opacity-75 text-white">
-                          <p className="mb-0 text-truncate">{item.title}</p>
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div
-                      className="gallery-item position-relative overflow-hidden rounded"
-                      style={{ cursor: "pointer", height: "300px" }}
-                      onClick={() => setSelectedItem(item)}
-                    >
-                      <video
-                        src={mediaUrl(item.media_path)}
-                        className="w-100 h-100"
-                        style={{ objectFit: "cover" }}
-                      />
-                      <div
-                        className="position-absolute top-50 start-50 translate-middle"
-                        style={{
-                          backgroundColor: "rgba(255,255,255,0.9)",
-                          borderRadius: "50%",
-                          width: "60px",
-                          height: "60px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        <i className="bi bi-play-fill text-primary fs-3"></i>
-                      </div>
-                      {item.title && (
-                        <div className="position-absolute bottom-0 start-0 w-100 p-3 bg-dark bg-opacity-75 text-white">
-                          <p className="mb-0 text-truncate">{item.title}</p>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
+          <span className="gallery-eyebrow"><i className="bi bi-camera me-2" />OUR SCHOOL, IN MOMENTS</span>
+          <h1>Memories we share</h1>
+          <p>Celebrations, culture, and everyday moments from the Lycée Saint Alexandre Sauli community.</p>
         </div>
+      </header>
+
+      <section className="gallery-feature container" aria-label="Featured photo slideshow">
+        <div className="gallery-feature-heading"><div><span className="gallery-kicker">FEATURED STORY</span><h2>Saint Alexandre Sauli Day</h2><p>A celebration of community, culture, and school spirit.</p></div><span className="gallery-count">{photos.length ? `${String(activeIndex + 1).padStart(2, "0")} / ${String(photos.length).padStart(2, "0")}` : "PHOTO STORY"}</span></div>
+        {activePhoto ? <div className="gallery-stage">
+          <img src={mediaUrl(activePhoto.media_path)} alt={itemDescription(activePhoto, activeIndex)} onError={(event) => { event.currentTarget.style.visibility = "hidden"; }} />
+          <div className="gallery-stage-shade" />
+          <div className="gallery-caption"><span className="gallery-caption-label">SAINT ALEXANDRE SAULI DAY</span><h3>{itemTitle(activePhoto, activeIndex)}</h3><p>{itemDescription(activePhoto, activeIndex)}</p></div>
+          {photos.length > 1 && <div className="gallery-controls"><button type="button" aria-label="Previous photo" onClick={() => moveSlide(-1)}><i className="bi bi-arrow-left" /></button><button type="button" aria-label={paused ? "Play slideshow" : "Pause slideshow"} onClick={() => setPaused(!paused)}><i className={`bi ${paused ? "bi-play-fill" : "bi-pause-fill"}`} /></button><button type="button" aria-label="Next photo" onClick={() => moveSlide(1)}><i className="bi bi-arrow-right" /></button></div>}
+          <div className="gallery-progress" aria-hidden="true"><span style={{ width: `${((activeIndex + 1) / photos.length) * 100}%` }} /></div>
+        </div> : <div className="gallery-empty-feature"><i className="bi bi-images" /><h3>Your photo story starts here</h3><p>Add ceremony photographs in the site gallery to feature the procession, performances, guests, and joyful moments here.</p></div>}
+        {photos.length > 1 && <div className="gallery-thumbnails" aria-label="Choose a photo">{photos.map((photo, index) => <button key={photo.id || index} className={index === activeIndex ? "is-active" : ""} onClick={() => setActiveIndex(index)} aria-label={`Show ${photo.title || `photo ${index + 1}`}`}><img src={mediaUrl(photo.media_path)} alt="" loading="lazy" /></button>)}</div>}
       </section>
 
-      {/* Modal for expanded view */}
-      {selectedItem && (
-        <div
-          className="modal fade show d-block"
-          tabIndex="-1"
-          style={{ backgroundColor: "rgba(0,0,0,0.7)" }}
-          onClick={() => setSelectedItem(null)}
-        >
-          <div className="modal-dialog modal-dialog-centered modal-lg">
-            <div
-              className="modal-content"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="modal-header border-0">
-                <h5 className="modal-title">{selectedItem.title || "Gallery Item"}</h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={() => setSelectedItem(null)}
-                ></button>
-              </div>
-              <div className="modal-body p-0">
-                {selectedItem.media_type === "image" ? (
-                  <img
-                    src={mediaUrl(selectedItem.media_path)}
-                    alt={selectedItem.title || "Gallery image"}
-                    className="w-100"
-                    onError={(e) => {
-                      e.target.src = "/assets/img/placeholder.jpg";
-                    }}
-                  />
-                ) : (
-                  <video
-                    src={mediaUrl(selectedItem.media_path)}
-                    className="w-100"
-                    controls
-                    autoPlay
-                  />
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <section className="gallery-collection container">
+        <div className="gallery-collection-top"><div><span className="gallery-kicker">THE COLLECTION</span><h2>Browse every moment</h2></div><div className="gallery-filters" role="group" aria-label="Filter gallery">{[["all", "Everything"], ["image", "Photos"], ["video", "Videos"]].map(([type, label]) => <button key={type} type="button" className={filterType === type ? "active" : ""} onClick={() => setFilter(type)}>{label}</button>)}</div></div>
+        {error && <div className="gallery-empty-feature"><h3>Gallery is taking a rest</h3><p>We could not load the online photo collection just now. Please try again in a little while.</p></div>}
+        {!error && visibleItems.length === 0 && <p className="gallery-no-items">No {filterType === "all" ? "memories" : filterType === "image" ? "photos" : "videos"} to show yet.</p>}
+        <div className="gallery-grid">{visibleItems.map((item, index) => { const photoIndex = photos.findIndex((photo) => photo.id === item.id); const captionIndex = photoIndex >= 0 ? photoIndex : index; return <button type="button" key={item.id || index} className="gallery-card" onClick={() => item.media_type === "image" ? (setActiveIndex(Math.max(0, photoIndex)), window.scrollTo({ top: 0, behavior: "smooth" })) : setSelectedItem(item)}>
+          {item.media_type === "image" ? <img src={mediaUrl(item.media_path)} alt={itemDescription(item)} loading="lazy" /> : <video src={mediaUrl(item.media_path)} aria-label={item.title || "School video"} muted preload="metadata" />}
+          <span className="gallery-card-icon"><i className={`bi ${item.media_type === "image" ? "bi-arrows-fullscreen" : "bi-play-fill"}`} /></span>
+          <span className="gallery-card-copy"><span>{item.media_type === "video" ? "VIDEO" : "PHOTO"}</span><strong>{itemTitle(item, captionIndex)}</strong><small>{itemDescription(item, captionIndex)}</small></span>
+        </button>; })}</div>
+      </section>
+
+      {selectedItem && <div className="gallery-video-modal" role="dialog" aria-modal="true" aria-label={itemTitle(selectedItem)} onClick={() => setSelectedItem(null)}><div className="gallery-video-dialog" onClick={(event) => event.stopPropagation()}><button className="gallery-video-close" aria-label="Close video" onClick={() => setSelectedItem(null)}><i className="bi bi-x-lg" /></button><video src={mediaUrl(selectedItem.media_path)} controls autoPlay /><h3>{itemTitle(selectedItem)}</h3><p>{itemDescription(selectedItem)}</p></div></div>}
     </main>
   );
 }
