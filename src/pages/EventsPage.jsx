@@ -1,18 +1,19 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { mediaUrl } from "../api/client";
 import { eventsAPI } from "../api/services";
 import Seo from "../components/Seo";
+import "./EventsPage.css";
 
 export default function EventsPage() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filterCategory, setFilterCategory] = useState("all");
+  const [filterType, setFilterType] = useState("all");
+  const [filterDate, setFilterDate] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-  const [eventBgColor, setEventBgColor] = useState("var(--brand-accent)");
+  const [sortOrder, setSortOrder] = useState("newest");
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const [activeSlide, setActiveSlide] = useState(0);
-  const sliderRef = useRef(null);
 
   useEffect(() => {
     const loadEvents = async () => {
@@ -37,6 +38,17 @@ export default function EventsPage() {
       filtered = filtered.filter((event) => event.category?.toLowerCase() === filterCategory.toLowerCase());
     }
 
+    if (filterType !== "all") {
+      filtered = filtered.filter((event) => (event.event_type || event.type || "Other").toLowerCase() === filterType.toLowerCase());
+    }
+
+    if (filterDate) {
+      filtered = filtered.filter((event) => {
+        const date = new Date(event.date || event.created_at);
+        return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === filterDate;
+      });
+    }
+
     if (searchTerm) {
       const normalizedSearch = searchTerm.toLowerCase();
       filtered = filtered.filter(
@@ -46,16 +58,12 @@ export default function EventsPage() {
       );
     }
 
+    filtered.sort((a, b) => {
+      const difference = new Date(a.date || a.created_at) - new Date(b.date || b.created_at);
+      return sortOrder === "newest" ? -difference : difference;
+    });
     return filtered;
-  }, [events, filterCategory, searchTerm]);
-
-  useEffect(() => {
-    if (filteredEvents.length === 0) {
-      setActiveSlide(0);
-      return;
-    }
-    setActiveSlide((current) => Math.min(current, filteredEvents.length - 1));
-  }, [filteredEvents.length]);
+  }, [events, filterCategory, filterType, filterDate, searchTerm, sortOrder]);
 
   const formatEventDate = (dateStr) => {
     if (!dateStr) return "No date";
@@ -68,67 +76,23 @@ export default function EventsPage() {
   };
 
   const categories = ["all", ...new Set(events.map((e) => e.category).filter(Boolean))];
+  const eventTypes = ["all", ...new Set(events.map((event) => event.event_type || event.type).filter(Boolean))];
 
-  const goToSlide = (index) => {
-    if (!sliderRef.current || filteredEvents.length === 0) return;
-    const cards = sliderRef.current.querySelectorAll("[data-event-card]");
-    const nextCard = cards[index];
-    if (!nextCard) return;
-    nextCard.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
-    setActiveSlide(index);
-  };
-
-  const slideCards = (direction) => {
-    if (filteredEvents.length === 0) return;
-    const nextIndex = (activeSlide + direction + filteredEvents.length) % filteredEvents.length;
-    goToSlide(nextIndex);
-  };
-
-  useEffect(() => {
-    if (!sliderRef.current) return undefined;
-
-    const slider = sliderRef.current;
-    const handleScroll = () => {
-      const cards = [...slider.querySelectorAll("[data-event-card]")];
-      if (cards.length === 0) return;
-
-      const sliderCenter = slider.scrollLeft + slider.clientWidth / 2;
-      let closestIndex = 0;
-      let closestDistance = Number.POSITIVE_INFINITY;
-
-      cards.forEach((card, index) => {
-        const cardCenter = card.offsetLeft + card.clientWidth / 2;
-        const distance = Math.abs(sliderCenter - cardCenter);
-        if (distance < closestDistance) {
-          closestDistance = distance;
-          closestIndex = index;
-        }
-      });
-
-      setActiveSlide(closestIndex);
-    };
-
-    slider.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-
-    return () => slider.removeEventListener("scroll", handleScroll);
-  }, [filteredEvents.length]);
-
-  useEffect(() => {
-    if (filteredEvents.length <= 1) return undefined;
-
-    const intervalId = window.setInterval(() => {
-      setActiveSlide((current) => {
-        const nextIndex = (current + 1) % filteredEvents.length;
-        const cards = sliderRef.current?.querySelectorAll("[data-event-card]");
-        const nextCard = cards?.[nextIndex];
-        nextCard?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
-        return nextIndex;
-      });
-    }, 4500);
-
-    return () => window.clearInterval(intervalId);
-  }, [filteredEvents.length]);
+  const today = new Date();
+  const monthLabel = today.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+  const monthDays = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+  const monthOffset = new Date(today.getFullYear(), today.getMonth(), 1).getDay();
+  const eventDays = new Set(events.map((event) => {
+    const date = new Date(event.date || event.created_at);
+    return date.getFullYear() === today.getFullYear() && date.getMonth() === today.getMonth() ? date.getDate() : null;
+  }).filter(Boolean));
+  const upcomingEvents = [...events]
+    .filter((event) => {
+      const date = new Date(event.date || event.created_at);
+      return !Number.isNaN(date.getTime()) && date >= new Date(new Date().setHours(0, 0, 0, 0));
+    })
+    .sort((a, b) => new Date(a.date || a.created_at) - new Date(b.date || b.created_at))
+    .slice(0, 6);
 
   return (
     <main className="main">
@@ -150,7 +114,7 @@ export default function EventsPage() {
               onClick={(e) => e.stopPropagation()}
               style={{ borderRadius: "1rem", overflow: "hidden" }}
             >
-              <div className="modal-header border-0" style={{ backgroundColor: "#004080" }}>
+              <div className="modal-header border-0" style={{ backgroundColor: "#211c13" }}>
                 <h5 className="modal-title text-white fw-bold">{selectedEvent.title}</h5>
                 <button
                   type="button"
@@ -208,312 +172,58 @@ export default function EventsPage() {
         </div>
       )}
 
-      <div className="page-title" data-aos="fade" style={{ backgroundColor: "var(--brand-accent)" }}>
-        <div className="heading">
-          <div className="container">
-            <div className="row d-flex justify-content-center text-center py-5">
-              <div className="col-lg-8">
-                <h1 className="text-white fw-bold">Events</h1>
-                <p className="text-white" style={{ opacity: 0.9 }}>
-                  Stay updated with the latest school activities, celebrations, and important events at Lycee Saint Alexandre Sauli De Muhura.
-                </p>
-              </div>
-            </div>
+      <section className="events-page container-fluid px-3 px-lg-4 pb-5" data-aos="fade-up">
+        <div className="events-hero">
+          <div className="events-hero-copy">
+            <span className="events-kicker">Lycee Saint Alexandre Sauli de Muhura</span>
+            <h1>Events</h1>
+            <p>Stay updated with the latest school activities, celebrations, and important events at Lycee Saint Alexandre Sauli De Muhura.</p>
           </div>
         </div>
-      </div>
-
-      <div className="container mb-4" data-aos="fade-up">
-        <div className="d-flex flex-wrap gap-2 justify-content-between align-items-center">
-          <div className="d-flex flex-wrap gap-2">
-            <input
-              type="text"
-              className="form-control form-control-sm"
-              style={{ minWidth: "200px", maxWidth: "350px" }}
-              placeholder="Search title or description..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <select
-              className="form-select form-select-sm"
-              style={{ width: "auto" }}
-              value={filterCategory}
-              onChange={(e) => setFilterCategory(e.target.value)}
-            >
-              {categories.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                </option>
-              ))}
-            </select>
-            <div className="d-flex align-items-center gap-2">
-              <input
-                type="color"
-                className="form-control form-control-color form-control-sm"
-                style={{ width: "40px", height: "30px", padding: "2px" }}
-                value={eventBgColor}
-                onChange={(e) => setEventBgColor(e.target.value)}
-                title="Change event card background color"
-              />
-            </div>
-            <button
-              className="btn btn-outline-secondary btn-sm"
-              onClick={() => {
-                setFilterCategory("all");
-                setSearchTerm("");
-                setEventBgColor("var(--brand-accent)");
-              }}
-            >
-              Reset
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <section className="container mb-5" data-aos="fade-up">
-        <div
-          className="rounded-4 p-4 p-lg-5"
-          style={{
-            background: "linear-gradient(180deg, rgba(255,255,255,1), rgba(246,239,214,0.9))",
-            border: "1px solid rgba(230,197,106,0.35)",
-            boxShadow: "0 24px 60px rgba(0, 0, 0, 0.08)",
-          }}
-        >
-          <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
-            <div>
-              <h2 className="fw-bold mb-1" style={{ color: "#004080" }}>Featured Events</h2>
-              <p className="mb-0 text-muted">
-                Slide through the latest activities and open any card for the full event.
-              </p>
-            </div>
-            <div className="d-flex gap-2">
-              <button
-                type="button"
-                onClick={() => slideCards(-1)}
-                className="btn rounded-circle border-0"
-                style={{
-                  width: "46px",
-                  height: "46px",
-                  backgroundColor: "var(--brand-accent)",
-                  color: "#000",
-                  boxShadow: "0 10px 24px rgba(230,197,106,0.35)",
-                }}
-                aria-label="Previous events"
-              >
-                <i className="bi bi-chevron-left"></i>
-              </button>
-              <button
-                type="button"
-                onClick={() => slideCards(1)}
-                className="btn rounded-circle border-0"
-                style={{
-                  width: "46px",
-                  height: "46px",
-                  backgroundColor: "var(--brand-accent)",
-                  color: "#000",
-                  boxShadow: "0 10px 24px rgba(230,197,106,0.35)",
-                }}
-                aria-label="Next events"
-              >
-                <i className="bi bi-chevron-right"></i>
-              </button>
-            </div>
-          </div>
-
-          {error && (
-            <div className="alert alert-danger mb-4" role="alert">
-              {error}
-            </div>
-          )}
-
-          {loading && (
-            <div className="alert alert-info mb-4" role="status">
-              Fetching latest events...
-            </div>
-          )}
-
-          <div
-            ref={sliderRef}
-            className="d-flex gap-4 overflow-auto pb-3"
-            style={{
-              scrollSnapType: "x mandatory",
-              scrollbarWidth: "none",
-              msOverflowStyle: "none",
-              scrollBehavior: "smooth",
-            }}
-          >
-            {filteredEvents.length > 0 ? (
-              filteredEvents.map((event, index) => (
-                <div
-                  key={event.id}
-                  data-event-card
-                  className="flex-shrink-0"
-                  style={{
-                    width: "min(360px, 82vw)",
-                    scrollSnapAlign: "center",
-                    transform: index === activeSlide ? "translateY(-8px) scale(1.01)" : "translateY(0) scale(0.97)",
-                    opacity: index === activeSlide ? 1 : 0.8,
-                    transition: "transform 0.4s ease, opacity 0.4s ease",
-                  }}
-                >
-                  <div
-                    className="card border-0 overflow-hidden h-100"
-                    style={{
-                      cursor: "pointer",
-                      borderRadius: "1.5rem",
-                      backgroundColor: eventBgColor,
-                      border: "2px solid var(--brand-accent)",
-                      boxShadow: index === activeSlide
-                        ? "0 24px 50px rgba(0,0,0,0.22)"
-                        : "0 16px 32px rgba(0,0,0,0.12)",
-                    }}
-                    onClick={() => setSelectedEvent(event)}
-                  >
-                    <div className="position-relative">
-                      {event.image_path ? (
-                        <img
-                          src={mediaUrl(event.image_path)}
-                          className="card-img-top"
-                          alt={event.title}
-                          style={{ height: "240px", objectFit: "cover" }}
-                          width="720"
-                          height="480"
-                          loading="lazy"
-                          decoding="async"
-                        />
-                      ) : (
-                        <div
-                          className="card-img-top d-flex align-items-center justify-content-center"
-                          style={{
-                            height: "240px",
-                            background: "linear-gradient(135deg, #f8f9fa, #dbe8f4)",
-                          }}
-                        >
-                          <i className="bi bi-calendar3-event" style={{ fontSize: "3.4rem", color: "#004080" }}></i>
-                        </div>
-                      )}
-                      <div
-                        className="position-absolute top-0 start-0 w-100 h-100"
-                        style={{
-                          background: "linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.5))",
-                          pointerEvents: "none",
-                        }}
-                      ></div>
-                      <div className="position-absolute top-0 start-0 p-3">
-                        <span
-                          className="badge text-dark fw-semibold px-3 py-2"
-                          style={{ backgroundColor: "var(--brand-accent)", borderRadius: "999px" }}
-                        >
-                          {event.category || "General"}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="card-body d-flex flex-column p-4">
-                      <div className="d-flex align-items-center gap-2 text-muted small mb-2">
-                        <i className="bi bi-calendar-event" style={{ color: "#004080" }}></i>
-                        <span>{formatEventDate(event.created_at || event.date)}</span>
-                      </div>
-                      <h5 className="card-title fw-bold mb-3" style={{ color: "#0f172a" }}>
-                        {event.title}
-                      </h5>
-                      <p className="card-text mb-4" style={{ color: "#334155", minHeight: "56px" }}>
-                        {event.description?.slice(0, 180)}
-                        {event.description?.length > 180 ? "..." : ""}
-                      </p>
-                      <button
-                        className="btn btn-sm fw-semibold mt-auto align-self-start px-4 py-2"
-                        style={{
-                          backgroundColor: "var(--brand-accent)",
-                          color: "#000",
-                          borderRadius: "999px",
-                        }}
-                      >
-                        Explore Event <i className="bi bi-arrow-right ms-1"></i>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="w-100">
-                <div className="alert alert-info mb-0">
-                  {loading ? "Loading events..." : "No events available."}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {filteredEvents.length > 1 && (
-            <div className="mt-4">
-              <div className="d-flex justify-content-center gap-2 mb-3">
-                {filteredEvents.map((event, index) => (
-                  <button
-                    key={event.id}
-                    type="button"
-                    onClick={() => goToSlide(index)}
-                    aria-label={`Go to event ${index + 1}`}
-                    className="border-0 p-0"
-                    style={{
-                      width: index === activeSlide ? "34px" : "10px",
-                      height: "10px",
-                      borderRadius: "999px",
-                      backgroundColor: index === activeSlide ? "#004080" : "rgba(0,64,128,0.2)",
-                      transition: "all 0.3s ease",
-                    }}
-                  ></button>
-                ))}
-              </div>
-
-              <div className="d-flex justify-content-center gap-2 gap-md-3 flex-wrap">
-                {filteredEvents.map((event, index) => (
-                  <button
-                    key={`${event.id}-thumb`}
-                    type="button"
-                    onClick={() => goToSlide(index)}
-                    className="border-0 p-0 bg-transparent"
-                    aria-label={`Preview ${event.title}`}
-                    style={{
-                      opacity: index === activeSlide ? 1 : 0.72,
-                      transform: index === activeSlide ? "translateY(-2px)" : "none",
-                      transition: "all 0.25s ease",
-                    }}
-                  >
-                    <div
-                      className="overflow-hidden"
-                      style={{
-                        width: "64px",
-                        height: "64px",
-                        borderRadius: "16px",
-                        border: index === activeSlide ? "3px solid #004080" : "2px solid rgba(230,197,106,0.8)",
-                        boxShadow: index === activeSlide ? "0 10px 24px rgba(0,64,128,0.2)" : "0 6px 14px rgba(0,0,0,0.08)",
-                        backgroundColor: "#f8f9fa",
-                      }}
-                    >
-                      {event.image_path ? (
-                        <img
-                          src={mediaUrl(event.image_path)}
-                          alt={event.title}
-                          style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                          width="128"
-                          height="128"
-                          loading="lazy"
-                          decoding="async"
-                        />
-                      ) : (
-                        <div
-                          className="d-flex align-items-center justify-content-center w-100 h-100"
-                          style={{ background: "linear-gradient(135deg, #f8f9fa, #ece4bf)" }}
-                        >
-                          <i className="bi bi-calendar3-event" style={{ fontSize: "1.4rem", color: "#004080" }}></i>
-                        </div>
-                      )}
-                    </div>
+        <form className="events-filter-bar" onSubmit={(event) => event.preventDefault()}>
+          <label className="events-filter-field"><span><i className="bi bi-calendar-event" /> Search by Date</span><input type="date" value={filterDate} onChange={(event) => setFilterDate(event.target.value)} /></label>
+          <label className="events-filter-field"><span><i className="bi bi-funnel-fill" /> Event Type</span><select value={filterType} onChange={(event) => setFilterType(event.target.value)}>{eventTypes.map((type) => <option key={type} value={type}>{type === "all" ? "All Event Types" : type}</option>)}</select></label>
+          <label className="events-filter-field"><span><i className="bi bi-tag-fill" /> Category</span><select value={filterCategory} onChange={(event) => setFilterCategory(event.target.value)}>{categories.map((category) => <option key={category} value={category}>{category === "all" ? "All Categories" : category}</option>)}</select></label>
+          <label className="events-filter-field events-search-field"><span><i className="bi bi-search" /> Search Events</span><input type="search" placeholder="Search events..." value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} /></label>
+          <button className="events-search-button" type="submit"><i className="bi bi-search" /> Search Events</button>
+        </form>
+        <div className="events-layout">
+          <div>
+            {error && <div className="alert alert-danger" role="alert">{error}</div>}
+            {loading && <div className="alert alert-light" role="status">Fetching latest events...</div>}
+            <div className="events-list-heading"><div><h2><i className="bi bi-calendar2-week-fill" /> All Events</h2><p>Showing {filteredEvents.length} event{filteredEvents.length === 1 ? "" : "s"} from Lycee Saint Alexandre Sauli De Muhura.</p></div><label>Sort by: <select value={sortOrder} onChange={(event) => setSortOrder(event.target.value)}><option value="newest">Newest First</option><option value="oldest">Oldest First</option></select></label></div>
+            <div className="events-grid">
+              {filteredEvents.map((event) => {
+                const eventDate = new Date(event.date || event.created_at);
+                return <article className="event-card" key={event.id}>
+                  <button className="event-image-button" onClick={() => setSelectedEvent(event)} aria-label={`View ${event.title}`}>
+                    {event.image_path ? <img src={mediaUrl(event.image_path)} alt={event.title} loading="lazy" decoding="async" /> : <span className="event-image-placeholder"><i className="bi bi-calendar-event" /></span>}
+                    <span className="event-date-badge"><b>{Number.isNaN(eventDate.getTime()) ? "-" : String(eventDate.getDate()).padStart(2, "0")}</b><small>{Number.isNaN(eventDate.getTime()) ? "Date" : eventDate.toLocaleDateString("en-US", { month: "short", year: "numeric" })}</small></span>
+                    <span className="event-category">{event.category || "General"}</span>
                   </button>
-                ))}
-              </div>
+                  <div className="event-card-content">
+                    <h2>{event.title}</h2>
+                    <p>{event.description?.slice(0, 145)}{event.description?.length > 145 ? "..." : ""}</p>
+                    <div className="event-meta"><span><i className="bi bi-calendar3" />{formatEventDate(event.date || event.created_at)}</span>{event.location && <span><i className="bi bi-geo-alt" />{event.location}</span>}</div>
+                    <button className="event-details" onClick={() => setSelectedEvent(event)}>View details <i className="bi bi-arrow-right" /></button>
+                  </div>
+                </article>;
+              })}
+              {!loading && filteredEvents.length === 0 && <div className="events-empty">No events match your search.</div>}
             </div>
-          )}
+          </div>
+          <aside className="events-sidebar">
+            <section className="events-side-panel">
+              <div className="events-panel-title"><h2><i className="bi bi-calendar3" /> Event Calendar</h2><span>{monthLabel}</span></div>
+              <div className="events-weekdays">{["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => <b key={day}>{day}</b>)}</div>
+              <div className="events-calendar">{Array.from({ length: monthOffset }, (_, i) => <span key={`blank-${i}`} />)}{Array.from({ length: monthDays }, (_, i) => <span key={i + 1} className={`${i + 1 === today.getDate() ? "today" : ""} ${eventDays.has(i + 1) ? "has-event" : ""}`}>{i + 1}</span>)}</div>
+            </section>
+            <section className="events-side-panel quick-events">
+              <div className="events-panel-title"><h2><i className="bi bi-calendar2-check-fill" /> Upcoming Events</h2><span>Coming up next</span></div>
+              {upcomingEvents.length ? upcomingEvents.map((event) => <button className="quick-event" key={event.id} onClick={() => setSelectedEvent(event)}><span className="quick-date">{new Date(event.date || event.created_at).toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" })}</span><span className="quick-event-info"><b>{event.title}</b><small><i className="bi bi-clock" /> {event.time || "Date to be announced"}</small><small><i className="bi bi-geo-alt-fill" /> {event.location || "School grounds"}</small></span><i className="bi bi-chevron-right" /></button>) : <p className="events-no-quick">No upcoming events are scheduled yet.</p>}
+            </section>
+            <div className="events-quote"><i className="bi bi-quote" /><p>Together we build a brighter future through education.</p><small>- Lycee Saint Alexandre Sauli de Muhura</small></div>
+          </aside>
         </div>
       </section>
     </main>

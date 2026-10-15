@@ -87,30 +87,35 @@ export const getApiError = (error, fallback = "Request failed") =>
 
 export const mediaUrl = (inputPath) => {
   if (!inputPath) return "";
+  const normalizedPath = String(inputPath).trim().replace(/\\/g, "/");
+  if (!normalizedPath) return "";
 
   // If it's already a full URL, return it as-is
-  if (/^https?:\/\//i.test(inputPath)) {
+  if (/^https?:\/\//i.test(normalizedPath)) {
     // If it's a localhost URL and we're in production, replace with API_BASE_URL
-    if (!isLocalFrontend() && /^https?:\/\/(localhost|127\.0\.0\.1):5000/i.test(inputPath)) {
-      return inputPath.replace(
+    if (!isLocalFrontend() && /^https?:\/\/(localhost|127\.0\.0\.1):5000/i.test(normalizedPath)) {
+      return normalizedPath.replace(
         /^https?:\/\/(localhost|127\.0\.0\.1):5000/i,
         API_BASE_URL || ""
       );
     }
-    return inputPath;
+    return normalizedPath;
   }
 
   // For relative paths, always prepend API_BASE_URL if it's set
   const base = API_BASE_URL || "";
-  
-  // Handle /uploads paths - these are served by backend
-  if (inputPath.startsWith("/uploads")) {
-    return `${base}${inputPath}`;
-  }
-  
-  // Handle /assets paths - these may be served separately
-  if (inputPath.startsWith("/assets")) return `${ASSETS_BASE_URL}${inputPath}`;
-  if (inputPath.startsWith("assets/")) return `${ASSETS_BASE_URL}/${inputPath}`;
 
-  return inputPath;
+  // Handle /uploads paths - these are served by backend
+  // Some API records omit the leading slash; normalize both forms so they
+  // resolve from the server root instead of the current page (for example /events).
+  const uploadPath = normalizedPath.replace(/^\.\//, "");
+  if (/^\/?uploads\//i.test(uploadPath)) {
+    return `${base}/${uploadPath.replace(/^\//, "")}`;
+  }
+
+  // Handle /assets paths - these may be served separately
+  if (uploadPath.startsWith("/assets/")) return `${ASSETS_BASE_URL}${uploadPath}`;
+  if (uploadPath.startsWith("assets/")) return `${ASSETS_BASE_URL}/${uploadPath}`;
+
+  return normalizedPath;
 };
