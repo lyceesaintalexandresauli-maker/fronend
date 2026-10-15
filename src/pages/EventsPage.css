@@ -169,6 +169,25 @@
 .quick-event-info b { color: #233a5b; font-size: .68rem; }
 .quick-event-info small { color: #697892; font-size: .58rem; }
 .quick-event-info small i { margin-right: 3px; color: #20395e; }
+.events-calendar-heading { align-items: flex-start; }
+.events-month-controls { display: flex; align-items: center; gap: 7px; color: #625c50; font-size: .65rem; font-weight: 700; white-space: nowrap; }
+.events-month-controls button { display: grid; width: 23px; height: 23px; place-items: center; border: 1px solid #eee7d5; border-radius: 50%; background: #fff; color: #594c2c; cursor: pointer; }
+.events-month-controls button:hover { background: #fff3d2; }
+.events-calendar .calendar-empty { min-height: 29px; }
+.events-calendar .calendar-day { position: relative; display: grid; min-width: 0; min-height: 29px; place-items: center; padding: 0; border: 0; border-radius: 50%; background: transparent; color: #4e493f; font-size: .65rem; cursor: pointer; }
+.events-calendar .calendar-day:hover { background: #fff2d5; }
+.events-calendar .calendar-day.today { background: #e6c56a; color: #292316; font-weight: 800; }
+.events-calendar .calendar-day.has-event:not(.today) { outline: 1px solid #bd922b; outline-offset: -3px; }
+.events-calendar .calendar-day.selected { background: #c94908; color: #fff; font-weight: 800; outline: 2px solid #a83d06; outline-offset: 1px; }
+.calendar-event-dot { position: absolute; bottom: 2px; width: 3px; height: 3px; border-radius: 50%; background: #c94908; }
+.calendar-day.selected .calendar-event-dot, .calendar-day.today .calendar-event-dot { background: #fff; }
+.events-clear-date { display: block; margin: 8px auto 0; padding: 3px 8px; border: 0; background: transparent; color: #a84711; font-size: .64rem; text-decoration: underline; }
+.events-page button:not(.btn-close):not(.accordion-button):not(.mobile-nav-toggle):not(.student-portal-btn-muted).calendar-day { background: transparent !important; border-color: transparent !important; color: #4e493f !important; }
+.events-page button:not(.btn-close):not(.accordion-button):not(.mobile-nav-toggle):not(.student-portal-btn-muted).calendar-day:hover { background: #fff2d5 !important; }
+.events-page button:not(.btn-close):not(.accordion-button):not(.mobile-nav-toggle):not(.student-portal-btn-muted).calendar-day.today { background: #e6c56a !important; color: #292316 !important; }
+.events-page button:not(.btn-close):not(.accordion-button):not(.mobile-nav-toggle):not(.student-portal-btn-muted).calendar-day.selected { background: #c94908 !important; border-color: transparent !important; color: #fff !important; }
+.events-page button:not(.btn-close):not(.accordion-button):not(.mobile-nav-toggle):not(.student-portal-btn-muted).events-month-controls button { width: 23px; min-height: 23px; padding: 0; border: 1px solid #eee7d5 !important; border-radius: 50%; background: #fff !important; color: #594c2c !important; }
+.events-page button:not(.btn-close):not(.accordion-button):not(.mobile-nav-toggle):not(.student-portal-btn-muted).events-clear-date { background: transparent !important; border-color: transparent !important; color: #a84711 !important; }
 .events-page button:not(.btn-close):not(.accordion-button):not(.mobile-nav-toggle):not(.student-portal-btn-muted).event-details,
 .events-page button:not(.btn-close):not(.accordion-button):not(.mobile-nav-toggle):not(.student-portal-btn-muted).events-search-button { background: #c94908 !important; border-color: #c94908 !important; color: #fff !important; }
 .events-page button:not(.btn-close):not(.accordion-button):not(.mobile-nav-toggle):not(.student-portal-btn-muted).event-details:hover,

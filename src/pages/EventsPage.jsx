@@ -2,7 +2,16 @@ import { useEffect, useMemo, useState } from "react";
 import { mediaUrl } from "../api/client";
 import { eventsAPI } from "../api/services";
 import Seo from "../components/Seo";
+import { fetchAllEventsFromSupabase } from "../api/supabaseEvents";
+import { isSupabaseConfigured } from "../supabase";
 import "./EventsPage.css";
+
+const toLocalDateValue = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
 
 export default function EventsPage() {
   const [events, setEvents] = useState([]);
@@ -14,13 +23,21 @@ export default function EventsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOrder, setSortOrder] = useState("newest");
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [calendarMonth, setCalendarMonth] = useState(() => {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), 1);
+  });
 
   useEffect(() => {
     const loadEvents = async () => {
       try {
         setLoading(true);
-        const res = await eventsAPI.getAll();
-        setEvents(res.data || []);
+        if (isSupabaseConfigured()) {
+          setEvents(await fetchAllEventsFromSupabase());
+        } else {
+          const res = await eventsAPI.getAll();
+          setEvents(res.data || []);
+        }
       } catch (err) {
         console.error("Error loading events:", err);
         setError(err.response?.data?.error || "Failed to load events");
@@ -45,7 +62,7 @@ export default function EventsPage() {
     if (filterDate) {
       filtered = filtered.filter((event) => {
         const date = new Date(event.date || event.created_at);
-        return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === filterDate;
+        return !Number.isNaN(date.getTime()) && toLocalDateValue(date) === filterDate;
       });
     }
 
@@ -79,13 +96,25 @@ export default function EventsPage() {
   const eventTypes = ["all", ...new Set(events.map((event) => event.event_type || event.type).filter(Boolean))];
 
   const today = new Date();
-  const monthLabel = today.toLocaleDateString("en-US", { month: "long", year: "numeric" });
-  const monthDays = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
-  const monthOffset = new Date(today.getFullYear(), today.getMonth(), 1).getDay();
-  const eventDays = new Set(events.map((event) => {
+  const calendarYear = calendarMonth.getFullYear();
+  const calendarMonthIndex = calendarMonth.getMonth();
+  const monthLabel = calendarMonth.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+  const monthDays = new Date(calendarYear, calendarMonthIndex + 1, 0).getDate();
+  const monthOffset = new Date(calendarYear, calendarMonthIndex, 1).getDay();
+  const eventDays = new Map();
+  events.forEach((event) => {
     const date = new Date(event.date || event.created_at);
-    return date.getFullYear() === today.getFullYear() && date.getMonth() === today.getMonth() ? date.getDate() : null;
-  }).filter(Boolean));
+    if (Number.isNaN(date.getTime()) || date.getFullYear() !== calendarYear || date.getMonth() !== calendarMonthIndex) return;
+    eventDays.set(date.getDate(), [...(eventDays.get(date.getDate()) || []), event]);
+  });
+  const changeCalendarMonth = (offset) => {
+    setCalendarMonth((current) => new Date(current.getFullYear(), current.getMonth() + offset, 1));
+  };
+  const selectCalendarDay = (day) => {
+    const selectedDate = new Date(calendarYear, calendarMonthIndex, day);
+    const value = toLocalDateValue(selectedDate);
+    setFilterDate((current) => current === value ? "" : value);
+  };
   const upcomingEvents = [...events]
     .filter((event) => {
       const date = new Date(event.date || event.created_at);
@@ -214,9 +243,29 @@ export default function EventsPage() {
           </div>
           <aside className="events-sidebar">
             <section className="events-side-panel">
-              <div className="events-panel-title"><h2><i className="bi bi-calendar3" /> Event Calendar</h2><span>{monthLabel}</span></div>
+              <div className="events-panel-title events-calendar-heading">
+                <h2><i className="bi bi-calendar3" /> Event Calendar</h2>
+                <div className="events-month-controls">
+                  <button type="button" aria-label="Previous month" title="Previous month" onClick={() => changeCalendarMonth(-1)}><i className="bi bi-chevron-left" /></button>
+                  <span>{monthLabel}</span>
+                  <button type="button" aria-label="Next month" title="Next month" onClick={() => changeCalendarMonth(1)}><i className="bi bi-chevron-right" /></button>
+                </div>
+              </div>
               <div className="events-weekdays">{["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => <b key={day}>{day}</b>)}</div>
-              <div className="events-calendar">{Array.from({ length: monthOffset }, (_, i) => <span key={`blank-${i}`} />)}{Array.from({ length: monthDays }, (_, i) => <span key={i + 1} className={`${i + 1 === today.getDate() ? "today" : ""} ${eventDays.has(i + 1) ? "has-event" : ""}`}>{i + 1}</span>)}</div>
+              <div className="events-calendar">
+                {Array.from({ length: monthOffset }, (_, i) => <span className="calendar-empty" key={`blank-${calendarYear}-${calendarMonthIndex}-${i}`} />)}
+                {Array.from({ length: monthDays }, (_, i) => {
+                  const day = i + 1;
+                  const dateValue = toLocalDateValue(new Date(calendarYear, calendarMonthIndex, day));
+                  const hasEvents = eventDays.has(day);
+                  const isToday = day === today.getDate() && calendarMonthIndex === today.getMonth() && calendarYear === today.getFullYear();
+                  const isSelected = filterDate === dateValue;
+                  return <button type="button" key={dateValue} className={`calendar-day ${isToday ? "today" : ""} ${hasEvents ? "has-event" : ""} ${isSelected ? "selected" : ""}`} onClick={() => selectCalendarDay(day)} aria-label={`${monthLabel} ${day}${hasEvents ? `, ${eventDays.get(day).length} event${eventDays.get(day).length === 1 ? "" : "s"}` : ""}`} aria-pressed={isSelected} title={hasEvents ? `${eventDays.get(day).length} event${eventDays.get(day).length === 1 ? "" : "s"}` : "Filter by this date"}>
+                    {day}{hasEvents && <i className="calendar-event-dot" />}
+                  </button>;
+                })}
+              </div>
+              {filterDate && <button type="button" className="events-clear-date" onClick={() => setFilterDate("")}>Clear selected date</button>}
             </section>
             <section className="events-side-panel quick-events">
               <div className="events-panel-title"><h2><i className="bi bi-calendar2-check-fill" /> Upcoming Events</h2><span>Coming up next</span></div>
