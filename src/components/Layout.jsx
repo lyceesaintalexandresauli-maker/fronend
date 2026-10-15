@@ -162,30 +162,18 @@ export default function Layout() {
         id="header"
         className="header fixed-top"
         style={{
-<<<<<<< HEAD
-          backgroundColor: "var(--brand-accent-glass)",
-          padding: "clamp(6px, 1.4vw, 10px) 0",
-=======
           background: "rgba(178, 77, 18, 0.8)",
-          backdropFilter: "blur(12px)",
-          WebkitBackdropFilter: "blur(12px)",
-          borderBottom: "1px solid rgba(255,255,255,0.18)",
-          boxShadow: "0 8px 22px rgba(15, 23, 42, 0.12)",
+          backdropFilter: "blur(12px) saturate(150%)",
+          WebkitBackdropFilter: "blur(12px) saturate(150%)",
+          borderBottom: "1px solid rgba(255, 255, 255, 0.28)",
+          boxShadow: "0 6px 26px rgba(15, 23, 42, 0.18)",
           padding: "10px 0",
->>>>>>> a3bbcdec43302530da2239a7a5d8874807163887
           position: "fixed",
           top: "0",
           left: "0",
           right: "0",
           width: "100%",
           zIndex: "9999",
-<<<<<<< HEAD
-          borderBottom: "1px solid rgba(255, 255, 255, 0.28)",
-          boxShadow: "0 6px 26px rgba(15, 23, 42, 0.18)",
-          backdropFilter: "blur(var(--glass-blur)) saturate(var(--glass-saturate))",
-          WebkitBackdropFilter: "blur(var(--glass-blur)) saturate(var(--glass-saturate))",
-=======
->>>>>>> a3bbcdec43302530da2239a7a5d8874807163887
         }}
       >
         <div className="container-fluid px-3 px-sm-4 d-flex align-items-center justify-content-between">
