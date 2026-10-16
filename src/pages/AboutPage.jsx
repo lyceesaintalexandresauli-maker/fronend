@@ -124,7 +124,7 @@ integrating academic excellence, Christian morals, discipline, and practical ski
             <div className="card shadow h-100 py-2 stats-card ui-stat-card">
               <div className="card-body text-center">
                 <h5 className="card-title text-primary">Students</h5>
-                <h2 className="card-text count" data-target="629">0</h2>
+                <h2 className="card-text count" data-target="718">0</h2>
               </div>
             </div>
           </div>
