@@ -7,7 +7,13 @@ function mapHref(href) {
 
 export default function NavTree({ items = [], onNavigate, depth = 0, includeMobileClose = false }) {
   const { pathname } = useLocation();
-  const safeItems = Array.isArray(items) ? items : [];
+  const safeItems = Array.isArray(items)
+    ? items.filter((item) => {
+        const href = String(item?.href || "").replace(/\/+$/, "").toLowerCase();
+        const label = String(item?.label || "").trim().toLowerCase();
+        return href !== "/gallery" && label !== "gallery";
+      })
+    : [];
   if (depth > 6) return null;
 
   const toggleDropdown = (e, liElement) => {
@@ -34,11 +40,14 @@ export default function NavTree({ items = [], onNavigate, depth = 0, includeMobi
         const active = pathname === target;
         const hasChildren = Array.isArray(item.children) && item.children.length > 0;
         const isLoginItem = depth === 0 && item.label?.toLowerCase() === "login";
+        const label = String(item.label || "").trim().toLowerCase();
+        const isDepartmentItem = depth === 0 && ["departments", "trades"].includes(label);
+        const isContactItem = depth === 0 && label === "contact";
         const key = item.id ?? `${item.label ?? "item"}-${depth}-${target}`;
         return (
           <li
             key={key}
-            className={`${hasChildren ? "dropdown" : ""} ${isLoginItem ? "d-xl-none" : ""}`}
+            className={`${hasChildren ? "dropdown" : ""} ${isLoginItem ? "d-xl-none" : ""} ${isDepartmentItem ? "nav-departments" : ""} ${isContactItem ? "nav-contact" : ""}`}
             ref={hasChildren ? (el) => {
               if (el) {
                 const anchor = el.querySelector('a');

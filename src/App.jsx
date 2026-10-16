@@ -4,7 +4,6 @@ import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import RouteSeo from "./components/RouteSeo";
 import PageLoader from "./components/PageLoader";
-import { useAuth } from "./context/AuthContext";
 
 const HomePage = lazy(() => import("./pages/HomePage"));
 const ContentPage = lazy(() => import("./pages/ContentPage"));
@@ -26,12 +25,6 @@ const GalleryPage = lazy(() => import("./pages/GalleryPage"));
 
 
 export default function App() {
-  const { isReady } = useAuth();
-
-  if (!isReady) {
-    return <PageLoader label="Preparing your session..." />;
-  }
-
   return (
     <Suspense fallback={<PageLoader />}>
       <RouteSeo />

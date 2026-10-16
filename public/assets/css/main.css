@@ -28,7 +28,7 @@
 /* ============================================================
    MOBILE NAVIGATION (991px and below)
    ============================================================ */
-@media (max-width: 1199px) {
+@media (max-width: 767px) {
 
   #navmenu {
     position: relative;
@@ -521,7 +521,7 @@ h6 {
 # Navigation Menu
 --------------------------------------------------------------*/
 /* Navmenu - Desktop */
-@media (min-width: 1200px) {
+@media (min-width: 768px) {
   .navmenu {
     padding: 0;
   }
@@ -628,7 +628,7 @@ h6 {
 }
 
 /* Navmenu - Mobile */
-@media (max-width: 1199px) {
+@media (max-width: 767px) {
   .mobile-nav-toggle {
     color: var(--nav-color);
     font-size: 28px;

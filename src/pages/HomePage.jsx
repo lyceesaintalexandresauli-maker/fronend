@@ -1,479 +1,132 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { mediaUrl } from "../api/client";
 import { eventsAPI, staffAPI, contentAPI, departmentsAPI } from "../api/services";
-import { getContentRows } from "../utils/helpers";
 import Seo from "../components/Seo";
+import "./HomePage.css";
+
+const slides = [
+  "/assets/img/photos/sod10.jpg",
+  "/assets/img/photos/sod0.jpg",
+  "/assets/img/photos/sod1.jpg",
+];
+
+const trades = [
+  { code: "ACC", name: "Accounting and Business", description: "The Accounting Department equips students with practical and theoretical skills in financial management and business.", image: "/assets/img/acc1_resized.jpg", href: "/acc" },
+  { code: "CSA", name: "Computer System and Architecture", description: "Learn how computer systems work, from hardware and software to servicing and support.", image: "/assets/img/photos/csa3.jpg", href: "/csa" },
+  { code: "FAD", name: "Fashion Design", description: "Build creative skills in clothing, accessories, and footwear design.", image: "/assets/img/fad2_resized.jpg", href: "/fad" },
+  { code: "SOD", name: "Software Development", description: "Learn programming and build useful software for real world needs.", image: "/assets/img/photos/sod4.jpg", href: "/sod" },
+  { code: "NIT", name: "Networking and Internet Technology", description: "Develop practical skills in networks, connectivity, and internet technology.", image: "/assets/img/photos/nit1.jpg", href: "/nit" },
+];
+
+const values = [
+  ["bi-clipboard-data", "Technical Excellence", "Quality training in ICT, Fashion Design, and related skills."],
+  ["bi-gem", "Discipline & Integrity", "We mold students into confident, disciplined, responsible citizens."],
+  ["bi-book", "Faith & Moral Formation", "Daily spiritual guidance from the Barnabite Fathers."],
+  ["bi-people-fill", "Holistic Development", "Academic, moral, cultural, and practical training for life."],
+];
+
+const quickLinks = [
+  ["bi-mortarboard", "Our Programs", "Quality education with technical and vocational training.", "/academic", "Learn More"],
+  ["bi-calendar-event", "News & Events", "Stay informed about school activities.", "/events", "View News"],
+  ["bi-people-fill", "Our Teachers", "Meet our dedicated teachers.", "/trainers", "Meet Our Staff"],
+  ["bi-images", "School Gallery", "Explore our campus life and achievements.", "/gallery", "View Gallery"],
+  ["bi-file-earmark-text", "Student Portal", "Access your timetable and school updates.", "/login", "Login"],
+];
+
+const galleryImages = [
+  "/assets/img/photos/sod0.jpg",
+  "/assets/img/photos/sod2.jpg",
+  "/assets/img/photos/acc1_resized.jpg",
+  "/assets/img/photos/csa3.jpg",
+  "/assets/img/photos/fad4.jpg",
+  "/assets/img/photos/nit1.jpg",
+];
+
+const getDate = (value) => value ? new Date(value).toLocaleDateString("en-GB", { day: "2-digit", month: "short" }).toUpperCase() : "SCHOOL";
 
 export default function HomePage() {
-  const [loading, setLoading] = useState(true);
   const [events, setEvents] = useState([]);
   const [staff, setStaff] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [content, setContent] = useState({});
-  const [heroSlides, setHeroSlides] = useState([]);
-  const [currentEventIndex, setCurrentEventIndex] = useState(0);
-  const swiperRef = useRef(null);
+  const [slide, setSlide] = useState(0);
 
   useEffect(() => {
-    const load = async () => {
-      try {
-        const [eventsRes, staffRes, depsRes, contentRes, heroRes] = await Promise.all([
-          eventsAPI.getAll().catch(() => ({ data: [] })),
-          staffAPI.getAll().catch(() => ({ data: [] })),
-          departmentsAPI.getAll().catch(() => ({ data: [] })),
-          contentAPI.getGrouped().catch(() => ({ data: {} })),
-          contentAPI.getByPageAndSection('index', 'hero-carousel').catch(() => ({ data: [] }))
-        ]);
-        setEvents((eventsRes.data || []).slice(0, 4));
-        setStaff((staffRes.data || []).slice(0, 4));
-        setDepartments(depsRes.data || []);
-        setContent(contentRes.data || {});
-        setHeroSlides(getContentRows(heroRes.data));
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
+    const timer = window.setInterval(() => setSlide((current) => (current + 1) % slides.length), 8000);
+    return () => window.clearInterval(timer);
   }, []);
 
   useEffect(() => {
-    if (window.AOS) {
-      window.AOS.init({ duration: 600, easing: 'ease-in-out', once: true, mirror: false });
-    }
+    let active = true;
+    Promise.all([
+      eventsAPI.getAll().catch(() => ({ data: [] })),
+      staffAPI.getAll().catch(() => ({ data: [] })),
+      departmentsAPI.getAll().catch(() => ({ data: [] })),
+      contentAPI.getGrouped().catch(() => ({ data: {} })),
+    ]).then(([eventRes, staffRes, departmentRes, contentRes]) => {
+      if (!active) return;
+      setEvents(eventRes.data || []);
+      setStaff(staffRes.data || []);
+      setDepartments(departmentRes.data || []);
+      setContent(contentRes.data || {});
+    });
+    return () => { active = false; };
   }, []);
 
-  useEffect(() => {
-    if (window.Swiper) {
-      swiperRef.current?.destroy?.(true, true);
-      swiperRef.current = new window.Swiper('.heroSwiper', {
-        loop: true, speed: 800,
-        autoplay: { delay: 4000, disableOnInteraction: false },
-        slidesPerView: 1, spaceBetween: 0,
-        pagination: { el: '.swiper-pagination', clickable: true },
-        navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
-        effect: 'slide'
-      });
-    }
-    return () => {
-      swiperRef.current?.destroy?.(true, true);
-      swiperRef.current = null;
+  const about = content.about?.[0];
+  const programCards = trades.map((trade) => {
+    const department = departments.find((item) => `${item.code || ""} ${item.name || ""}`.toLowerCase().includes(trade.code.toLowerCase()));
+    return {
+      ...trade,
+      image: mediaUrl(department?.image_path) || trade.image,
+      description: department?.description || trade.description,
     };
-  }, [heroSlides.length]);
-
-  // Auto-play event slider
-  useEffect(() => {
-    if (events.length > 1) {
-      const interval = setInterval(() => {
-        setCurrentEventIndex((prev) => (prev + 1) % events.length);
-      }, 4000);
-      return () => clearInterval(interval);
-    }
-  }, [events.length]);
+  });
+  const aboutText = about?.content?.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim()
+    || "Lycée St Alexandre Sauli de Muhura is a Catholic secondary school run by the Barnabite Fathers, committed to providing holistic education, moral values, and practical skills to help students build a better future.";
 
   return (
-    <main className="main">
-      <Seo
-        title="Home"
-        description="Lycee Saint Alexandre Sauli de Muhura offers quality education, moral formation, and strong technical programs in ICT, fashion design, and accounting."
-        path="/"
-      />
-      {/* Hero Section - Full Screen Slider */}
-      <section id="hero" className="hero section position-relative">
-        <div className="swiper heroSwiper" style={{ width: '100%', height: '100vh' }}>
-          <div className="swiper-wrapper">
-            {heroSlides.length > 0 ? heroSlides.map((slide, index) => (
-              <div key={slide.id || index} className="swiper-slide position-relative">
-                <img
-                  src={mediaUrl(slide.image_path) || `/assets/img/photos/sod${10 - index}.jpg`}
-                  className="w-100 h-100"
-                  style={{ objectFit: 'cover', width: '100%', height: '100vh' }}
-                  alt={slide.title || `Slide ${index + 1}`}
-                  fetchPriority={index === 0 ? "high" : "auto"}
-                  loading={index === 0 ? "eager" : "lazy"}
-                  decoding="async"
-                />
-                <div className="container position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
-                  <div className="glass-panel text-center px-4" style={{ color: '#ffffff', borderRadius: '28px', padding: '2.5rem 2rem', maxWidth: '880px' }}>
-                    <h2 className="fw-bold mb-4" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', lineHeight: '1.3', color: '#ffffff', textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }} data-aos="fade-up" data-aos-delay="100">
-                      {slide.title || 'Welcome to Lycee saint Alexandre Sauli'}
-                    </h2>
-                    <h3 className="mb-0" style={{ fontSize: 'clamp(1.2rem, 3vw, 2rem)', fontWeight: '400', color: '#ffffff', textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }} data-aos="fade-up" data-aos-delay="200">
-                      {slide.content || 'De Muhura Barnabites School'}
-                    </h3>
-                  </div>
-                </div>
-              </div>
-            )) : (
-              <>
-                <div className="swiper-slide position-relative">
-                  <img src="/assets/img/photos/sod10.jpg" className="w-100 h-100" style={{ objectFit: 'cover', width: '100%', height: '100vh' }} alt="Welcome" fetchPriority="high" loading="eager" decoding="async" />
-                  <div className="container position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
-                    <div className="glass-panel text-center px-4" style={{ color: '#ffffff', borderRadius: '28px', padding: '2.5rem 2rem', maxWidth: '880px' }}>
-                      <h2 className="fw-bold mb-4" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', lineHeight: '1.3', color: '#ffffff', textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }} data-aos="fade-up" data-aos-delay="100">
-                        Welcome to Lycee saint Alexandre Sauli
-                      </h2>
-                      <h3 className="mb-0" style={{ fontSize: 'clamp(1.2rem, 3vw, 2rem)', fontWeight: '400', color: '#ffffff', textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }} data-aos="fade-up" data-aos-delay="200">
-                        De Muhura Barnabites's School
-                      </h3>
-                    </div>
-                  </div>
-                </div>
-                <div className="swiper-slide position-relative">
-                  <img src="/assets/img/photos/sod0.jpg" className="w-100 h-100" style={{ objectFit: 'cover', width: '100%', height: '100vh' }} alt="Education" loading="lazy" decoding="async" />
-                  <div className="container position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
-                    <div className="glass-panel text-center px-4" style={{ color: '#ffffff', borderRadius: '28px', padding: '2.5rem 2rem', maxWidth: '880px' }}>
-                      <h2 className="fw-bold mb-4" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', lineHeight: '1.3', color: '#ffffff', textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }} data-aos="fade-up" data-aos-delay="100">
-                        Quality Education & Moral Formation
-                      </h2>
-                      <h3 className="mb-0" style={{ fontSize: 'clamp(1.2rem, 3vw, 2rem)', fontWeight: '400', color: '#ffffff', textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }} data-aos="fade-up" data-aos-delay="200">
-                        Building Tomorrow's Leaders Today
-                      </h3>
-                    </div>
-                  </div>
-                </div>
-                <div className="swiper-slide position-relative">
-                  <img src="/assets/img/photos/sod1.jpg" className="w-100 h-100" style={{ objectFit: 'cover', width: '100%', height: '100vh' }} alt="Excellence" loading="lazy" decoding="async" />
-                  <div className="container position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
-                    <div className="glass-panel text-center px-4" style={{ color: '#ffffff', borderRadius: '28px', padding: '2.5rem 2rem', maxWidth: '880px' }}>
-                      <h2 className="fw-bold mb-4" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', lineHeight: '1.3', color: '#ffffff', textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }} data-aos="fade-up" data-aos-delay="100">
-                        Excellence in Technical Education
-                      </h2>
-                      <h3 className="mb-0" style={{ fontSize: 'clamp(1.2rem, 3vw, 2rem)', fontWeight: '400', color: '#ffffff', textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }} data-aos="fade-up" data-aos-delay="200">
-                        ICT, Fashion Design, and Accounting Programs
-                      </h3>
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-          <div className="swiper-pagination" style={{ bottom: '30px' }}></div>
-          <div className="swiper-button-next" style={{ color: 'white' }}></div>
-          <div className="swiper-button-prev" style={{ color: 'white' }}></div>
+    <main className="home-page">
+      <Seo title="Home" description="Quality education, moral formation, and practical training for future leaders at Lycée Saint Alexandre Sauli de Muhura." path="/" />
+
+      <section className="home-hero" aria-label="Welcome">
+        <div key={slide} className="home-hero-photo" style={{ backgroundImage: `url('${slides[slide]}')` }} role="img" aria-label={`Students learning at school, slide ${slide + 1}`} />
+        <div className="home-hero-overlay" />
+        <button className="home-hero-arrow home-hero-prev" type="button" aria-label="Previous slide" onClick={() => setSlide((slide - 1 + slides.length) % slides.length)}><i className="bi bi-chevron-left" /></button>
+        <button className="home-hero-arrow home-hero-next" type="button" aria-label="Next slide" onClick={() => setSlide((slide + 1) % slides.length)}><i className="bi bi-chevron-right" /></button>
+        <div className="home-wrap home-hero-copy">
+          <span className="home-kicker">Discipline <b>·</b> Excellence <b>·</b> Service</span>
+          <h1>Welcome to<br />Lycée St Alexandre Sauli<br />de Muhura</h1>
+          <p>Quality education, moral formation, and practical training for future leaders.</p>
+          <div className="home-hero-actions"><Link className="home-btn" to="/about">Explore Our School <i className="bi bi-arrow-right" /></Link><Link className="home-btn home-btn-outline" to="/academic">Learn More</Link></div>
         </div>
       </section>
 
-      {/* Events Section */}
-      {events.length > 0 && (
-        <section className="py-2" style={{ backgroundColor: 'rgba(178, 77, 18, 0.12)' }}>
-          <div className="container" data-aos="fade-up">
-            <div className="mb-2">
-              <h2 className="fw-bold mb-1 text-white" style={{ fontSize: '1.5rem' }}>Recent Events</h2>
-            </div>
-            <div style={{ width: '100%', height: '86px', position: 'relative', overflow: 'hidden' }}>
-              <div
-                style={{
-                  display: 'flex',
-                  height: '100%',
-                  transition: 'transform 0.6s ease-in-out',
-                  transform: `translateX(-${currentEventIndex * 100}%)`
-                }}
-              >
-                {events.map((event) => (
-                  <div key={event.id} style={{ minWidth: '100%', height: '100%', position: 'relative' }}>
-                    <div className="card h-100 border-0 glass-card" style={{ overflow: 'hidden', display: 'flex', flexDirection: 'row' }}>
-                      <div style={{ width: '220px', flexShrink: 0, overflow: 'hidden' }}>
-                        {event.image_path && (
-                          <img
-                            src={mediaUrl(event.image_path)}
-                            className="w-100 h-100"
-                            style={{ objectFit: 'cover', height: '86px', transform: 'scale(1.15)', transformOrigin: 'center center' }}
-                            alt={event.title}
-                            loading="lazy"
-                            decoding="async"
-                          />
-                        )}
-                      </div>
-                      <div className="p-2 d-flex flex-column justify-content-center" style={{ flex: 1, backgroundColor: 'rgba(178, 77, 18, 0.8)' }}>
-                        <span className="badge d-inline-block mb-0 px-2 py-1" style={{ backgroundColor: 'white', color: '#333', fontSize: '0.7rem', borderRadius: '4px', width: 'fit-content' }}>
-                          {event.category || 'General'}
-                        </span>
-                        <h3 className="fw-bold mb-0" style={{ fontSize: '1rem', color: 'white' }}>
-                          {event.title}
-                        </h3>
-                        <p className="text-white mb-0" style={{ fontSize: '0.8rem', lineHeight: '1.3', flex: 1, opacity: 0.9 }}>
-                          {event.description}
-                        </p>
-                        <div className="small text-white mb-0" style={{ opacity: 0.8, fontSize: '0.75rem' }}>
-                          <i className="bi bi-calendar-event me-2"></i>
-                          {event.created_at ? new Date(event.created_at).toLocaleDateString() : 'TBD'}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {events.length > 1 && (
-                <>
-                  <button
-                    onClick={() => setCurrentEventIndex((prev) => (prev - 1 + events.length) % events.length)}
-                    style={{
-                      position: 'absolute',
-                      left: '15px',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      backgroundColor: 'white',
-                      border: 'none',
-                      borderRadius: '50%',
-                      width: '35px',
-                      height: '35px',
-                      cursor: 'pointer',
-                      zIndex: 10,
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
-                    }}
-                  >
-                    <i className="bi bi-chevron-left" style={{ fontSize: '1.1rem', color: '#333' }}></i>
-                  </button>
-                  <button
-                    onClick={() => setCurrentEventIndex((prev) => (prev + 1) % events.length)}
-                    style={{
-                      position: 'absolute',
-                      right: '15px',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      backgroundColor: 'white',
-                      border: 'none',
-                      borderRadius: '50%',
-                      width: '35px',
-                      height: '35px',
-                      cursor: 'pointer',
-                      zIndex: 10,
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
-                    }}
-                  >
-                    <i className="bi bi-chevron-right" style={{ fontSize: '1.1rem', color: '#333' }}></i>
-                  </button>
-                  <div style={{ position: 'absolute', bottom: '15px', left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: '8px', zIndex: 10 }}>
-                    {events.map((_, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setCurrentEventIndex(index)}
-                        style={{
-                          width: '8px',
-                          height: '8px',
-                          borderRadius: '50%',
-                          border: 'none',
-                          cursor: 'pointer',
-                          backgroundColor: index === currentEventIndex ? 'white' : 'rgba(255,255,255,0.5)',
-                          transition: 'background-color 0.3s'
-                        }}
-                      />
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
-            <div className="text-end mt-2">
-              <Link
-                to="/events"
-                className="btn fw-bold text-white glass-button"
-                style={{ color: 'white', padding: '0.6rem 2rem', borderRadius: '999px', fontSize: '1rem', border: '1px solid rgba(255,255,255,0.35)' }}
-              >
-                View All Events <i className="bi bi-arrow-right ms-2"></i>
-              </Link>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* About Section */}
-      <section id="about" className="about section py-5">
-        <div className="container" data-aos="fade-up">
-          <div className="row gy-4 align-items-center">
-            <div className="col-lg-5 order-lg-2" data-aos="fade-left" data-aos-delay="100">
-              <div className="about-img position-relative glass-panel" style={{ padding: '2rem', borderRadius: '24px' }}>
-                <img
-                  src={mediaUrl(content['about']?.[0]?.image_path) || "/assets/img/saul2.jpg"}
-                  className="img-fluid rounded"
-                  alt="About Our School"
-                  style={{ maxHeight: '450px', objectFit: 'cover', width: '100%', display: 'block', margin: '0 auto', borderRadius: '20px' }}
-                  loading="lazy"
-                  decoding="async"
-                />
-              </div>
-            </div>
-            <div className="col-lg-7 order-lg-1" data-aos="fade-right" data-aos-delay="200">
-              <div className="glass-card p-4 p-lg-5" style={{ borderRadius: '24px' }}>
-                <h3 className="mb-3" style={{ fontSize: '2.5rem', fontWeight: '700', color: '#333' }}>
-                  {content['about']?.[0]?.title || 'Who We Are'}
-                </h3>
-                <div className="fst-italic mb-4" style={{ fontSize: '1.1rem', lineHeight: '1.8', color: '#555' }} dangerouslySetInnerHTML={{ __html: content['about']?.[0]?.content || '' }} />
-                
-                <ul className="list-unstyled mb-4">
-                  <li className="mb-3 d-flex align-items-start">
-                    <i className="bi bi-check-circle-circle me-2" style={{ color: 'var(--brand-accent)', fontSize: '1.3rem', marginTop: '2px' }}></i>
-                    <span style={{ fontSize: '1.05rem' }}>Strong discipline and character formation.</span>
-                  </li>
-                  <li className="mb-3 d-flex align-items-start">
-                    <i className="bi bi-check-circle-circle me-2" style={{ color: 'var(--brand-accent)', fontSize: '1.3rem', marginTop: '2px' }}></i>
-                    <span style={{ fontSize: '1.05rem' }}>High-quality technical and vocational training.</span>
-                  </li>
-                  <li className="mb-3 d-flex align-items-start">
-                    <i className="bi bi-check-circle-circle me-2" style={{ color: 'var(--brand-accent)', fontSize: '1.3rem', marginTop: '2px' }}></i>
-                    <span style={{ fontSize: '1.05rem' }}>Catholic education rooted in moral and spiritual values.</span>
-                  </li>
-                </ul>
-                
-                <Link to="/about" className="btn btn-wall-yellow btn-lg rounded-pill px-4 glass-button">
-                  <span>Read More</span> <i className="bi bi-arrow-right ms-2"></i>
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
+      <section className="home-wrap home-shortcuts" aria-label="Quick links">
+        {quickLinks.map(([icon, title, description, href, action]) => <Link className="home-shortcut-card" to={href} key={title}><span><i className={`bi ${icon}`} /></span><h2>{title}</h2><p>{description}</p><b>{action} <i className="bi bi-arrow-right" /></b></Link>)}
       </section>
 
-      {/* Why Us Section */}
-      <section id="why-us" className="section why-us py-5">
-        <div className="container" data-aos="fade-up">
-          <div className="row gy-4">
-            <div className="col-lg-4" data-aos="fade-up" data-aos-delay="100">
-              <div className="why-box h-100 p-5 glass-card" style={{ color: 'white', borderRadius: '28px', background: 'linear-gradient(135deg, rgba(178,77,18,0.9), rgba(96,42,17,0.85))' }}>
-                <h3 className="mb-4" style={{ fontSize: '2rem', fontWeight: '700' }}>
-                  {content['index']?.[0]?.title || 'Why Choose Our School?'}
-                </h3>
-                <p className="mb-4" style={{ fontSize: '1.05rem', lineHeight: '1.7', color: 'rgba(255,255,255,0.9)' }} dangerouslySetInnerHTML={{ __html: content['index']?.[0]?.content || '' }} />
-                <div className="text-center">
-                  <Link to="/about" className="btn btn-light rounded-pill px-4 py-2 glass-button" style={{ color: '#1f2937' }}>
-                    <span>Learn More</span> <i className="bi bi-chevron-right ms-1"></i>
-                  </Link>
-                </div>
-              </div>
-            </div>
-            <div className="col-lg-8">
-              <div className="row gy-4">
-                <div className="col-md-4" data-aos="fade-up" data-aos-delay="200">
-                  <div className="icon-box text-center h-100 p-4 glass-card" style={{ borderRadius: '24px' }}>
-                    <div className="mb-3" style={{ width: '60px', height: '60px', margin: '0 auto', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.28)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <i className="bi bi-clipboard-data" style={{ fontSize: '1.8rem', color: 'var(--brand-accent)' }}></i>
-                    </div>
-                    <h4 className="mb-3" style={{ fontSize: '1.3rem', fontWeight: '700', color: '#333' }}>Technical Excellence</h4>
-                    <p className="text-muted mb-0" style={{ fontSize: '0.95rem' }}>Quality training in ICT, Fashion Design, and Accounting.</p>
-                  </div>
-                </div>
-                <div className="col-md-4" data-aos="fade-up" data-aos-delay="300">
-                  <div className="icon-box text-center h-100 p-4 glass-card" style={{ borderRadius: '24px' }}>
-                    <div className="mb-3" style={{ width: '60px', height: '60px', margin: '0 auto', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.28)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <i className="bi bi-gem" style={{ fontSize: '1.8rem', color: 'var(--brand-accent)' }}></i>
-                    </div>
-                    <h4 className="mb-3" style={{ fontSize: '1.3rem', fontWeight: '700', color: '#333' }}>Discipline & Integrity</h4>
-                    <p className="text-muted mb-0" style={{ fontSize: '0.95rem' }}>We mold students into confident, disciplined citizens.</p>
-                  </div>
-                </div>
-                <div className="col-md-4" data-aos="fade-up" data-aos-delay="400">
-                  <div className="icon-box text-center h-100 p-4 glass-card" style={{ borderRadius: '24px' }}>
-                    <div className="mb-3" style={{ width: '60px', height: '60px', margin: '0 auto', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.28)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <i className="bi bi-book" style={{ fontSize: '1.8rem', color: 'var(--brand-accent)' }}></i>
-                    </div>
-                    <h4 className="mb-3" style={{ fontSize: '1.3rem', fontWeight: '700', color: '#333' }}>Faith & Moral Formation</h4>
-                    <p className="text-muted mb-0" style={{ fontSize: '0.95rem' }}>Daily spiritual guidance from Barnabite Fathers.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <section className="home-wrap home-intro">
+        <div className="home-intro-copy"><span className="home-rule" /><h2>Who We Are</h2><p>{aboutText}</p><Link className="home-btn" to="/about">About Our School <i className="bi bi-arrow-right" /></Link></div>
+        <figure className="home-founder"><img src="/assets/img/sauli2.jfif" alt="Painting of St. Alessandro Sauli" loading="lazy" /><figcaption><strong>St. Alessandro Sauli</strong><small>Barnabite</small></figcaption></figure>
       </section>
 
-      {/* Courses Section */}
-      <section id="courses" className="courses section py-5">
-        <div className="container" data-aos="fade-up">
-          <div className="section-title text-center mb-5">
-            <h2 className="mb-2" style={{ fontSize: '2.5rem', fontWeight: '700', color: '#333' }}>Programs</h2>
-            <p className="text-muted" style={{ fontSize: '1.1rem' }}>Our Technical Courses</p>
-          </div>
-          {departments.length > 0 ? (
-            <div className="row gy-4">
-              {departments.map((dep, index) => (
-                <div key={dep.id} className="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-delay={index * 100}>
-                  <div className="card h-100 border-0 glass-card" style={{ transition: 'transform 0.3s, box-shadow 0.3s', borderRadius: '24px' }}>
-                    <div className="position-relative overflow-hidden" style={{ height: '180px' }}>
-                      <img
-                        src={mediaUrl(dep.image_path) || "/assets/img/photos/sod1.jpg"}
-                        className="w-100 h-100 object-fit-cover"
-                        style={{ transition: 'transform 0.5s' }}
-                        alt={dep.name}
-                        loading="lazy"
-                        decoding="async"
-                      />
-                      <span className="badge position-absolute top-0 start-0 m-2" style={{ backgroundColor: 'var(--brand-accent)' }}>
-                        {dep.code || dep.name?.substring(0,3).toUpperCase() || "N/A"}
-                      </span>
-                    </div>
-                    <div className="card-body p-4">
-                      <h5 className="card-title fw-bold mb-2">{dep.name}</h5>
-                      <p className="card-text text-muted small" style={{ lineHeight: '1.6' }}>
-                        {dep.description}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="col-12 text-center py-5">
-              <p className="text-muted">{loading ? "Loading courses..." : "Courses will appear soon."}</p>
-            </div>
-          )}
-        </div>
+      <section className="home-values"><div className="home-wrap home-value-grid">{values.map(([icon, title, description]) => <article className="home-value-card" key={title}><span className="home-value-icon"><i className={`bi ${icon}`} /></span><h3>{title}</h3><p>{description}</p><Link to="/about" aria-label={`Learn about ${title}`}><i className="bi bi-arrow-right" /></Link></article>)}</div></section>
+
+      <section className="home-wrap home-programs">
+        <div className="home-heading"><span>Our Dedicated Team <i /></span><h2>Programs</h2><strong>Our Technical Courses</strong></div>
+        <div className="home-program-grid">{programCards.map((program) => <article className="home-program-card" key={program.code}><Link to={program.href} className="home-program-photo"><img src={program.image} alt={program.name} loading="lazy" /><span>{program.code}</span></Link><div className="home-program-copy"><h3>{program.name}</h3><p>{program.description}</p><Link to={program.href}>Read More <i className="bi bi-arrow-right" /></Link></div></article>)}</div>
       </section>
 
-      {/* Staff Section */}
-      <section id="trainers-index" className="section trainers-index">
-        <div className="container" data-aos="fade-up">
-          <div className="section-title text-center mb-5">
-            <h2>Our Dedicated Team</h2>
-            <p>Trainers & Staff</p>
-          </div>
-          <div className="row gy-4">
-            {staff.length > 0 ? staff.map((member, index) => (
-              <div key={member.id} className="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay={index * 100}>
-                <div className="member glass-card" style={{ borderRadius: '24px', overflow: 'hidden' }}>
-                  <div className="member-img" style={{ height: '250px', overflow: 'hidden' }}>
-                    {member.image_path ? (
-                      <img 
-                        src={mediaUrl(member.image_path)} 
-                        className="img-fluid w-100 h-100" 
-                        style={{ objectFit: 'cover' }}
-                        alt={member.name}
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    ) : (
-                      <div className="w-100 h-100 bg-light d-flex align-items-center justify-content-center">
-                        <i className="bi bi-person-circle text-muted" style={{ fontSize: '4rem' }}></i>
-                      </div>
-                    )}
-                  </div>
-                  <div className="member-info p-4">
-                    <h4>{member.name}</h4>
-                    <span>{member.position || member.department || 'Staff'}</span>
-                    <p className="text-muted small">{member.bio}</p>
-                    <div className="social">
-                      {member.email && <a href={`mailto:${member.email}`}><i className="bi bi-envelope"></i></a>}
-                      {member.phone && <a href={`tel:${member.phone}`}><i className="bi bi-telephone"></i></a>}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )) : (
-              <div className="col-12 text-center py-5">
-                <p className="text-muted">{loading ? "Loading staff..." : "Staff will appear soon."}</p>
-              </div>
-            )}
-          </div>
-          <div className="text-end mt-4">
-            <Link
-              to="/trainers"
-              className="btn fw-semibold text-white glass-button"
-              style={{ borderRadius: '999px', padding: '0.7rem 1.6rem' }}
-            >
-              View All Staff <i className="bi bi-arrow-right ms-2"></i>
-            </Link>
-          </div>
-        </div>
+      <section className="home-wrap home-community">
+        <div className="home-teachers"><div className="home-small-heading"><span>Our Staff</span><h2>Our Teachers & Staff <i /></h2></div><div className="home-teacher-grid">{staff.slice(0, 4).map((person) => <article className="home-teacher-card" key={person.id}>{person.image_path ? <img src={mediaUrl(person.image_path)} alt={person.name} loading="lazy" /> : <div className="home-teacher-empty"><i className="bi bi-person-circle" /></div>}<h3>{person.name}</h3><small>{person.position || person.department || "Teacher"}</small></article>)}{staff.length === 0 && <div className="home-empty-state">Our teachers and staff will be introduced here.</div>}</div></div>
+        <div className="home-events"><div className="home-events-head"><div className="home-small-heading"><span>Recent Events</span><h2>Latest Events</h2></div><Link className="home-btn home-btn-small" to="/events">View All Events <i className="bi bi-arrow-right" /></Link></div><div className="home-event-list">{events.slice(0, 3).map((event) => <article className="home-event" key={event.id}><img src={mediaUrl(event.image_path) || "/assets/img/photos/acc2.jpg"} alt="" loading="lazy" /><time>{getDate(event.created_at)}</time><div><h3>{event.title}</h3><p>{event.description}</p></div></article>)}{events.length === 0 && <div className="home-empty-state">School events and activities will appear here.</div>}</div></div>
       </section>
+
+      <section className="home-gallery-strip"><div className="home-wrap"><div className="home-gallery-heading"><div className="home-small-heading"><span>Our Gallery</span><h2>Moments That Inspire</h2></div><Link to="/gallery">View All Photos <i className="bi bi-arrow-right" /></Link></div><div className="home-gallery-grid">{galleryImages.map((image) => <Link to="/gallery" key={image}><img src={image} alt="School life at Lycée Saint Alexandre Sauli" loading="lazy" /></Link>)}</div></div></section>
+
+      <section className="home-join"><div className="home-join-overlay" /><div className="home-wrap home-join-content"><span className="home-join-icon"><i className="bi bi-mortarboard" /></span><div><h2>Ready to Join Our School?</h2><p>Take the first step towards a brighter future. Apply now or contact us to learn more.</p></div><div className="home-join-actions"><Link className="home-btn home-btn-white" to="/contact">Apply for Admission <i className="bi bi-arrow-right" /></Link><Link className="home-btn home-btn-outline" to="/contact">Contact Us</Link></div></div></section>
     </main>
   );
 }

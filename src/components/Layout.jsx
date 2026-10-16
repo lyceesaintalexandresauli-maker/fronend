@@ -3,36 +3,49 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 import { api } from "../api/client";
 import NavTree from "./NavTree";
 
+const departmentPrograms = [
+  { id: "trade-fad", label: "Fashion Design (FAD)", href: "/fad", children: [] },
+  { id: "trade-acc", label: "Accounting", href: "/acc", children: [] },
+  {
+    id: "trade-ict",
+    label: "ICT",
+    href: null,
+    children: [
+      { id: "trade-sod", label: "Software Development (SOD)", href: "/sod", children: [] },
+      { id: "trade-csa", label: "Computer Systems & Architecture (CSA)", href: "/csa", children: [] },
+      { id: "trade-nit", label: "Networking & Internet Technology (NIT)", href: "/nit", children: [] },
+    ],
+  },
+];
+
+const departmentMenu = { id: "departments-menu", label: "Departments", href: null, children: departmentPrograms };
+const tradePaths = new Set(["/fad", "/acc", "/sod", "/csa", "/nit"]);
+
 const fallbackNavigation = [
   { id: 1, label: "Home", href: "/", children: [] },
   { id: 2, label: "About", href: "/about", children: [] },
-  { id: 3, label: "Academic", href: "/academic", children: [] },
-  { id: 15, label: "Timetables", href: "/timetables", children: [] },
+  {
+    id: 3,
+    label: "Academic",
+    href: "/academic",
+    children: [],
+  },
+  { id: 15, label: "Time Tables", href: "/timetables", children: [] },
   { id: 4, label: "Staff", href: "/trainers", children: [] },
   { id: 5, label: "Events", href: "/events", children: [] },
   { id: 6, label: "Announcements", href: "/anouncement", children: [] },
-  { id: 16, label: "Gallery", href: "/gallery", children: [] },
-  {
-    id: 7,
-    label: "Departments",
-    href: null,
-    children: [
-      { id: 8, label: "Fashion Design (FAD)", href: "/fad", children: [] },
-      { id: 9, label: "Accounting", href: "/acc", children: [] },
-      {
-        id: 10,
-        label: "ICT",
-        href: null,
-        children: [
-          { id: 11, label: "Software Development (SOD)", href: "/sod", children: [] },
-          { id: 12, label: "Computer Systems & Architecture (CSA)", href: "/csa", children: [] },
-          { id: 13, label: "Networking & Internet Technology (NIT)", href: "/nit", children: [] },
-        ],
-      },
-    ],
-  },
+  departmentMenu,
   { id: 14, label: "Contact", href: "/contact", children: [] },
 ];
+
+const withTradeLinks = (items) => {
+  const cleanNavigation = (Array.isArray(items) ? items : []).filter((item) =>
+    !tradePaths.has(item?.href) && !["departments", "trades"].includes(item?.label?.trim().toLowerCase())
+  );
+  const contactIndex = cleanNavigation.findIndex((item) => item?.label?.trim().toLowerCase() === "contact");
+  cleanNavigation.splice(contactIndex < 0 ? cleanNavigation.length : contactIndex, 0, departmentMenu);
+  return cleanNavigation;
+};
 
 const BOOTSTRAP_CACHE_TTL_MS = 5 * 60 * 1000;
 
@@ -72,7 +85,9 @@ const writeCachedBootstrap = (page, data) => {
         data,
       })
     );
-  } catch {}
+  } catch {
+    // Session storage can be unavailable; the API response is still usable.
+  }
 };
 
 export default function Layout() {
@@ -94,7 +109,7 @@ export default function Layout() {
           settings: cached.settings || {},
           navigation:
             Array.isArray(cached.navigation) && cached.navigation.length > 0
-              ? cached.navigation
+              ? withTradeLinks(cached.navigation)
               : fallbackNavigation,
           content: cached.content || [],
         });
@@ -108,7 +123,7 @@ export default function Layout() {
           settings: data?.settings || {},
           navigation:
             Array.isArray(data?.navigation) && data.navigation.length > 0
-              ? data.navigation
+              ? withTradeLinks(data.navigation)
               : fallbackNavigation,
           content: data?.content || [],
         });
@@ -128,12 +143,12 @@ export default function Layout() {
   }, [pathname]);
 
   useEffect(() => {
-    setMenuOpen(false);
-    if (window.AOS) {
-      window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
+      setMenuOpen(false);
+      if (window.AOS) {
         window.AOS.refresh();
-      });
-    }
+      }
+    });
   }, [pathname]);
 
   useEffect(() => {
@@ -182,8 +197,8 @@ export default function Layout() {
               src="/assets/img/logo1.jpg"
               alt="School Logo"
               style={{
-                width: "clamp(32px, 6vw, 40px)",
-                height: "clamp(32px, 6vw, 40px)",
+                width: "clamp(44px, 4vw, 58px)",
+                height: "clamp(44px, 4vw, 58px)",
                 objectFit: "contain",
                 backgroundColor: "rgba(255,255,255,0.9)",
                 padding: "2px",
@@ -195,19 +210,19 @@ export default function Layout() {
             <div className="d-block" style={{ minWidth: 0 }}>
               <h1
                 className="mb-0 text-white fw-bold"
-                style={{ fontSize: "clamp(0.62rem, 2.6vw, 0.7rem)", lineHeight: "1.1", letterSpacing: "0.3px" }}
+                style={{ fontSize: "clamp(0.72rem, 1vw, 0.95rem)", lineHeight: "1.08", letterSpacing: "0.2px" }}
               >
                 LYCEE S<sup>T</sup> ALEXANDRE
               </h1>
               <p
                 className="mb-0 text-white fw-bold"
-                style={{ fontSize: "clamp(0.58rem, 2.35vw, 0.65rem)", lineHeight: "1.1", letterSpacing: "0.3px" }}
+                style={{ fontSize: "clamp(0.68rem, 0.9vw, 0.88rem)", lineHeight: "1.08", letterSpacing: "0.2px" }}
               >
                 SAULI DE MUHURA
               </p>
               <p
                 className="mb-0 text-white fw-bold"
-                style={{ fontSize: "clamp(0.58rem, 2.35vw, 0.65rem)", lineHeight: "1.1", letterSpacing: "0.3px" }}
+                style={{ fontSize: "clamp(0.68rem, 0.9vw, 0.88rem)", lineHeight: "1.08", letterSpacing: "0.2px" }}
               >
                 PERES BARNABITES
               </p>
@@ -238,7 +253,7 @@ export default function Layout() {
         </div>
       </header>
 
-      <div style={{ height: "clamp(56px, 8vw, 65px)" }}></div>
+      <div className="header-spacer" />
 
       <Outlet />
 
@@ -250,25 +265,23 @@ export default function Layout() {
         boxShadow: "0 -6px 26px rgba(15, 23, 42, 0.16)",
       }}>
         <div className="footer-content">
-          <div className="footer-section">
-            <h4 style={{ fontFamily: "var(--font-display)", color: "#fff" }}>School Contact</h4>
-            <p className="mb-2" style={{ color: "rgba(255,255,255,0.92)" }}>
-              Quality education, moral formation, and practical training for future leaders.
-            </p>
-            <p style={{ color: "rgba(255,255,255,0.92)" }}><strong>Email:</strong> {boot.settings.primary_email || "lycemuhur@gmail.com"}</p>
-            {boot.settings.primary_phone && <p style={{ color: "rgba(255,255,255,0.92)" }}><strong>Phone:</strong> {boot.settings.primary_phone}</p>}
+          <div className="footer-section footer-school-brand">
+            <img src="/assets/img/logo1.jpg" alt="Lycée Saint Alexandre Sauli crest" />
+            <div><strong>LYCÉE SAINT ALEXANDRE SAULI<br />DE MUHURA<br />PÈRES BARNABITES</strong><p>Quality education, moral formation, and practical training for future leaders.</p></div>
           </div>
 
           <div className="footer-section">
-            <h4 style={{ fontFamily: "var(--font-display)", color: "#fff" }}>School Location</h4>
-            <div
-              dangerouslySetInnerHTML={{
-                __html:
-                  boot.settings.location ||
-                  "Rwanda, Eastern Province<br/>Gatsibo District<br/>Muhura Sector, Taba Cell<br/>Kanyinya Village",
-              }}
-              style={{ color: "rgba(255,255,255,0.92)" }}
-            />
+            <h4 style={{ fontFamily: "var(--font-display)", color: "#fff" }}>Quick Links</h4>
+            <div className="footer-quick-links">
+              <Link to="/">Home</Link><Link to="/about">About Us</Link><Link to="/academic">Academics</Link><Link to="/trainers">Teachers & Staff</Link><Link to="/events">News & Events</Link><Link to="/contact">Contact</Link>
+            </div>
+          </div>
+
+          <div className="footer-section">
+            <h4 style={{ fontFamily: "var(--font-display)", color: "#fff" }}>Contact Information</h4>
+            <p style={{ color: "rgba(255,255,255,0.92)" }}><i className="bi bi-geo-alt-fill" /> Muhura, Rwanda</p>
+            {boot.settings.primary_phone && <p style={{ color: "rgba(255,255,255,0.92)" }}><i className="bi bi-telephone-fill" /> {boot.settings.primary_phone}</p>}
+            <p style={{ color: "rgba(255,255,255,0.92)" }}><i className="bi bi-envelope-fill" /> {boot.settings.primary_email || "lycemuhur@gmail.com"}</p>
           </div>
 
           <div className="footer-section">
@@ -276,7 +289,7 @@ export default function Layout() {
             <div className="social-icons">
               <a href="#" target="_blank" rel="noopener" style={{ background: "rgba(255,255,255,0.9)", color: "#1f2937", borderColor: "rgba(255,255,255,0.6)" }}><i className="bi bi-facebook"></i></a>
               <a href="#" target="_blank" rel="noopener" style={{ background: "rgba(255,255,255,0.9)", color: "#1f2937", borderColor: "rgba(255,255,255,0.6)" }}><i className="bi bi-twitter"></i></a>
-              <a href="#" target="_blank" rel="noopener" style={{ background: "rgba(255,255,255,0.9)", color: "#1f2937", borderColor: "rgba(255,255,255,0.6)" }}><i className="bi bi-instagram"></i></a>
+              <a href="https://www.instagram.com/lyceesaintalexandresauli/" target="_blank" rel="noopener noreferrer" aria-label="Lycée De Muhura on Instagram" title="Lycée De Muhura on Instagram" style={{ background: "rgba(255,255,255,0.9)", color: "#1f2937", borderColor: "rgba(255,255,255,0.6)" }}><i className="bi bi-instagram"></i></a>
               <a href="#" target="_blank" rel="noopener" style={{ background: "rgba(255,255,255,0.9)", color: "#1f2937", borderColor: "rgba(255,255,255,0.6)" }}><i className="bi bi-linkedin"></i></a>
               <a href="#" target="_blank" rel="noopener" style={{ background: "rgba(255,255,255,0.9)", color: "#1f2937", borderColor: "rgba(255,255,255,0.6)" }}><i className="bi bi-youtube"></i></a>
             </div>
