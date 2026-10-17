@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { mediaUrl } from "../api/client";
-import { eventsAPI, staffAPI, contentAPI, departmentsAPI } from "../api/services";
+import { eventsAPI, contentAPI, departmentsAPI } from "../api/services";
 import Seo from "../components/Seo";
 import "./HomePage.css";
 
@@ -43,15 +43,9 @@ const galleryImages = [
 ];
 
 const getDate = (value) => value ? new Date(value).toLocaleDateString("en-GB", { day: "2-digit", month: "short" }).toUpperCase() : "SCHOOL";
-const featuredStaff = [
-  { surname: "habimana", givenName: "pascal", name: "Padri HABIMANA Pascal", position: "HeadMaster" },
-  { surname: "karenzi", givenName: "faustin", name: "KARENZI Faustin" },
-  { surname: "nsengiyumva", givenName: "ignace", name: "Padri NSENGIYUMVA Ignace" },
-];
 
 export default function HomePage() {
   const [events, setEvents] = useState([]);
-  const [staff, setStaff] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [content, setContent] = useState({});
   const [slide, setSlide] = useState(0);
@@ -65,13 +59,11 @@ export default function HomePage() {
     let active = true;
     Promise.all([
       eventsAPI.getAll().catch(() => ({ data: [] })),
-      staffAPI.getAll().catch(() => ({ data: [] })),
       departmentsAPI.getAll().catch(() => ({ data: [] })),
       contentAPI.getGrouped().catch(() => ({ data: {} })),
-    ]).then(([eventRes, staffRes, departmentRes, contentRes]) => {
+    ]).then(([eventRes, departmentRes, contentRes]) => {
       if (!active) return;
       setEvents(eventRes.data || []);
-      setStaff(staffRes.data || []);
       setDepartments(departmentRes.data || []);
       setContent(contentRes.data || {});
     });
@@ -87,15 +79,6 @@ export default function HomePage() {
       description: department?.description || trade.description,
     };
   });
-  const homepageStaff = featuredStaff
-    .map((featured) => {
-      const person = staff.find((member) => {
-        const normalizedName = String(member.name || "").toLowerCase().replace(/[^a-z]/g, "");
-        return normalizedName.includes(featured.surname) && normalizedName.includes(featured.givenName);
-      });
-      return person ? { ...person, name: featured.name, position: featured.position || person.position || person.department || "Staff" } : null;
-    })
-    .filter(Boolean);
   const aboutText = about?.content?.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim()
     || "Lycée St Alexandre Sauli de Muhura is a Catholic secondary school run by the Barnabite Fathers, committed to providing holistic education, moral values, and practical skills to help students build a better future.";
 
@@ -135,7 +118,6 @@ export default function HomePage() {
       </section>
 
       <section className="home-wrap home-community">
-        <div className="home-teachers"><div className="home-small-heading"><span>Our Staff</span><h2>Our Teachers & Staff <i /></h2></div><div className="home-teacher-grid">{homepageStaff.map((person) => <article className="home-teacher-card" key={person.id}>{person.image_path ? <img src={mediaUrl(person.image_path)} alt={person.name} loading="lazy" /> : <div className="home-teacher-empty"><i className="bi bi-person-circle" /></div>}<h3>{person.name}</h3><small>{person.position}</small></article>)}{staff.length > 0 && homepageStaff.length === 0 && <div className="home-empty-state">Our featured staff profiles are being updated.</div>}{staff.length === 0 && <div className="home-empty-state">Our teachers and staff will be introduced here.</div>}</div></div>
         <div className="home-events"><div className="home-events-head"><div className="home-small-heading"><span>Recent Events</span><h2>Latest Events</h2></div><Link className="home-btn home-btn-small" to="/events">View All Events <i className="bi bi-arrow-right" /></Link></div><div className="home-event-list">{events.slice(0, 3).map((event) => <article className="home-event" key={event.id}><img src={mediaUrl(event.image_path) || "/assets/img/photos/acc2.jpg"} alt="" loading="lazy" /><time>{getDate(event.created_at)}</time><div><h3>{event.title}</h3><p>{event.description}</p></div></article>)}{events.length === 0 && <div className="home-empty-state">School events and activities will appear here.</div>}</div></div>
       </section>
 

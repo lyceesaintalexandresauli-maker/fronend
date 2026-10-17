@@ -304,6 +304,11 @@
 .events-detail-meta span { display:inline-flex; align-items:center; gap:7px; padding:8px 11px; border:1px solid rgba(255,255,255,.82); border-radius:999px; background:rgba(255,255,255,.52); color:#6c5949; font-size:.72rem; box-shadow:0 5px 16px rgba(83,53,31,.06); }
 .events-detail-meta i { color:#b24d12; }
 .events-detail-content>p { color:#6d6055; font-size:.96rem; line-height:1.75; white-space:pre-line; }
+.events-video-tag { display:inline-flex; align-items:center; gap:8px; margin:10px 0 10px; padding:7px 12px; border:1px solid rgba(178,77,18,.12); border-radius:999px; background:rgba(230,197,106,.18); color:#8b4a0d; font-size:.72rem; font-weight:700; }
+.events-detail-video-wrap { position:relative; width:100%; padding-top:56.25%; overflow:hidden; border-radius:18px; background:#1d120d; box-shadow:0 14px 28px rgba(37,20,11,.1); }
+.events-detail-video-wrap iframe,
+.events-detail-video { position:absolute; inset:0; width:100%; height:100%; border:0; }
+.events-detail-video { object-fit:cover; }
 .events-detail-register { display:inline-flex; align-items:center; gap:8px; margin-top:8px; padding:10px 16px; border:1px solid rgba(255,255,255,.56); border-radius:999px; background:#b24d12; color:#fff; font-size:.8rem; font-weight:750; text-decoration:none; box-shadow:0 8px 20px rgba(178,77,18,.22); }
 .events-detail-register:hover { color:#fff; background:#913b10; }
 .events-page button:not(.btn-close):not(.accordion-button):not(.mobile-nav-toggle):not(.student-portal-btn-muted).event-details { border:1px solid rgba(255,255,255,.64)!important; background:linear-gradient(135deg,#bc571b,#a84410)!important; color:#fff!important; box-shadow:0 7px 16px rgba(146,58,14,.17); }

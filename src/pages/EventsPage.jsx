@@ -13,6 +13,37 @@ const toLocalDateValue = (date) => {
   return `${year}-${month}-${day}`;
 };
 
+const getEventVideoUrl = (event) => {
+  if (!event) return null;
+  return event.video_url || event.video_path || event.video || event.media_url || null;
+};
+
+const isDirectVideoUrl = (value) => /\.(mp4|webm|ogg)(\?.*)?$/i.test(String(value));
+
+const getYoutubeEmbedUrl = (value) => {
+  if (!value) return null;
+  try {
+    const url = new URL(value);
+    if (url.hostname.includes("youtu.be")) {
+      const videoId = url.pathname.replace("/", "");
+      return `https://www.youtube.com/embed/${videoId}`;
+    }
+    if (url.hostname.includes("youtube.com")) {
+      const videoId = url.searchParams.get("v");
+      if (videoId) return `https://www.youtube.com/embed/${videoId}`;
+      const shortCode = url.pathname.match(/\/shorts\/(.+)/)?.[1];
+      if (shortCode) return `https://www.youtube.com/embed/${shortCode}`;
+    }
+    if (url.hostname.includes("vimeo.com")) {
+      const match = url.pathname.match(/\/(\d+)/);
+      if (match) return `https://player.vimeo.com/video/${match[1]}`;
+    }
+  } catch {
+    return null;
+  }
+  return null;
+};
+
 export default function EventsPage() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -140,7 +171,29 @@ export default function EventsPage() {
         <article className="events-detail-dialog" role="dialog" aria-modal="true" aria-labelledby="event-detail-title" onClick={(event) => event.stopPropagation()}>
           <button type="button" className="events-detail-close" aria-label="Close event details" onClick={() => setSelectedEvent(null)}><i className="bi bi-x-lg" /></button>
           <div className="events-detail-image-wrap">
-            {selectedEvent.image_path ? <img src={mediaUrl(selectedEvent.image_path)} alt={selectedEvent.title} /> : <div className="events-detail-image-empty"><i className="bi bi-calendar-event" /></div>}
+            {(() => {
+              const videoUrl = getEventVideoUrl(selectedEvent);
+              const embedUrl = videoUrl ? getYoutubeEmbedUrl(videoUrl) : null;
+              if (videoUrl && embedUrl) {
+                return (
+                  <div className="events-detail-video-wrap">
+                    <iframe
+                      src={embedUrl}
+                      title={`${selectedEvent.title} video`}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                    />
+                  </div>
+                );
+              }
+              if (videoUrl && isDirectVideoUrl(videoUrl)) {
+                return <video className="events-detail-video" controls preload="metadata" src={videoUrl.startsWith("http") ? videoUrl : mediaUrl(videoUrl)} />;
+              }
+              if (selectedEvent.image_path) {
+                return <img src={mediaUrl(selectedEvent.image_path)} alt={selectedEvent.title} />;
+              }
+              return <div className="events-detail-image-empty"><i className="bi bi-calendar-event" /></div>;
+            })()}
             <span className="events-detail-category">{selectedEvent.category || "School event"}</span>
           </div>
           <div className="events-detail-content">
@@ -148,6 +201,7 @@ export default function EventsPage() {
             <h2 id="event-detail-title">{selectedEvent.title}</h2>
             <div className="events-detail-meta"><span><i className="bi bi-calendar-event" />{formatEventDate(selectedEvent.date || selectedEvent.created_at)}</span><span><i className="bi bi-geo-alt-fill" />{selectedEvent.location || "School grounds"}</span>{selectedEvent.time && <span><i className="bi bi-clock-fill" />{selectedEvent.time}</span>}</div>
             <p>{selectedEvent.description || "Join the school community for this special event."}</p>
+            {getEventVideoUrl(selectedEvent) && <div className="events-video-tag"><i className="bi bi-play-circle-fill" /> Video event</div>}
             {selectedEvent.registration_link && <a className="events-detail-register" href={selectedEvent.registration_link} target="_blank" rel="noopener noreferrer">Learn more <i className="bi bi-arrow-up-right" /></a>}
           </div>
         </article>

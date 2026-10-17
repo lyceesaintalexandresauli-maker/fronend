@@ -290,7 +290,7 @@ export default function Layout() {
               <a href="#" target="_blank" rel="noopener" style={{ background: "rgba(255,255,255,0.9)", color: "#1f2937", borderColor: "rgba(255,255,255,0.6)" }}><i className="bi bi-facebook"></i></a>
               <a href="#" target="_blank" rel="noopener" style={{ background: "rgba(255,255,255,0.9)", color: "#1f2937", borderColor: "rgba(255,255,255,0.6)" }}><i className="bi bi-twitter"></i></a>
               <a href="https://www.instagram.com/lyceesaintalexandresauli/" target="_blank" rel="noopener noreferrer" aria-label="Lycée De Muhura on Instagram" title="Lycée De Muhura on Instagram" style={{ background: "rgba(255,255,255,0.9)", color: "#1f2937", borderColor: "rgba(255,255,255,0.6)" }}><i className="bi bi-instagram"></i></a>
-              <a href="#" target="_blank" rel="noopener" style={{ background: "rgba(255,255,255,0.9)", color: "#1f2937", borderColor: "rgba(255,255,255,0.6)" }}><i className="bi bi-linkedin"></i></a>
+              <a href="mailto:lyceesaintalexandresauli@gmail.com" rel="noopener noreferrer" aria-label="Email Lycée Saint Alexandre Sauli" title="Email Lycée Saint Alexandre Sauli" style={{ background: "rgba(255,255,255,0.9)", color: "#1f2937", borderColor: "rgba(255,255,255,0.6)" }}><i className="bi bi-linkedin"></i></a>
               <a href="#" target="_blank" rel="noopener" style={{ background: "rgba(255,255,255,0.9)", color: "#1f2937", borderColor: "rgba(255,255,255,0.6)" }}><i className="bi bi-youtube"></i></a>
             </div>
           </div>
