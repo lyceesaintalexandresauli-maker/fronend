@@ -6,9 +6,9 @@ import Seo from "../components/Seo";
 import "./HomePage.css";
 
 const slides = [
-  "/assets/img/photos/sod10.jpg",
-  "/assets/img/photos/sod0.jpg",
-  "/assets/img/photos/sod1.jpg",
+  "/assets/img/photos/sod1_resized.jpg",
+  "/assets/img/acc1_resized.jpg",
+  "/assets/img/fad2_resized.jpg",
 ];
 
 const trades = [

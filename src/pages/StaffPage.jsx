@@ -7,7 +7,14 @@ import { staffAPI, departmentsAPI } from "../api/services";
 const sortStaffByIdAsc = (members = []) =>
   [...members].sort((a, b) => Number(a?.id ?? 0) - Number(b?.id ?? 0));
 
-const formatWhatsAppNumber = (phone = "") => String(phone).replace(/\D/g, "");
+const formatWhatsAppNumber = (phone = "") => {
+  const digits = String(phone).replace(/\D/g, "");
+  if (digits.startsWith("00250")) return digits.slice(2);
+  if (digits.startsWith("250")) return digits;
+  if (digits.startsWith("0")) return `250${digits.slice(1)}`;
+  if (digits.length === 9 && digits.startsWith("7")) return `250${digits}`;
+  return digits;
+};
 
 export default function StaffPage() {
   const [staff, setStaff] = useState([]);

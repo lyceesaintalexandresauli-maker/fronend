@@ -7,6 +7,7 @@ import SafeImage from "../components/SafeImage";
 export default function AcademicPage() {
   const [content, setContent] = useState({});
   const [loading, setLoading] = useState(true);
+  const [lightboxReady, setLightboxReady] = useState(false);
 
   useEffect(() => {
     if (window.AOS) {
@@ -34,15 +35,50 @@ export default function AcademicPage() {
   }, []);
 
   useEffect(() => {
+    let active = true;
     if (window.GLightbox) {
-      window.GLightbox({
-        selector: '.glightbox',
-        touchNavigation: true,
-        loop: true,
-        autoplayVideos: true
-      });
+      setLightboxReady(true);
+      return () => { active = false; };
     }
-  }, [loading]);
+
+    if (!document.querySelector('link[data-glightbox]')) {
+      const stylesheet = document.createElement("link");
+      stylesheet.rel = "stylesheet";
+      stylesheet.href = "/assets/vendor/glightbox/css/glightbox.min.css";
+      stylesheet.dataset.glightbox = "true";
+      document.head.appendChild(stylesheet);
+    }
+
+    let script = document.querySelector('script[data-glightbox]');
+    const onLoad = () => {
+      if (active) setLightboxReady(true);
+    };
+    if (!script) {
+      script = document.createElement("script");
+      script.src = "/assets/vendor/glightbox/js/glightbox.min.js";
+      script.dataset.glightbox = "true";
+      script.onload = onLoad;
+      document.body.appendChild(script);
+    } else {
+      script.addEventListener("load", onLoad, { once: true });
+    }
+
+    return () => {
+      active = false;
+      script?.removeEventListener("load", onLoad);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (loading || !lightboxReady || !window.GLightbox) return undefined;
+    const lightbox = window.GLightbox({
+      selector: ".glightbox",
+      touchNavigation: true,
+      loop: true,
+      autoplayVideos: true,
+    });
+    return () => lightbox?.destroy?.();
+  }, [loading, lightboxReady]);
 
   const getSection = (slug) => content[slug] || {};
 
