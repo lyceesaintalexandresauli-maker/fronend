@@ -239,12 +239,12 @@ export default function StaffPage() {
                           href={`https://wa.me/${formatWhatsAppNumber(member.phone)}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="btn btn-sm btn-outline-secondary rounded-circle ui-icon-btn"
-                          style={{ width: "36px", height: "36px", padding: "0" }}
+                          className="btn btn-sm btn-outline-success d-inline-flex align-items-center gap-2 ui-icon-btn"
                           title={`Chat with ${member.name} on WhatsApp`}
                           aria-label={`Chat with ${member.name} on WhatsApp`}
                         >
                           <i className="bi bi-whatsapp"></i>
+                          <span>Call on WhatsApp</span>
                         </a>
                       )}
                       {member.linkedin && (
