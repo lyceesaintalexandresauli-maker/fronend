@@ -1040,6 +1040,10 @@
     font-family: var(--font-body);
   }
 
+  a[href], button, [role="button"], summary {
+    cursor: pointer;
+  }
+
   h1, h2, h3, h4, h5, h6,
   .sitename,
   .section-title h1,

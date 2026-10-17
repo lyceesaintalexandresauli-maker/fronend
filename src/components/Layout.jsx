@@ -287,11 +287,11 @@ export default function Layout() {
           <div className="footer-section">
             <h4 style={{ fontFamily: "var(--font-display)", color: "#fff" }}>Follow Us</h4>
             <div className="social-icons">
-              <a href="#" target="_blank" rel="noopener" style={{ background: "rgba(255,255,255,0.9)", color: "#1f2937", borderColor: "rgba(255,255,255,0.6)" }}><i className="bi bi-facebook"></i></a>
-              <a href="#" target="_blank" rel="noopener" style={{ background: "rgba(255,255,255,0.9)", color: "#1f2937", borderColor: "rgba(255,255,255,0.6)" }}><i className="bi bi-twitter"></i></a>
+              <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook" title="Facebook" style={{ background: "rgba(255,255,255,0.9)", color: "#1f2937", borderColor: "rgba(255,255,255,0.6)" }}><i className="bi bi-facebook"></i></a>
+              <a href="https://x.com" target="_blank" rel="noopener noreferrer" aria-label="X / Twitter" title="X / Twitter" style={{ background: "rgba(255,255,255,0.9)", color: "#1f2937", borderColor: "rgba(255,255,255,0.6)" }}><i className="bi bi-twitter"></i></a>
               <a href="https://www.instagram.com/lyceesaintalexandresauli/" target="_blank" rel="noopener noreferrer" aria-label="Lycée De Muhura on Instagram" title="Lycée De Muhura on Instagram" style={{ background: "rgba(255,255,255,0.9)", color: "#1f2937", borderColor: "rgba(255,255,255,0.6)" }}><i className="bi bi-instagram"></i></a>
               <a href="mailto:lyceesaintalexandresauli@gmail.com" rel="noopener noreferrer" aria-label="Email Lycée Saint Alexandre Sauli" title="Email Lycée Saint Alexandre Sauli" style={{ background: "rgba(255,255,255,0.9)", color: "#1f2937", borderColor: "rgba(255,255,255,0.6)" }}><i className="bi bi-linkedin"></i></a>
-              <a href="#" target="_blank" rel="noopener" style={{ background: "rgba(255,255,255,0.9)", color: "#1f2937", borderColor: "rgba(255,255,255,0.6)" }}><i className="bi bi-youtube"></i></a>
+              <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" aria-label="YouTube" title="YouTube" style={{ background: "rgba(255,255,255,0.9)", color: "#1f2937", borderColor: "rgba(255,255,255,0.6)" }}><i className="bi bi-youtube"></i></a>
             </div>
           </div>
         </div>
@@ -300,7 +300,7 @@ export default function Layout() {
         </div>
       </footer>
 
-      <a href="#" id="scroll-top" className="scroll-top d-flex align-items-center justify-content-center" style={{
+      <a href="/" id="scroll-top" className="scroll-top d-flex align-items-center justify-content-center" style={{
         background: "var(--brand-accent-glass)",
         backdropFilter: "blur(var(--glass-blur)) saturate(var(--glass-saturate))",
         WebkitBackdropFilter: "blur(var(--glass-blur)) saturate(var(--glass-saturate))",

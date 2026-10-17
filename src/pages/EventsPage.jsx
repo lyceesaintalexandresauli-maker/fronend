@@ -49,6 +49,7 @@ export default function EventsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filterDate, setFilterDate] = useState("");
+  const [mediaFilter, setMediaFilter] = useState("all");
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [calendarMonth, setCalendarMonth] = useState(() => {
     const now = new Date();
@@ -107,12 +108,19 @@ export default function EventsPage() {
       });
     }
 
+    if (mediaFilter === "videos") {
+      filtered = filtered.filter((event) => Boolean(getEventVideoUrl(event)));
+    } else if (mediaFilter === "images") {
+      filtered = filtered.filter((event) => Boolean(event.image_path) && !getEventVideoUrl(event));
+    }
+
     filtered.sort((a, b) => {
-      const difference = new Date(a.date || a.created_at) - new Date(b.date || b.created_at);
-      return difference;
+      const dateA = new Date(a.date || a.created_at).getTime();
+      const dateB = new Date(b.date || b.created_at).getTime();
+      return dateB - dateA;
     });
     return filtered;
-  }, [events, filterDate]);
+  }, [events, filterDate, mediaFilter]);
 
   const formatEventDate = (dateStr) => {
     if (!dateStr) return "No date";
@@ -215,11 +223,11 @@ export default function EventsPage() {
           </div>
         </div>
         <div className="events-filter-bar" aria-label="Calendar is the active event control">
-          <div className="events-filter-field"><span><i className="bi bi-calendar-event" /> Select a date in the calendar</span><div className="events-filter-display">{filterDate ? formatEventDate(filterDate) : "Choose an event date"}</div></div>
-          <div className="events-filter-field is-inactive"><span><i className="bi bi-funnel-fill" /> Event Type</span><div className="events-filter-display">All event types</div></div>
-          <div className="events-filter-field is-inactive"><span><i className="bi bi-tag-fill" /> Category</span><div className="events-filter-display">All categories</div></div>
-          <div className="events-search-field is-inactive"><span><i className="bi bi-info-circle" /> Browse events</span><div className="events-filter-display">Use the calendar to choose a day</div></div>
-          <div className="events-search-button is-inactive"><i className="bi bi-calendar-check" /> Calendar active</div>
+          <div className="events-filter-field active-filter"><span><i className="bi bi-calendar-event" /> Select a date in the calendar</span><div className="events-filter-display active-display">{filterDate ? formatEventDate(filterDate) : "Choose an event date"}</div></div>
+          <div className="events-filter-field active-filter"><span><i className="bi bi-funnel-fill" /> Event Type</span><div className="events-filter-display active-display">All event types</div></div>
+          <label className="events-filter-field active-filter"><span><i className="bi bi-tag-fill" /> Category</span><select className="events-filter-display active-display" value={mediaFilter} onChange={(event) => setMediaFilter(event.target.value)} aria-label="Filter events by media category"><option value="all">All events</option><option value="videos">Videos</option><option value="images">Images</option></select></label>
+          <div className="events-search-field active-filter"><span><i className="bi bi-info-circle" /> Browse events</span><div className="events-filter-display active-display">Use the calendar to choose a day</div></div>
+          <div className="events-search-button active-button"><i className="bi bi-calendar-check" /> Calendar active</div>
         </div>
         <div className="events-layout">
           <div>

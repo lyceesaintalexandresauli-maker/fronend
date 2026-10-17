@@ -7,6 +7,8 @@ import { staffAPI, departmentsAPI } from "../api/services";
 const sortStaffByIdAsc = (members = []) =>
   [...members].sort((a, b) => Number(a?.id ?? 0) - Number(b?.id ?? 0));
 
+const formatWhatsAppNumber = (phone = "") => String(phone).replace(/\D/g, "");
+
 export default function StaffPage() {
   const [staff, setStaff] = useState([]);
   const [departments, setDepartments] = useState([]);
@@ -207,6 +209,12 @@ export default function StaffPage() {
                     <p className="text-muted small mb-3" style={{ lineHeight: "1.6" }}>
                       {member.bio ? `"${member.bio.slice(0, 150)}${member.bio.length > 150 ? "..." : ""}"` : "No biography available."}
                     </p>
+                    {member.phone && (
+                      <p className="small mb-3">
+                        <i className="bi bi-telephone me-2" aria-hidden="true"></i>
+                        <span>{member.phone}</span>
+                      </p>
+                    )}
 
                     <div className="d-flex justify-content-center gap-2 mb-3 ui-icon-actions">
                       {member.email && (
@@ -221,12 +229,15 @@ export default function StaffPage() {
                       )}
                       {member.phone && (
                         <a
-                          href={`tel:${member.phone}`}
+                          href={`https://wa.me/${formatWhatsAppNumber(member.phone)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           className="btn btn-sm btn-outline-secondary rounded-circle ui-icon-btn"
                           style={{ width: "36px", height: "36px", padding: "0" }}
-                          title="Phone"
+                          title={`Chat with ${member.name} on WhatsApp`}
+                          aria-label={`Chat with ${member.name} on WhatsApp`}
                         >
-                          <i className="bi bi-telephone"></i>
+                          <i className="bi bi-whatsapp"></i>
                         </a>
                       )}
                       {member.linkedin && (
