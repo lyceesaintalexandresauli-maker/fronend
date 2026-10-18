@@ -6,9 +6,13 @@ import Seo from "../components/Seo";
 import "./HomePage.css";
 
 const slides = [
-  { src: "/assets/img/photos/sod1.jpg", alt: "ICT students seated at computers in class" },
-  { src: "/assets/img/photos/sod2.jpg", alt: "ICT students working at computers in class" },
-  { src: "/assets/img/photos/sod3.jpg", alt: "ICT students learning together at computers" },
+  { src: "/assets/img/photos/sod0.jpg", alt: "Software Development students seated in class" },
+  { src: "/assets/img/photos/nit1.jpg", alt: "Networking students seated at computers in class" },
+  { src: "/assets/img/photos/sod3.jpg", alt: "Software Development students learning at computers" },
+  { src: "/assets/img/photos/sod1.jpg", alt: "Software Development students seated at computers in class" },
+  { src: "/assets/img/photos/sod2.jpg", alt: "Software Development students working together in class" },
+  { src: "/assets/img/photos/sod10.jpg", alt: "Software Development students seated together in class" },
+  { src: "/assets/img/photos/csa3.jpg", alt: "Computer Systems and Architecture students learning about hardware in class" },
 ];
 
 const trades = [
@@ -51,7 +55,7 @@ export default function HomePage() {
   const [slide, setSlide] = useState(0);
 
   useEffect(() => {
-    const timer = window.setInterval(() => setSlide((current) => (current + 1) % slides.length), 8000);
+    const timer = window.setInterval(() => setSlide((current) => (current + 1) % slides.length), 3000);
     return () => window.clearInterval(timer);
   }, []);
 
