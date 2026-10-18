@@ -6,9 +6,9 @@ import Seo from "../components/Seo";
 import "./HomePage.css";
 
 const slides = [
-  "/assets/img/photos/sod1.jpg",
-  "/assets/img/photos/nit1.jpg",
-  "/assets/img/photos/csa3.jpg",
+  { src: "/assets/img/photos/sod1.jpg", alt: "ICT students seated at computers in class" },
+  { src: "/assets/img/photos/sod2.jpg", alt: "ICT students working at computers in class" },
+  { src: "/assets/img/photos/sod3.jpg", alt: "ICT students learning together at computers" },
 ];
 
 const trades = [
@@ -87,7 +87,7 @@ export default function HomePage() {
       <Seo title="Home" description="Quality education, moral formation, and practical training for future leaders at Lycée Saint Alexandre Sauli de Muhura." path="/" />
 
       <section className="home-hero" aria-label="Welcome">
-        <img key={slide} className="home-hero-photo" src={slides[slide]} alt={`Students learning at school, slide ${slide + 1}`} fetchPriority={slide === 0 ? "high" : "auto"} decoding="async" />
+        <img key={slide} className="home-hero-photo" src={slides[slide].src} alt={slides[slide].alt} fetchPriority={slide === 0 ? "high" : "auto"} decoding="async" />
         <div className="home-hero-overlay" />
         <button className="home-hero-arrow home-hero-prev" type="button" aria-label="Previous slide" onClick={() => setSlide((slide - 1 + slides.length) % slides.length)}><i className="bi bi-chevron-left" /></button>
         <button className="home-hero-arrow home-hero-next" type="button" aria-label="Next slide" onClick={() => setSlide((slide + 1) % slides.length)}><i className="bi bi-chevron-right" /></button>
