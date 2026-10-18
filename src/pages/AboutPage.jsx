@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { mediaUrl } from "../api/client";
 import { contentAPI } from "../api/services";
 import { getContentSections } from "../utils/helpers";
@@ -7,6 +7,7 @@ import Seo from "../components/Seo";
 import PageLoader from "../components/PageLoader";
 
 export default function AboutPage() {
+  const location = useLocation();
   const [sections, setSections] = useState({});
   const [loading, setLoading] = useState(true);
   const [readMoreOpen, setReadMoreOpen] = useState(false);
@@ -55,6 +56,11 @@ export default function AboutPage() {
       }, 12);
     });
   }, [loading]);
+
+  useEffect(() => {
+    if (loading || location.hash !== "#saint-alexandre-sauli") return;
+    document.getElementById("saint-alexandre-sauli")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [loading, location.hash]);
 
   const getSection = (slug) => sections[slug] || {};
 
@@ -179,7 +185,7 @@ integrating academic excellence, Christian morals, discipline, and practical ski
           </div>
         </div>
 
-        <div className="row align-items-center mb-5">
+        <div id="saint-alexandre-sauli" className="row align-items-center mb-5" style={{ scrollMarginTop: "110px" }}>
           <div className="col-lg-6 order-lg-2" data-aos="fade-left">
             <h2>{saint.title || "Who Was Saint Alexandre Sauli?"}</h2>
             <p>{(saint.content || "Saint Alexandre Sauli (1534–1592) was a Barnabite priest, bishop, and scholar.").split("Sauli studied")[0]}</p>

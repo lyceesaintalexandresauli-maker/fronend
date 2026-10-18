@@ -17,3 +17,21 @@
 
 /* Keep the motto directly over the hero image without a dark banner. */
 .home-hero-copy>.home-kicker{background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;}.home-founder{display:grid;justify-items:center;max-width:520px;width:100%;margin:0 auto}.home-founder img{display:block;width:min(100%,520px);height:auto;max-height:560px;object-fit:cover;border-radius:18px;box-shadow:0 18px 36px rgba(18,45,68,.16)}.home-founder figcaption{display:grid;gap:2px;text-align:center;margin-top:12px}.home-founder figcaption strong{font-size:1rem}.home-founder figcaption small{font-size:.68rem;color:#5d6b78}
+
+/* Keep homepage photos fully visible in their frames without distortion. */
+.home-founder{height:auto;min-height:0;overflow:visible;border-radius:0;box-shadow:none}
+.home-founder img{height:auto;max-height:560px;object-fit:contain;background:#f3f7f9}
+.home-founder figcaption{position:static;left:auto;right:auto;bottom:auto;align-items:center;margin-top:12px;padding:0;background:transparent;color:var(--home-ink)}
+.home-founder figcaption small{color:#5d6b78}
+.home-founder figcaption .home-btn{width:fit-content;margin-top:8px}
+.home-program-photo img,.home-event>img,.home-gallery-grid img{object-fit:contain;background:#f3f7f9}
+@media(max-width:560px){.home-founder{height:auto}}
+
+/* Keep the full hero photo visible in the first screen, without a blurred backdrop. */
+.home-hero{height:100vh;height:100svh;min-height:520px;background:#29271e}
+.home-hero::before{content:none}
+.home-hero-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;background:#29271e}
+.home-hero-overlay{background:linear-gradient(90deg,rgba(12,20,25,.65),rgba(12,20,25,.34) 45%,rgba(12,20,25,.05) 100%)}
+.home-hero-copy{ text-shadow:0 2px 8px rgba(0,0,0,.55) }
+.home-hero-actions{ text-shadow:none }
+@media(max-width:560px){.home-hero{height:430px}.home-hero-photo{object-position:center}}

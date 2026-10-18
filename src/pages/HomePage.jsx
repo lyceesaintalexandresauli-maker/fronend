@@ -6,9 +6,9 @@ import Seo from "../components/Seo";
 import "./HomePage.css";
 
 const slides = [
-  "/assets/img/photos/sod1_resized.jpg",
-  "/assets/img/acc1_resized.jpg",
-  "/assets/img/fad2_resized.jpg",
+  "/assets/img/photos/sod1.jpg",
+  "/assets/img/photos/nit1.jpg",
+  "/assets/img/photos/csa3.jpg",
 ];
 
 const trades = [
@@ -87,7 +87,7 @@ export default function HomePage() {
       <Seo title="Home" description="Quality education, moral formation, and practical training for future leaders at Lycée Saint Alexandre Sauli de Muhura." path="/" />
 
       <section className="home-hero" aria-label="Welcome">
-        <div key={slide} className="home-hero-photo" style={{ backgroundImage: `url('${slides[slide]}')` }} role="img" aria-label={`Students learning at school, slide ${slide + 1}`} />
+        <img key={slide} className="home-hero-photo" src={slides[slide]} alt={`Students learning at school, slide ${slide + 1}`} fetchPriority={slide === 0 ? "high" : "auto"} decoding="async" />
         <div className="home-hero-overlay" />
         <button className="home-hero-arrow home-hero-prev" type="button" aria-label="Previous slide" onClick={() => setSlide((slide - 1 + slides.length) % slides.length)}><i className="bi bi-chevron-left" /></button>
         <button className="home-hero-arrow home-hero-next" type="button" aria-label="Next slide" onClick={() => setSlide((slide + 1) % slides.length)}><i className="bi bi-chevron-right" /></button>
@@ -107,7 +107,7 @@ export default function HomePage() {
 
       <section className="home-wrap home-intro">
         <div className="home-intro-copy"><span className="home-rule" /><h2>Who We Are</h2><p>{aboutText}</p><Link className="home-btn" to="/about">About Our School <i className="bi bi-arrow-right" /></Link></div>
-        <figure className="home-founder"><img src="/assets/img/sauli2.jfif" alt="Painting of St. Alessandro Sauli" loading="lazy" /><figcaption><strong>St. Alessandro Sauli</strong><small>Barnabite</small></figcaption></figure>
+        <figure className="home-founder"><img src="/assets/img/sauli2.jfif" alt="Painting of St. Alessandro Sauli" loading="lazy" /><figcaption><strong>St. Alessandro Sauli</strong><small>Barnabite</small><Link className="home-btn" to="/about#saint-alexandre-sauli">Learn about Saint Alexandre Sauli <i className="bi bi-arrow-right" /></Link></figcaption></figure>
       </section>
 
       <section className="home-values"><div className="home-wrap home-value-grid">{values.map(([icon, title, description]) => <article className="home-value-card" key={title}><span className="home-value-icon"><i className={`bi ${icon}`} /></span><h3>{title}</h3><p>{description}</p><Link to="/about" aria-label={`Learn about ${title}`}><i className="bi bi-arrow-right" /></Link></article>)}</div></section>
