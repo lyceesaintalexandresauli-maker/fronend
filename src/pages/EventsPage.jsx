@@ -49,6 +49,7 @@ export default function EventsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filterDate, setFilterDate] = useState("");
+  const [eventTypeFilter, setEventTypeFilter] = useState("all");
   const [mediaFilter, setMediaFilter] = useState("all");
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [calendarMonth, setCalendarMonth] = useState(() => {
@@ -108,6 +109,10 @@ export default function EventsPage() {
       });
     }
 
+    if (eventTypeFilter !== "all") {
+      filtered = filtered.filter((event) => (event.category || "General") === eventTypeFilter);
+    }
+
     if (mediaFilter === "videos") {
       filtered = filtered.filter((event) => Boolean(getEventVideoUrl(event)));
     } else if (mediaFilter === "images") {
@@ -120,7 +125,9 @@ export default function EventsPage() {
       return dateB - dateA;
     });
     return filtered;
-  }, [events, filterDate, mediaFilter]);
+  }, [events, filterDate, eventTypeFilter, mediaFilter]);
+
+  const eventTypes = [...new Set(events.map((event) => event.category || "General"))].sort((a, b) => a.localeCompare(b));
 
   const formatEventDate = (dateStr) => {
     if (!dateStr) return "No date";
@@ -222,12 +229,12 @@ export default function EventsPage() {
             <p>Stay updated with the latest school activities, celebrations, and important events at Lycee Saint Alexandre Sauli De Muhura.</p>
           </div>
         </div>
-        <div className="events-filter-bar" aria-label="Calendar is the active event control">
-          <div className="events-filter-field active-filter"><span><i className="bi bi-calendar-event" /> Select a date in the calendar</span><div className="events-filter-display active-display">{filterDate ? formatEventDate(filterDate) : "Choose an event date"}</div></div>
-          <div className="events-filter-field active-filter"><span><i className="bi bi-funnel-fill" /> Event Type</span><div className="events-filter-display active-display">All event types</div></div>
-          <label className="events-filter-field active-filter"><span><i className="bi bi-tag-fill" /> Category</span><select className="events-filter-display active-display" value={mediaFilter} onChange={(event) => setMediaFilter(event.target.value)} aria-label="Filter events by media category"><option value="all">All events</option><option value="videos">Videos</option><option value="images">Images</option></select></label>
+        <div className="events-filter-bar" aria-label="Filter events">
+          <label className="events-filter-field active-filter"><span><i className="bi bi-calendar-event" /> Select date</span><input className="events-filter-display active-display" type="date" value={filterDate} onChange={(event) => { const value = event.target.value; setFilterDate(value); if (value) { const [year, month] = value.split("-").map(Number); setCalendarMonth(new Date(year, month - 1, 1)); } }} aria-label="Search events by date" /></label>
+          <label className="events-filter-field active-filter"><span><i className="bi bi-funnel-fill" /> Event Type</span><select className="events-filter-display active-display" value={eventTypeFilter} onChange={(event) => setEventTypeFilter(event.target.value)} aria-label="Filter events by type"><option value="all">All event types</option>{eventTypes.map((type) => <option key={type} value={type}>{type}</option>)}</select></label>
+          <label className="events-filter-field active-filter"><span><i className="bi bi-tag-fill" /> Media</span><select className="events-filter-display active-display" value={mediaFilter} onChange={(event) => setMediaFilter(event.target.value)} aria-label="Filter events by media"><option value="all">All media</option><option value="videos">Videos</option><option value="images">Images</option></select></label>
           <div className="events-search-field active-filter"><span><i className="bi bi-info-circle" /> Browse events</span><div className="events-filter-display active-display">Use the calendar to choose a day</div></div>
-          <div className="events-search-button active-button"><i className="bi bi-calendar-check" /> Calendar active</div>
+          <button type="button" className="events-search-button active-button" onClick={() => { setFilterDate(""); setEventTypeFilter("all"); setMediaFilter("all"); }}><i className="bi bi-arrow-counterclockwise" /> Clear filters</button>
         </div>
         <div className="events-layout">
           <div>
