@@ -3,7 +3,7 @@
   @tailwind utilities;
 
   :root {
-    /* Deep burnt orange — easy on the eyes vs bright yellow */
+    /* Deep burnt orange - easy on the eyes vs bright yellow */
     --brand-accent: #b24d12;
     --brand-accent-hover: #983f0e;
     --brand-accent-border: #7c340c;
