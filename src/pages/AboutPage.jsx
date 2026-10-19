@@ -243,34 +243,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <nav className="container py-3" aria-label="About page links">
-        <div className="d-flex flex-wrap gap-2 justify-content-center">
-          {Object.entries(INFO_PAGES).map(([key, page]) => (
-            <a
-              key={key}
-              href={`#${key}`}
-              onClick={() => setActiveTab(key)}
-              aria-current={activeTab === key ? "location" : undefined}
-              className={`btn btn-sm rounded-pill ${activeTab === key ? "btn-primary" : "btn-outline-secondary"}`}
-            >
-              {page.title}
-            </a>
-          ))}
-          {[
-            ["What Drives Our School", "drives-school"],
-            ["Core Values", "core-values"],
-            ["Academic Programs", "academic-programs"],
-            ["Our Heritage", "heritage"],
-            ["Why Choose Us", "why-choose"],
-            ["Join Our School", "join-school"],
-          ].map(([label, target]) => (
-            <a key={target} href={`#${target}`} className="btn btn-sm btn-outline-secondary rounded-pill">
-              {label}
-            </a>
-          ))}
-        </div>
-      </nav>
-
       {/* ── Info Section (Sidebar Menu + Content Panel) ──── */}
       <section id="about-info-section" className="container py-5" style={{ scrollMarginTop: "110px" }}>
         <div className="row g-4">
@@ -424,87 +396,11 @@ integrating academic excellence, Christian morals, discipline, and practical ski
         </div>
       </section>
 
-      {/* ── Mission / Vision / Values Cards ────────────────────── */}
-      <section id="drives-school" className="container py-5" style={{ scrollMarginTop: "110px" }}>
-        <div className="text-center mb-5" data-aos="fade-up">
-          <h2 className="fw-bold">What Drives Our School</h2>
-          <p className="text-muted mx-auto" style={{ maxWidth: 620 }}>
-            Our mission, vision, and core values shape every lesson, every
-            relationship, and every decision at our school.
-          </p>
-        </div>
-        <div className="row g-4">
-          {[
-            {
-              title: mission.title || "Our Mission",
-              content:
-                mission.content ||
-                "To provide quality education rooted in Christian values.",
-              icon: "bi-bullseye",
-              color: "#0d6efd",
-            },
-            {
-              title: vision.title || "Our Vision",
-              content:
-                vision.content ||
-                "To be a leading educational institution nurturing excellence.",
-              icon: "bi-eye",
-              color: "#198754",
-            },
-            {
-              title: values.title || "Core Values",
-              content:
-                values.content ||
-                "Respect, Discipline, Integrity, Excellence.",
-              icon: "bi-gem",
-              color: "#dc3545",
-              html: true,
-            },
-          ].map((item, i) => (
-            <div
-              className="col-lg-4"
-              key={item.title}
-              data-aos="fade-up"
-              data-aos-delay={i * 150}
-            >
-              <div
-                id={item.html ? "core-values" : undefined}
-                className="card h-100 border-0 shadow-sm rounded-4 p-2 hover-lift"
-                style={{ scrollMarginTop: "110px" }}
-              >
-                <div className="card-body">
-                  <div
-                    className="d-inline-flex align-items-center justify-content-center rounded-3 mb-3"
-                    style={{
-                      width: 56,
-                      height: 56,
-                      background: `${item.color}1a`,
-                      color: item.color,
-                    }}
-                  >
-                    <i className={`bi ${item.icon} fs-4`} />
-                  </div>
-                  <h4 className="fw-semibold mb-3">{item.title}</h4>
-                  {item.html ? (
-                    <div
-                      className="text-secondary"
-                      dangerouslySetInnerHTML={{ __html: item.content }}
-                    />
-                  ) : (
-                    <p className="text-secondary mb-0">{item.content}</p>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* ── Programs ─────────────────────────────────────── */}
       <section id="academic-programs" className="py-5 bg-light" style={{ scrollMarginTop: "110px" }}>
         <div className="container">
           <div className="text-center mb-5" data-aos="fade-up">
-            <h2 className="fw-bold">Academic Programs Offered</h2>
+            <h2 className="fw-bold"><Link to="/academic" className="text-decoration-none text-reset">Academic Programs Offered</Link></h2>
             <p className="text-muted">
               Five career-focused pathways designed for the future of work.
             </p>
@@ -552,7 +448,11 @@ integrating academic excellence, Christian morals, discipline, and practical ski
         style={{ scrollMarginTop: "110px" }}
       >
         <div className="text-center mb-5" data-aos="fade-up">
-          <h2 className="fw-bold">Our Heritage</h2>
+          <h2 className="fw-bold">
+            <a href="#heritage" className="text-decoration-none text-reset">
+              Our Heritage
+            </a>
+          </h2>
           <p className="text-muted mx-auto" style={{ maxWidth: 640 }}>
             The name of our school carries a legacy of faith and education. Our
             patron saint and the Barnabite Fathers inspire the values we live
