@@ -26,6 +26,7 @@ export default function AboutPage() {
   const [sections, setSections] = useState({});
   const [loading, setLoading] = useState(true);
   const [readMoreOpen, setReadMoreOpen] = useState(false);
+  const [activeAboutLink, setActiveAboutLink] = useState("organization");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -73,10 +74,15 @@ export default function AboutPage() {
   }, [loading]);
 
   useEffect(() => {
-    if (loading || location.hash !== "#heritage") return;
-    document
-      .getElementById("heritage")
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (loading || !location.hash) return;
+    const targetId = decodeURIComponent(location.hash.slice(1));
+    const target = document.getElementById(targetId);
+    if (!target) return;
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (targetId === "heritage") setActiveAboutLink("history");
+    else if (["mission", "vision", "goals", "history", "accreditation", "organization"].includes(targetId)) {
+      setActiveAboutLink(targetId);
+    }
   }, [loading, location.hash]);
 
   const getSection = (slug) => sections[slug] || {};
@@ -125,7 +131,28 @@ export default function AboutPage() {
       </section>
 
       {/* ── Who We Are (school intro) ────────────────────── */}
-      <section className="container py-5">
+      <nav className="about-section-nav" aria-label="About page sections">
+        {[
+          ["Mission", "mission"],
+          ["Vision", "vision"],
+          ["Goals", "goals"],
+          ["History", "history"],
+          ["Accreditation", "accreditation"],
+          ["Organization", "organization"],
+        ].map(([label, target]) => (
+          <a
+            key={target}
+            href={`#${target}`}
+            className={activeAboutLink === target ? "is-active" : ""}
+            aria-current={activeAboutLink === target ? "location" : undefined}
+            onClick={() => setActiveAboutLink(target)}
+          >
+            {label}
+          </a>
+        ))}
+      </nav>
+
+      <section id="organization" className="container py-5 about-anchor-section">
         <div className="row align-items-center g-5">
           <div className="col-lg-6" data-aos="fade-right">
             <p className="text-uppercase text-primary fw-semibold small mb-2">
@@ -144,6 +171,9 @@ founded under the spiritual guidance of the <strong>Barnabite Fathers</strong>. 
 integrating academic excellence, Christian morals, discipline, and practical skills.`,
               }}
             />
+            <p className="text-secondary lh-lg mt-3">
+              Our organization is built around a shared responsibility for student learning and wellbeing. Students, teachers and trainers, school staff, families, and the Barnabite Fathers each contribute to a supportive community. Together they encourage steady study, respectful relationships, good conduct, practical learning, and service. This shared approach helps connect classroom teaching with personal development and prepares learners to take responsibility within their school and wider community.
+            </p>
           </div>
           <div className="col-lg-6" data-aos="fade-left">
             <div className="position-relative">
@@ -238,6 +268,8 @@ integrating academic excellence, Christian morals, discipline, and practical ski
                 "To be a leading educational institution nurturing excellence.",
               icon: "bi-eye",
               color: "#198754",
+              id: "vision",
+              detail: "A vision describes the future an institution is working toward. For our school, it means helping learners grow into knowledgeable, confident, and responsible people who can use their education to serve others. We want students to develop strong academic foundations, Christian values, discipline, curiosity, and practical abilities. This vision guides how we teach, support students, and prepare them to contribute positively to their families, workplaces, and communities.",
             },
             {
               title: values.title || "Core Values",
@@ -247,15 +279,26 @@ integrating academic excellence, Christian morals, discipline, and practical ski
               icon: "bi-gem",
               color: "#dc3545",
               html: true,
+              id: "values",
+            },
+            {
+              title: "Our Goals",
+              content: "Our goals turn the school’s mission and vision into practical priorities. We aim to provide a strong academic education, build moral character and personal discipline, develop useful technical and vocational skills, and help students communicate, solve problems, and work with others. We also seek to create a safe and respectful learning environment, encourage students to take pride in their progress, and prepare graduates to continue their studies, enter employment, and serve their communities with integrity.",
+              icon: "bi-flag",
+              color: "#b7791f",
+              id: "goals",
             },
           ].map((item, i) => (
             <div
-              className="col-lg-4"
+              className="col-lg-6"
               key={item.title}
               data-aos="fade-up"
               data-aos-delay={i * 150}
             >
-              <div className="card h-100 border-0 shadow-sm rounded-4 p-2 hover-lift">
+              <div
+                id={item.id || (i === 0 ? "mission" : "values")}
+                className="card h-100 border-0 shadow-sm rounded-4 p-2 hover-lift about-anchor-section"
+              >
                 <div className="card-body">
                   <div
                     className="d-inline-flex align-items-center justify-content-center rounded-3 mb-3"
@@ -277,6 +320,7 @@ integrating academic excellence, Christian morals, discipline, and practical ski
                   ) : (
                     <p className="text-secondary mb-0">{item.content}</p>
                   )}
+                  {item.detail && <p className="text-secondary mt-3 mb-0">{item.detail}</p>}
                 </div>
               </div>
             </div>
@@ -285,12 +329,15 @@ integrating academic excellence, Christian morals, discipline, and practical ski
       </section>
 
       {/* ── Academic Programs (school offering) ──────────── */}
-      <section className="py-5 bg-light">
+      <section id="accreditation" className="py-5 bg-light about-anchor-section">
         <div className="container">
           <div className="text-center mb-5" data-aos="fade-up">
             <h2 className="fw-bold">Academic Programs Offered</h2>
             <p className="text-muted">
               Five career-focused pathways designed for the future of work.
+            </p>
+            <p className="text-muted mx-auto" style={{ maxWidth: 760 }}>
+              Accreditation is a formal review that recognizes whether an institution or program meets established educational standards. It helps students and families understand what a qualification represents and which authority has reviewed it. Information about accreditation should identify the recognizing body, the approved programs or levels, and the period covered by the recognition. Please contact the school administration for the latest official accreditation documents and program details.
             </p>
           </div>
           <div className="row g-4">
@@ -328,15 +375,13 @@ integrating academic excellence, Christian morals, discipline, and practical ski
       {/* ── Our Heritage (school context, not personal bio) ── */}
       <section
         id="heritage"
-        className="container py-5"
+        className="container py-5 about-anchor-section"
         style={{ scrollMarginTop: "110px" }}
       >
         <div className="text-center mb-5" data-aos="fade-up">
-          <h2 className="fw-bold">Our Heritage</h2>
+          <h2 id="history" className="fw-bold about-anchor-section">Our Heritage</h2>
           <p className="text-muted mx-auto" style={{ maxWidth: 640 }}>
-            The name of our school carries a legacy of faith and education. Our
-            patron saint and the Barnabite Fathers inspire the values we live
-            every day.
+            The school’s history is rooted in its Catholic identity and its commitment to education in Muhura. Named for Saint Alexandre Sauli, the school draws inspiration from his work as a Barnabite priest, bishop, and educator. The Barnabite Fathers, whose congregation was founded in 1530, continue to inform the school’s spiritual and educational tradition. This heritage connects faith, learning, discipline, and service, and provides a foundation for the community’s work with each new generation of students.
           </p>
         </div>
 
@@ -492,12 +537,42 @@ integrating academic excellence, Christian morals, discipline, and practical ski
       </section>
 
       <style>{`
+        .about-section-nav {
+          width: min(420px, calc(100% - 32px));
+          margin: 60px auto 0 max(32px, calc((100vw - 1280px) / 2));
+          padding: 10px 0 28px;
+          overflow: hidden;
+          border: 1px solid #dedede;
+          border-radius: 12px;
+          background: #f2f2f2;
+        }
+        .about-section-nav a {
+          display: block;
+          padding: 17px 36px;
+          color: #617b95;
+          font-size: 1.35rem;
+          font-weight: 400;
+          line-height: 1.5;
+          text-decoration: none;
+          transition: color .18s ease, background-color .18s ease;
+        }
+        .about-section-nav a:hover { color: #071344; }
+        .about-section-nav a.is-active {
+          background: #071344;
+          color: #fff;
+          font-weight: 700;
+        }
+        .about-anchor-section { scroll-margin-top: 110px; }
         .about-page .hover-lift {
           transition: transform .3s ease, box-shadow .3s ease;
         }
         .about-page .hover-lift:hover {
           transform: translateY(-6px);
           box-shadow: 0 1rem 2rem rgba(0,0,0,.12) !important;
+        }
+        @media (max-width: 767px) {
+          .about-section-nav { width: calc(100% - 32px); margin: 32px auto 0; }
+          .about-section-nav a { padding: 14px 24px; font-size: 1.15rem; }
         }
       `}</style>
     </main>
