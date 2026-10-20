@@ -339,6 +339,29 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const registerParent = async ({ email, password, fullName }) => {
+    if (!isSupabaseConfigured()) {
+      return {
+        ok: false,
+        error: getSupabaseConfigError() || "Sign-in is temporarily unavailable.",
+      };
+    }
+
+    try {
+      await api.post("/auth/parent/register", {
+        email,
+        password,
+        full_name: fullName,
+      });
+      return await loginStep1(email, password);
+    } catch (error) {
+      return {
+        ok: false,
+        error: getApiError(error, "Unable to create your parent account."),
+      };
+    }
+  };
+
   const refreshMe = async () => {
     try {
       const { data } = await api.get("/auth/me");
@@ -370,10 +393,11 @@ export function AuthProvider({ children }) {
       authConfigError,
       loginStep1,
       registerStudent,
+      registerParent,
       refreshMe,
       logout,
     }),
-    [authConfigError, isReady, token, user]
+    [authConfigError, isReady, loginStep1, logout, refreshMe, registerParent, registerStudent, token, user]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

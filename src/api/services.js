@@ -1,4 +1,4 @@
-import { api, getApiError } from './client';
+import { api } from './client';
 
 // Health API
 export const healthAPI = {
@@ -149,4 +149,9 @@ export const galleryAPI = {
   create: (data) => api.post('/gallery', data),
   update: (id, data) => api.put(`/gallery/${id}`, data),
   delete: (id) => api.delete(`/gallery/${id}`),
+};
+
+export const resultsAPI = {
+  lookup: (studentName, programCode) =>
+    api.post("/results/lookup", { student_name: studentName, program_code: programCode }),
 };

@@ -36,10 +36,12 @@ export default function NavTree({ items = [], onNavigate, depth = 0, includeMobi
       )}
       {safeItems.map((item) => {
         if (!item || typeof item !== "object") return null;
-        const target = mapHref(item.href);
+        const loginLabel = item.label?.trim().toLowerCase();
+        const isResultsItem = depth === 0 && ["login", "student portal"].includes(loginLabel);
+        const target = isResultsItem ? "/results" : mapHref(item.href);
         const active = pathname === target;
         const hasChildren = Array.isArray(item.children) && item.children.length > 0;
-        const isLoginItem = depth === 0 && item.label?.toLowerCase() === "login";
+        const displayLabel = isResultsItem ? "Student Results" : item.label;
         const label = String(item.label || "").trim().toLowerCase();
         const isDepartmentItem = depth === 0 && ["departments", "trades"].includes(label);
         const isContactItem = depth === 0 && label === "contact";
@@ -47,7 +49,7 @@ export default function NavTree({ items = [], onNavigate, depth = 0, includeMobi
         return (
           <li
             key={key}
-            className={`${hasChildren ? "dropdown" : ""} ${isLoginItem ? "d-xl-none" : ""} ${isDepartmentItem ? "nav-departments" : ""} ${isContactItem ? "nav-contact" : ""}`}
+            className={`${hasChildren ? "dropdown" : ""} ${isResultsItem ? "d-xl-none" : ""} ${isDepartmentItem ? "nav-departments" : ""} ${isContactItem ? "nav-contact" : ""}`}
             ref={hasChildren ? (el) => {
               if (el) {
                 const anchor = el.querySelector('a');
@@ -71,11 +73,11 @@ export default function NavTree({ items = [], onNavigate, depth = 0, includeMobi
                 className={active ? "active" : ""}
                 onClick={onNavigate}
               >
-                {item.label}
+                {displayLabel}
               </Link>
             ) : (
               <a href="#" onClick={(e) => e.preventDefault()}>
-                <span>{item.label}</span> <i className="bi bi-chevron-down"></i>
+                <span>{displayLabel}</span> <i className="bi bi-chevron-down"></i>
               </a>
             )}
             {hasChildren && (

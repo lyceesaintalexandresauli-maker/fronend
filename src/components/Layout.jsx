@@ -233,7 +233,7 @@ export default function Layout() {
             <NavTree items={boot.navigation} onNavigate={() => setMenuOpen(false)} includeMobileClose />
             <Link
               className="ms-3 d-none d-xl-inline-block rounded-pill px-3 py-2 fw-bold text-decoration-none flex-shrink-0"
-              to="/login"
+              to="/results"
               style={{
                 color: "#1f2937",
                 background: "rgba(255,255,255,0.96)",
@@ -242,7 +242,7 @@ export default function Layout() {
                 boxShadow: "0 2px 8px rgba(15, 23, 42, 0.08)",
               }}
             >
-              Student Portal
+              Student Results
             </Link>
             <i
               className={`mobile-nav-toggle d-xl-none bi ms-3 ${menuOpen ? "bi-x" : "bi-list"}`}
@@ -273,7 +273,7 @@ export default function Layout() {
           <div className="footer-section">
             <h4 style={{ fontFamily: "var(--font-display)", color: "#fff" }}>Quick Links</h4>
             <div className="footer-quick-links">
-              <Link to="/">Home</Link><Link to="/about">About Us</Link><Link to="/academic">Academics</Link><Link to="/trainers">Teachers & Staff</Link><Link to="/events">News & Events</Link><Link to="/contact">Contact</Link>
+              <Link to="/">Home</Link><Link to="/about">About Us</Link><Link to="/academic">Academics</Link><Link to="/trainers">Teachers & Staff</Link><Link to="/events">News & Events</Link><Link to="/results">Student Results</Link><Link to="/contact">Contact</Link>
             </div>
           </div>
 

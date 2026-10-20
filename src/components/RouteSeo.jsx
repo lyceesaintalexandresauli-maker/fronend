@@ -49,6 +49,11 @@ const PAGE_META = {
     description: "Secure portal login for Lycee Saint Alexandre Sauli de Muhura.",
     robots: "noindex,nofollow",
   },
+  "/results": {
+    title: "Student Results",
+    description: "Sign in to view published student examination results from Lycee Saint Alexandre Sauli de Muhura.",
+    robots: "noindex,nofollow",
+  },
   "/timetables": {
     title: "Timetables",
     description: "View school timetables for classes and programs at Lycee Saint Alexandre Sauli de Muhura.",

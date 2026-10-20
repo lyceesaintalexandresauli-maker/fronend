@@ -6,7 +6,7 @@ export default function LoginPage() {
   const [galleryItems] = useState([
     { id: 1, type: "image", src: "/assets/img/sauli.jfif", title: "Campus View 1" },
     { id: 2, type: "image", src: "/assets/img/sauli1.jfif", title: "Campus View 2" },
-    { id: 3, type: "image", src: "/assets/img/sauli2.jfif", title: "Campus View 3" },
+    { id: 3, type: "image", src: "/assets/img/saul2.jpg", title: "Saint Alexandre Sauli" },
   ]);
 
   return (

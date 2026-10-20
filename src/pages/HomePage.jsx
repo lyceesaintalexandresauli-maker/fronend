@@ -34,7 +34,7 @@ const quickLinks = [
   ["bi-mortarboard", "Our Programs", "Quality education with technical and vocational training.", "/academic", "Learn More"],
   ["bi-calendar-event", "News & Events", "Stay informed about school activities.", "/events", "View News"],
   ["bi-people-fill", "Our Teachers", "Meet our dedicated teachers.", "/trainers", "Meet Our Staff"],
-  ["bi-file-earmark-text", "Student Portal", "Access your timetable and school updates.", "/login", "Login"],
+  ["bi-file-earmark-text", "Student Results", "Sign in to view published student examination results.", "/results", "View Results"],
 ];
 
 const galleryImages = [
@@ -111,7 +111,7 @@ export default function HomePage() {
 
       <section className="home-wrap home-intro">
         <div className="home-intro-copy"><span className="home-rule" /><h2>Who We Are</h2><p>{aboutText}</p><Link className="home-btn" to="/about">About Our School <i className="bi bi-arrow-right" /></Link></div>
-        <figure className="home-founder"><img src="/assets/img/sauli2.jfif" alt="Painting of St. Alessandro Sauli" loading="lazy" /><figcaption><strong>St. Alessandro Sauli</strong><small>Barnabite</small><Link className="home-btn" to="/about#saint-alexandre-sauli">Learn about Saint Alexandre Sauli <i className="bi bi-arrow-right" /></Link></figcaption></figure>
+        <figure className="home-founder"><img src="/assets/img/saul2.jpg" alt="Painting of St. Alessandro Sauli" loading="lazy" /><figcaption><strong>St. Alessandro Sauli</strong><small>Barnabite</small><Link className="home-btn" to="/about#saint-alexandre-sauli">Learn about Saint Alexandre Sauli <i className="bi bi-arrow-right" /></Link></figcaption></figure>
       </section>
 
       <section className="home-values"><div className="home-wrap home-value-grid">{values.map(([icon, title, description]) => <article className="home-value-card" key={title}><span className="home-value-icon"><i className={`bi ${icon}`} /></span><h3>{title}</h3><p>{description}</p><Link to="/about" aria-label={`Learn about ${title}`}><i className="bi bi-arrow-right" /></Link></article>)}</div></section>

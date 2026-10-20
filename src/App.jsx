@@ -11,7 +11,6 @@ const EventsPage = lazy(() => import("./pages/EventsPage"));
 const AnnouncementsPage = lazy(() => import("./pages/AnnouncementsPage"));
 const StaffPage = lazy(() => import("./pages/StaffPage"));
 const ContactPage = lazy(() => import("./pages/ContactPage"));
-const LoginPage = lazy(() => import("./pages/LoginPage"));
 const AboutPage = lazy(() => import("./pages/AboutPage"));
 const AcademicPage = lazy(() => import("./pages/AcademicPage"));
 const SodPage = lazy(() => import("./pages/SodPage"));
@@ -21,6 +20,7 @@ const FadPage = lazy(() => import("./pages/FadPage"));
 const AccPage = lazy(() => import("./pages/AccPage"));
 const TimetablesPage = lazy(() => import("./pages/TimetablesPage"));
 const GalleryPage = lazy(() => import("./pages/GalleryPage"));
+const StudentResultsPage = lazy(() => import("./pages/StudentResultsPage"));
 
 
 
@@ -37,7 +37,8 @@ export default function App() {
           <Route path="/announcements" element={<AnnouncementsPage />} />
           <Route path="/trainers" element={<StaffPage />} />
           <Route path="/contact" element={<ContactPage />} />
-          <Route path="/login" element={<LoginPage />} />
+          <Route path="/login" element={<Navigate to="/results" replace />} />
+          <Route path="/results" element={<StudentResultsPage />} />
           <Route element={<ProtectedRoute roles={["admin", "teacher", "secretary"]} />}>
            
           </Route>
