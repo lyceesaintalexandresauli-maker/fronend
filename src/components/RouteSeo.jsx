@@ -51,7 +51,7 @@ const PAGE_META = {
   },
   "/results": {
     title: "Student Results",
-    description: "Sign in to view published student examination results from Lycee Saint Alexandre Sauli de Muhura.",
+    description: "Search and view published student examination results from Lycee Saint Alexandre Sauli de Muhura.",
     robots: "noindex,nofollow",
   },
   "/timetables": {

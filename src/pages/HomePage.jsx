@@ -34,7 +34,7 @@ const quickLinks = [
   ["bi-mortarboard", "Our Programs", "Quality education with technical and vocational training.", "/academic", "Learn More"],
   ["bi-calendar-event", "News & Events", "Stay informed about school activities.", "/events", "View News"],
   ["bi-people-fill", "Our Teachers", "Meet our dedicated teachers.", "/trainers", "Meet Our Staff"],
-  ["bi-file-earmark-text", "Student Results", "Sign in to view published student examination results.", "/results", "View Results"],
+  ["bi-file-earmark-text", "Student Results", "Search and view published student examination results.", "/results", "View Results"],
 ];
 
 const galleryImages = [

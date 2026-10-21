@@ -1,8 +1,6 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { resultsAPI } from "../api/services";
 import Seo from "../components/Seo";
-import { useAuth } from "../context/AuthContext";
 import "./StudentResultsPage.css";
 
 const programs = [
@@ -59,38 +57,11 @@ function ResultCard({ result }) {
 }
 
 export default function StudentResultsPage() {
-  const { user, isAuthenticated, isReady, loginStep1, registerParent, logout } = useAuth();
-  const [isSignup, setIsSignup] = useState(false);
-  const [authForm, setAuthForm] = useState({ fullName: "", email: "", password: "", confirmPassword: "" });
   const [studentName, setStudentName] = useState("");
   const [programCode, setProgramCode] = useState("");
   const [results, setResults] = useState([]);
   const [message, setMessage] = useState("");
-  const [authBusy, setAuthBusy] = useState(false);
   const [searchBusy, setSearchBusy] = useState(false);
-
-  const handleAuth = async (event) => {
-    event.preventDefault();
-    setMessage("");
-    if (isSignup && authForm.password !== authForm.confirmPassword) {
-      setMessage("The passwords do not match.");
-      return;
-    }
-
-    setAuthBusy(true);
-    const response = isSignup
-      ? await registerParent({
-          email: authForm.email.trim(),
-          password: authForm.password,
-          fullName: authForm.fullName.trim(),
-        })
-      : await loginStep1(authForm.email.trim(), authForm.password);
-    setAuthBusy(false);
-
-    if (!response.ok) {
-      setMessage(response.error || "Unable to sign in. Please try again.");
-    }
-  };
 
   const handleLookup = async (event) => {
     event.preventDefault();
@@ -110,153 +81,64 @@ export default function StudentResultsPage() {
     }
   };
 
-  const handleLogout = async () => {
-    await logout();
-    setResults([]);
-    setMessage("");
-  };
-
   return (
     <main className="main student-results-page">
       <Seo
         title="Student Results"
-        description="Sign in to view published student examination results from Lycée Saint Alexandre Sauli."
+        description="Search and view published student examination results from Lycée Saint Alexandre Sauli."
         path="/results"
         robots="noindex,nofollow"
       />
       <header className="student-results-hero">
         <div className="container">
-          <span className="student-results-kicker"><i className="bi bi-mortarboard me-2" />PARENT RESULT SERVICE</span>
+          <span className="student-results-kicker"><i className="bi bi-mortarboard me-2" />STUDENT RESULT SERVICE</span>
           <h1>Student Results</h1>
-          <p>Sign in to view published examination results.</p>
+          <p>Enter the student’s full name and program to view published examination results.</p>
         </div>
       </header>
 
       <section className="container student-results-content">
-        {!isReady ? (
-          <div className="student-results-panel text-center" role="status">Preparing secure sign-in…</div>
-        ) : isAuthenticated && user?.role === "parent" ? (
-          <>
-            <div className="student-results-account">
-              <span>Signed in as <strong>{user.full_name || user.email}</strong></span>
-              <button type="button" className="student-results-link-button" onClick={handleLogout}>Sign out</button>
-            </div>
-            <form className="student-results-panel student-results-form" onSubmit={handleLookup}>
-              <div>
-                <h2>Find a student’s result</h2>
-                <p>Enter the student’s full name and select their program.</p>
-              </div>
-              <label>
-                <span>Student full name</span>
-                <input
-                  autoComplete="off"
-                  maxLength={160}
-                  minLength={3}
-                  onChange={(event) => setStudentName(event.target.value)}
-                  placeholder="Enter the student’s first and last name"
-                  required
-                  value={studentName}
-                />
-              </label>
-              <label>
-                <span>Program / level</span>
-                <select onChange={(event) => setProgramCode(event.target.value)} required value={programCode}>
-                  <option value="">Select a program</option>
-                  {programs.map((program) => <option key={program.value} value={program.value}>{program.label}</option>)}
-                </select>
-              </label>
-              <button className="student-results-submit" disabled={searchBusy} type="submit">
-                {searchBusy ? "Searching…" : "Get Result"}
-              </button>
-            </form>
-            {message && <p className="student-results-message" role="status">{message}</p>}
-            {results.length > 0 && (
-              <section className="student-results-list" aria-label="Published results">
-                <div className="student-results-list-heading">
-                  <div><span>Published records for</span><h2>{results[0].student_name}</h2></div>
-                  <button className="student-results-print" type="button" onClick={() => window.print()}>
-                    <i className="bi bi-printer me-2" />Print results
-                  </button>
-                </div>
-                {results.map((result) => <ResultCard key={result.id} result={result} />)}
-              </section>
-            )}
-            <p className="student-results-privacy">Results are available to signed-in parent accounts. Contact the school if a published result is missing.</p>
-          </>
-        ) : isAuthenticated ? (
-          <div className="student-results-panel student-results-auth">
-            <h2>This page is for parent accounts</h2>
-            <p>You are signed in with a {user?.role || "staff"} account. Sign out, then use a parent account to continue.</p>
-            <button className="student-results-submit" type="button" onClick={handleLogout}>Sign out</button>
+        <form className="student-results-panel student-results-form" onSubmit={handleLookup}>
+          <div>
+            <h2>Find a student’s result</h2>
+            <p>Enter the student’s full name and select their program.</p>
           </div>
-        ) : (
-          <div className="student-results-panel student-results-auth">
-            <div className="student-results-auth-heading">
-              <span className="student-results-lock"><i className="bi bi-shield-lock" /></span>
-              <h2>{isSignup ? "Create a parent account" : "Parent sign in"}</h2>
-              <p>{isSignup ? "Create an account to access student results." : "Sign in to view published student results."}</p>
+          <label>
+            <span>Student full name</span>
+            <input
+              autoComplete="off"
+              maxLength={160}
+              minLength={3}
+              onChange={(event) => setStudentName(event.target.value)}
+              placeholder="Enter the student’s first and last name"
+              required
+              value={studentName}
+            />
+          </label>
+          <label>
+            <span>Program / level</span>
+            <select onChange={(event) => setProgramCode(event.target.value)} required value={programCode}>
+              <option value="">Select a program</option>
+              {programs.map((program) => <option key={program.value} value={program.value}>{program.label}</option>)}
+            </select>
+          </label>
+          <button className="student-results-submit" disabled={searchBusy} type="submit">
+            {searchBusy ? "Searching…" : "Get Result"}
+          </button>
+        </form>
+        {message && <p className="student-results-message" role="status">{message}</p>}
+        {results.length > 0 && (
+          <section className="student-results-list" aria-label="Published results">
+            <div className="student-results-list-heading">
+              <div><span>Published records for</span><h2>{results[0].student_name}</h2></div>
+              <button className="student-results-print" type="button" onClick={() => window.print()}>
+                <i className="bi bi-printer me-2" />Print results
+              </button>
             </div>
-            <form className="student-results-auth-form" onSubmit={handleAuth}>
-              {isSignup && (
-                <label>
-                  <span>Parent full name</span>
-                  <input
-                    autoComplete="name"
-                    maxLength={120}
-                    onChange={(event) => setAuthForm((current) => ({ ...current, fullName: event.target.value }))}
-                    required
-                    value={authForm.fullName}
-                  />
-                </label>
-              )}
-              <label>
-                <span>Email address</span>
-                <input
-                  autoComplete="email"
-                  onChange={(event) => setAuthForm((current) => ({ ...current, email: event.target.value }))}
-                  required
-                  type="email"
-                  value={authForm.email}
-                />
-              </label>
-              <label>
-                <span>Password</span>
-                <input
-                  autoComplete={isSignup ? "new-password" : "current-password"}
-                  minLength={8}
-                  onChange={(event) => setAuthForm((current) => ({ ...current, password: event.target.value }))}
-                  required
-                  type="password"
-                  value={authForm.password}
-                />
-              </label>
-              {isSignup && (
-                <label>
-                  <span>Confirm password</span>
-                  <input
-                    autoComplete="new-password"
-                    minLength={8}
-                    onChange={(event) => setAuthForm((current) => ({ ...current, confirmPassword: event.target.value }))}
-                    required
-                    type="password"
-                    value={authForm.confirmPassword}
-                  />
-                </label>
-              )}
-              {message && <p className="student-results-message" role="alert">{message}</p>}
-              <button className="student-results-submit" disabled={authBusy} type="submit">
-                {authBusy ? "Please wait…" : isSignup ? "Create account" : "Sign in"}
-              </button>
-            </form>
-            <p className="student-results-switch">
-              {isSignup ? "Already have an account?" : "New parent?"}{" "}
-              <button type="button" onClick={() => { setIsSignup((current) => !current); setMessage(""); }}>
-                {isSignup ? "Sign in" : "Create an account"}
-              </button>
-            </p>
-            <Link className="student-results-home-link" to="/">Back to school website</Link>
-          </div>
+            {results.map((result) => <ResultCard key={result.id} result={result} />)}
+          </section>
         )}
+        <p className="student-results-privacy">Only published results are shown. Contact the school if a published result is missing.</p>
       </section>
     </main>
   );
