@@ -10,6 +10,13 @@ const programs = [
   { value: "ACC", label: "Accounting (ACC — Senior)" },
   { value: "FAD", label: "Fashion & Design (FAD)" },
 ];
+const levelsByProgram = {
+  SWD: ["L3SWD", "L4SWDA", "L4SWDB", "L5SWD"],
+  NIT: ["L3NIT", "L4NITA", "L4NITB", "L5NIT"],
+  CSA: ["L3CSA", "L4CSA", "L5CSA"],
+  ACC: ["S4ACC", "S5ACC", "S6ACC"],
+  FAD: ["L3FAD", "L4FAD", "L5FAD"],
+};
 
 const number = (value) => Number(value || 0);
 
@@ -22,12 +29,13 @@ function ResultCard({ result }) {
     <article className="student-result-card">
       <div className="student-result-heading">
         <div>
-          <span>{programs.find((program) => program.value === result.program_code)?.label || result.program_code}</span>
+          <span>{programs.find((program) => program.value === result.program_code)?.label || result.program_code}{result.class_level ? ` · ${result.class_level}` : ""}</span>
           <h2>{result.academic_year} · {result.term}</h2>
         </div>
         <div className="student-result-total">
           <strong>{percentage.toFixed(1)}%</strong>
           <small>{totalScore.toFixed(2)} / {totalMaximum.toFixed(2)} total marks</small>
+          {result.position && <small>Position: {result.position}</small>}
         </div>
       </div>
 
@@ -59,6 +67,7 @@ function ResultCard({ result }) {
 export default function StudentResultsPage() {
   const [studentName, setStudentName] = useState("");
   const [programCode, setProgramCode] = useState("");
+  const [classLevel, setClassLevel] = useState("");
   const [results, setResults] = useState([]);
   const [message, setMessage] = useState("");
   const [searchBusy, setSearchBusy] = useState(false);
@@ -69,7 +78,7 @@ export default function StudentResultsPage() {
     setResults([]);
     setSearchBusy(true);
     try {
-      const { data } = await resultsAPI.lookup(studentName.trim(), programCode);
+      const { data } = await resultsAPI.lookup(studentName.trim(), programCode, classLevel);
       setResults(Array.isArray(data?.results) ? data.results : []);
       if (!data?.results?.length) {
         setMessage("No published results matched that student name and program.");
@@ -117,9 +126,16 @@ export default function StudentResultsPage() {
           </label>
           <label>
             <span>Program / level</span>
-            <select onChange={(event) => setProgramCode(event.target.value)} required value={programCode}>
+            <select onChange={(event) => { setProgramCode(event.target.value); setClassLevel(""); }} required value={programCode}>
               <option value="">Select a program</option>
               {programs.map((program) => <option key={program.value} value={program.value}>{program.label}</option>)}
+            </select>
+          </label>
+          <label>
+            <span>Level / section</span>
+            <select onChange={(event) => setClassLevel(event.target.value)} required value={classLevel}>
+              <option value="">Select a level</option>
+              {(levelsByProgram[programCode] || []).map((level) => <option key={level} value={level}>{level}</option>)}
             </select>
           </label>
           <button className="student-results-submit" disabled={searchBusy} type="submit">

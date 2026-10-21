@@ -152,6 +152,6 @@ export const galleryAPI = {
 };
 
 export const resultsAPI = {
-  lookup: (studentName, programCode) =>
-    api.post("/results/lookup", { student_name: studentName, program_code: programCode }),
+  lookup: (studentName, programCode, classLevel) =>
+    api.post("/results/lookup", { student_name: studentName, program_code: programCode, class_level: classLevel }),
 };
