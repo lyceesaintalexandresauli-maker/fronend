@@ -1,23 +1,16 @@
 import { useState } from "react";
 import { resultsAPI } from "../api/services";
 import Seo from "../components/Seo";
+import { getLevelLabel, getProgramForLevel, STUDENT_LEVELS } from "../constants/studentLevels";
 import "./StudentResultsPage.css";
 
-const programs = [
-  { value: "SWD", label: "Software Development (SWD)" },
-  { value: "NIT", label: "Networking & Internet Technology (NIT)" },
-  { value: "CSA", label: "Computer Systems & Architecture (CSA)" },
-  { value: "ACC", label: "Accounting (ACC — Senior)" },
-  { value: "FAD", label: "Fashion & Design (FAD)" },
-];
-const levelsByProgram = {
-  SWD: ["L3SWD", "L4SWDA", "L4SWDB", "L5SWD", "L3", "L4", "L5"],
-  NIT: ["L3NIT", "L4NITA", "L4NITB", "L5NIT", "L3", "L4", "L5"],
-  CSA: ["L3CSA", "L4CSA", "L5CSA", "L3", "L4", "L5"],
-  ACC: ["S4ACC", "S5ACC", "S6ACC", "S4", "S5", "S6"],
-  FAD: ["L3FAD", "L4FAD", "L5FAD", "L3", "L4", "L5"],
+const programNames = {
+  SWD: "Software Development (SWD)",
+  NIT: "Networking & Internet Technology (NIT)",
+  CSA: "Computer Systems & Architecture (CSA)",
+  ACC: "Accounting (ACC)",
+  FAD: "Fashion & Design (FAD)",
 };
-
 const number = (value) => Number(value || 0);
 
 function ResultCard({ result }) {
@@ -29,7 +22,7 @@ function ResultCard({ result }) {
     <article className="student-result-card">
       <div className="student-result-heading">
         <div>
-          <span>{programs.find((program) => program.value === result.program_code)?.label || result.program_code}{result.class_level ? ` · ${result.class_level}` : ""}</span>
+          <span>{programNames[result.program_code] || result.program_code} · {getLevelLabel(result.class_level)}</span>
           <h2>{result.academic_year} · {result.term}</h2>
         </div>
         <div className="student-result-total">
@@ -66,7 +59,6 @@ function ResultCard({ result }) {
 
 export default function StudentResultsPage() {
   const [studentName, setStudentName] = useState("");
-  const [programCode, setProgramCode] = useState("");
   const [classLevel, setClassLevel] = useState("");
   const [results, setResults] = useState([]);
   const [message, setMessage] = useState("");
@@ -78,10 +70,10 @@ export default function StudentResultsPage() {
     setResults([]);
     setSearchBusy(true);
     try {
-      const { data } = await resultsAPI.lookup(studentName.trim(), programCode, classLevel);
+      const { data } = await resultsAPI.lookup(studentName.trim(), getProgramForLevel(classLevel), classLevel);
       setResults(Array.isArray(data?.results) ? data.results : []);
       if (!data?.results?.length) {
-        setMessage("No published results matched that student name and program.");
+        setMessage("No published results matched that student name and program/level.");
       }
     } catch (error) {
       setMessage(error?.response?.data?.error || "Unable to retrieve results. Please try again.");
@@ -102,7 +94,7 @@ export default function StudentResultsPage() {
         <div className="container">
           <span className="student-results-kicker"><i className="bi bi-mortarboard me-2" />STUDENT RESULT SERVICE</span>
           <h1>Student Results</h1>
-          <p>Enter the student’s full name and program to view published examination results.</p>
+          <p>Enter the student’s full name and program/level to view published examination results.</p>
         </div>
       </header>
 
@@ -110,7 +102,7 @@ export default function StudentResultsPage() {
         <form className="student-results-panel student-results-form" onSubmit={handleLookup}>
           <div>
             <h2>Find a student’s result</h2>
-            <p>Enter the student’s full name and select their program.</p>
+            <p>Enter the student’s full name and select their program and level.</p>
           </div>
           <label>
             <span>Student full name</span>
@@ -126,16 +118,9 @@ export default function StudentResultsPage() {
           </label>
           <label>
             <span>Program / level</span>
-            <select onChange={(event) => { setProgramCode(event.target.value); setClassLevel(""); }} required value={programCode}>
-              <option value="">Select a program</option>
-              {programs.map((program) => <option key={program.value} value={program.value}>{program.label}</option>)}
-            </select>
-          </label>
-          <label>
-            <span>Level / section</span>
             <select onChange={(event) => setClassLevel(event.target.value)} required value={classLevel}>
-              <option value="">Select a level</option>
-              {(levelsByProgram[programCode] || []).map((level) => <option key={level} value={level}>{level}</option>)}
+              <option value="">Select program / level</option>
+              {STUDENT_LEVELS.map((level) => <option key={level.value} value={level.value}>{level.label}</option>)}
             </select>
           </label>
           <button className="student-results-submit" disabled={searchBusy} type="submit">
