@@ -11,11 +11,11 @@ const programs = [
   { value: "FAD", label: "Fashion & Design (FAD)" },
 ];
 const levelsByProgram = {
-  SWD: ["L3SWD", "L4SWDA", "L4SWDB", "L5SWD"],
-  NIT: ["L3NIT", "L4NITA", "L4NITB", "L5NIT"],
-  CSA: ["L3CSA", "L4CSA", "L5CSA"],
-  ACC: ["S4ACC", "S5ACC", "S6ACC"],
-  FAD: ["L3FAD", "L4FAD", "L5FAD"],
+  SWD: ["L3SWD", "L4SWDA", "L4SWDB", "L5SWD", "L3", "L4", "L5"],
+  NIT: ["L3NIT", "L4NITA", "L4NITB", "L5NIT", "L3", "L4", "L5"],
+  CSA: ["L3CSA", "L4CSA", "L5CSA", "L3", "L4", "L5"],
+  ACC: ["S4ACC", "S5ACC", "S6ACC", "S4", "S5", "S6"],
+  FAD: ["L3FAD", "L4FAD", "L5FAD", "L3", "L4", "L5"],
 };
 
 const number = (value) => Number(value || 0);
