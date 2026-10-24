@@ -135,17 +135,19 @@ export default function StaffPage() {
               </button>
             )}
           </div>
-          <select
-            className="form-select ui-staff-department-select"
-            aria-label="Filter staff by department"
-            value={filterDepartment}
-            onChange={(event) => setFilterDepartment(event.target.value)}
-          >
-            <option value="all">All Departments</option>
-            {departments.map((dept) => (
-              <option key={dept.id} value={dept.name}>{dept.name}</option>
-            ))}
-          </select>
+          <div className="ui-staff-department-wrap">
+            <select
+              className="form-select ui-staff-department-select"
+              aria-label="Filter staff by department"
+              value={filterDepartment}
+              onChange={(event) => setFilterDepartment(event.target.value)}
+            >
+              <option value="all">All Departments</option>
+              {departments.map((dept) => (
+                <option key={dept.id} value={dept.name}>{dept.name}</option>
+              ))}
+            </select>
+          </div>
           {(searchTerm || filterDepartment !== "all") && (
             <button
               className="btn btn-outline-secondary btn-sm ui-staff-clear-filters"
