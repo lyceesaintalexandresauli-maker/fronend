@@ -17,7 +17,13 @@ const formatWhatsAppNumber = (phone = "") => {
   return digits;
 };
 
-const normalizeSearchValue = (value) => String(value ?? "").trim().toLocaleLowerCase();
+const normalizeSearchValue = (value) =>
+  String(value ?? "")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
 const departmentOptionValue = (department) => String(department?.id ?? department?.name ?? "");
 
 const getStaffDepartmentValues = (member) =>
@@ -108,17 +114,19 @@ export default function StaffPage() {
     const query = normalizeSearchValue(value);
     if (!query) return;
 
-    const exactMatches = staff.filter(
-      (member) => normalizeSearchValue(member.name) === query
-    );
+    const nameMatches = query.length >= 3
+      ? staff.filter((member) => normalizeSearchValue(member.name).includes(query))
+      : staff.filter((member) => normalizeSearchValue(member.name) === query);
     const matchedDepartments = new Map();
-    exactMatches.forEach((member) => {
+    nameMatches.forEach((member) => {
       const department = findStaffDepartment(member, departments);
       if (department) matchedDepartments.set(departmentOptionValue(department), department);
     });
 
     if (matchedDepartments.size === 1) {
       setFilterDepartment([...matchedDepartments.keys()][0]);
+    } else if (matchedDepartments.size === 0 && nameMatches.length === 1) {
+      setFilterDepartment("all");
     }
   };
 
