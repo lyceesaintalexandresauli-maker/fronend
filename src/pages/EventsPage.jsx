@@ -166,6 +166,19 @@ export default function EventsPage() {
     })
     .sort((a, b) => new Date(a.date || a.created_at) - new Date(b.date || b.created_at))
     .slice(0, 6);
+  const activeFilterLabels = [
+    eventTypeFilter !== "all" ? eventTypeFilter : null,
+    mediaFilter !== "all" ? `${mediaFilter === "videos" ? "Videos" : "Images"}` : null,
+    filterDate ? formatEventDate(filterDate) : null,
+  ].filter(Boolean);
+  const eventListHeading = filterDate
+    ? `Events on ${formatEventDate(filterDate)}`
+    : eventTypeFilter !== "all"
+      ? `${eventTypeFilter} Events`
+      : mediaFilter !== "all"
+        ? `${mediaFilter === "videos" ? "Video" : "Image"} Events`
+        : "All Events";
+  const activeFilterDescription = activeFilterLabels.join(" and ");
 
   useEffect(() => {
     const closeOnEscape = (event) => {
@@ -240,7 +253,7 @@ export default function EventsPage() {
           <div>
             {error && <div className="alert alert-danger" role="alert">{error}</div>}
             {loading && <div className="alert alert-light" role="status">Fetching latest events...</div>}
-            <div className="events-list-heading"><div><h2><i className="bi bi-calendar2-week-fill" /> {filterDate ? `Events on ${formatEventDate(filterDate)}` : "All Events"}</h2><p>Showing {filteredEvents.length} event{filteredEvents.length === 1 ? "" : "s"} from Lycee Saint Alexandre Sauli De Muhura.</p></div></div>
+            <div className="events-list-heading"><div><h2><i className="bi bi-calendar2-week-fill" /> {eventListHeading}</h2><p>Showing {filteredEvents.length} event{filteredEvents.length === 1 ? "" : "s"}{activeFilterDescription ? ` matching ${activeFilterDescription}` : " from Lycee Saint Alexandre Sauli De Muhura"}.</p></div></div>
             <div className="events-grid">
               {filteredEvents.map((event) => {
                 const eventDate = new Date(event.date || event.created_at);
@@ -258,7 +271,17 @@ export default function EventsPage() {
                   </div>
                 </article>;
               })}
-              {!loading && filteredEvents.length === 0 && <div className="events-empty">No events match your search.</div>}
+              {!loading && filteredEvents.length === 0 && (
+                <div className="events-empty" aria-live="polite">
+                  <i className="bi bi-calendar2-x" aria-hidden="true" />
+                  <p>
+                    {activeFilterDescription
+                      ? `No events match the selected filters: ${activeFilterDescription}.`
+                      : "There are no events to display right now."}
+                  </p>
+                  {activeFilterDescription && <small>Try another filter combination or use Clear filters above.</small>}
+                </div>
+              )}
             </div>
           </div>
           <aside className="events-sidebar">

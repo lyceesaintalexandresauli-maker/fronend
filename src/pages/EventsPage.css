@@ -392,6 +392,14 @@
   font-size:.64rem;
   white-space:nowrap;
 }
+.events-page .events-empty {
+  display:grid;
+  justify-items:center;
+  gap:6px;
+}
+.events-page .events-empty>i { color:#b24d12; font-size:1.35rem; }
+.events-page .events-empty>p { margin:0; }
+.events-page .events-empty>small { color:#786a5d; font-size:.68rem; }
 @media(max-width:760px) {
   .events-page>.events-filter-bar { grid-template-columns:repeat(2,minmax(0,1fr)); }
   .events-page .events-search-button { grid-column:1/-1; }
