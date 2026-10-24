@@ -25,10 +25,22 @@ const normalizeSearchValue = (value) =>
     .replace(/[^a-z0-9]+/g, " ")
     .trim();
 const departmentOptionValue = (department) => String(department?.id ?? department?.name ?? "");
+const DEPARTMENT_FIELD_NAMES = new Set([
+  "trade",
+  "trade_name",
+  "subject",
+  "subject_name",
+  "program",
+  "program_name",
+  "specialization",
+]);
 
 const getStaffDepartmentValues = (member) =>
   Object.entries(member || {})
-    .filter(([key]) => key.toLocaleLowerCase().includes("department"))
+    .filter(([key]) => {
+      const normalizedKey = key.toLocaleLowerCase();
+      return normalizedKey.includes("department") || DEPARTMENT_FIELD_NAMES.has(normalizedKey);
+    })
     .flatMap(([, value]) => {
       if (value && typeof value === "object") {
         return [value.id, value.name, value.title, value.code, value.department_id, value.department_name];
@@ -39,11 +51,26 @@ const getStaffDepartmentValues = (member) =>
 
 const staffMatchesDepartment = (member, department) => {
   const departmentId = normalizeSearchValue(department?.id);
-  const departmentName = normalizeSearchValue(department?.name);
+  const departmentNames = [department?.name, department?.title]
+    .map(normalizeSearchValue)
+    .filter(Boolean);
+  const departmentCodes = [department?.code, department?.abbreviation]
+    .map(normalizeSearchValue)
+    .filter(Boolean);
 
   return getStaffDepartmentValues(member).some((value) => {
     const normalizedValue = normalizeSearchValue(value);
-    return normalizedValue === departmentId || normalizedValue === departmentName;
+    if (normalizedValue === departmentId) return true;
+
+    const matchesName = departmentNames.some((name) =>
+      normalizedValue === name || normalizedValue.includes(name) ||
+      (normalizedValue.length >= 5 && name.includes(normalizedValue))
+    );
+    const matchesCode = departmentCodes.some((code) =>
+      normalizedValue === code || ` ${normalizedValue} `.includes(` ${code} `)
+    );
+
+    return matchesName || matchesCode;
   });
 };
 
@@ -114,9 +141,12 @@ export default function StaffPage() {
     const query = normalizeSearchValue(value);
     if (!query) return;
 
-    const nameMatches = query.length >= 3
-      ? staff.filter((member) => normalizeSearchValue(member.name).includes(query))
-      : staff.filter((member) => normalizeSearchValue(member.name) === query);
+    const exactNameMatches = staff.filter((member) => normalizeSearchValue(member.name) === query);
+    const nameMatches = exactNameMatches.length
+      ? exactNameMatches
+      : query.length >= 3
+        ? staff.filter((member) => normalizeSearchValue(member.name).includes(query))
+        : [];
     const matchedDepartments = new Map();
     nameMatches.forEach((member) => {
       const department = findStaffDepartment(member, departments);
@@ -349,6 +379,11 @@ export default function StaffPage() {
                 <p className="text-muted mb-4 px-4">
                   No staff members match your current filters. Try adjusting your search criteria or clear all filters.
                 </p>
+                {filterDepartment !== "all" && !searchTerm && (
+                  <p className="text-muted small mb-4 px-4">
+                    If staff should appear in this department, check that their staff profiles have the department assigned.
+                  </p>
+                )}
                 <button
                   onClick={() => {
                     setFilterDepartment("all");
