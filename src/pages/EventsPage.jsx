@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { mediaUrl } from "../api/client";
 import { eventsAPI } from "../api/services";
 import Seo from "../components/Seo";
@@ -19,7 +19,115 @@ const getEventVideoUrl = (event) => {
 };
 const getEventAudioUrl = (event) => event?.audio_url || event?.audio_path || event?.audio || null;
 
+<<<<<<< HEAD
 const isDirectVideoUrl = (value) => /\.(mp4|webm|ogg|avi|mov|mkv)(\?.*)?$/i.test(String(value));
+=======
+const normalizeEventType = (value) => String(value || "General").trim().replace(/\s+/g, " ");
+
+function EventTypeDropdown({ value, options, onChange }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const rootRef = useRef(null);
+  const triggerRef = useRef(null);
+  const allOptions = [{ value: "all", label: "All event types" }, ...options.map((option) => ({ value: option, label: option }))];
+  const selectedOption = allOptions.find((option) => option.value === value) || allOptions[0];
+
+  useEffect(() => {
+    if (!isOpen) return undefined;
+
+    const closeOnOutsideClick = (event) => {
+      if (!rootRef.current?.contains(event.target)) setIsOpen(false);
+    };
+    const closeOnEscape = (event) => {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+        triggerRef.current?.focus();
+      }
+    };
+
+    document.addEventListener("pointerdown", closeOnOutsideClick);
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("pointerdown", closeOnOutsideClick);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [isOpen]);
+
+  const focusOption = (direction) => {
+    setIsOpen(true);
+    window.requestAnimationFrame(() => {
+      const items = rootRef.current?.querySelectorAll('[role="option"]');
+      if (!items?.length) return;
+      (direction === "last" ? items[items.length - 1] : items[0]).focus();
+    });
+  };
+
+  const handleOptionKeyDown = (event, index) => {
+    const items = rootRef.current?.querySelectorAll('[role="option"]');
+    if (!items?.length) return;
+
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+      const nextIndex = event.key === "ArrowDown"
+        ? (index + 1) % items.length
+        : (index - 1 + items.length) % items.length;
+      items[nextIndex].focus();
+    } else if (event.key === "Home" || event.key === "End") {
+      event.preventDefault();
+      items[event.key === "Home" ? 0 : items.length - 1].focus();
+    }
+  };
+
+  return (
+    <div className={`events-type-select${isOpen ? " is-open" : ""}`} ref={rootRef}>
+      <button
+        type="button"
+        ref={triggerRef}
+        className="events-filter-display events-type-trigger"
+        aria-label="Filter events by type"
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+        aria-controls="events-type-options"
+        onClick={() => setIsOpen((open) => !open)}
+        onKeyDown={(event) => {
+          if (event.key === "ArrowDown") {
+            event.preventDefault();
+            focusOption("first");
+          } else if (event.key === "ArrowUp") {
+            event.preventDefault();
+            focusOption("last");
+          }
+        }}
+      >
+        <span>{selectedOption.label}</span>
+        <i className="bi bi-chevron-down" aria-hidden="true" />
+      </button>
+      {isOpen && (
+        <div className="events-type-options" id="events-type-options" role="listbox" aria-label="Event types">
+          {allOptions.map((option, index) => (
+            <button
+              type="button"
+              key={option.value}
+              role="option"
+              aria-selected={option.value === value}
+              className="events-type-option"
+              onClick={() => {
+                onChange(option.value);
+                setIsOpen(false);
+                triggerRef.current?.focus();
+              }}
+              onKeyDown={(event) => handleOptionKeyDown(event, index)}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+const isDirectVideoUrl = (value) => /\.(mp4|webm|ogg)(\?.*)?$/i.test(String(value));
+>>>>>>> 45501e0314c405963248e5722720ffe589930c2f
 
 const getYoutubeEmbedUrl = (value) => {
   if (!value) return null;
@@ -111,7 +219,7 @@ export default function EventsPage() {
     }
 
     if (eventTypeFilter !== "all") {
-      filtered = filtered.filter((event) => (event.category || "General") === eventTypeFilter);
+      filtered = filtered.filter((event) => normalizeEventType(event.category) === normalizeEventType(eventTypeFilter));
     }
 
     if (mediaFilter === "videos") {
@@ -130,7 +238,10 @@ export default function EventsPage() {
     return filtered;
   }, [events, filterDate, eventTypeFilter, mediaFilter]);
 
-  const eventTypes = [...new Set(events.map((event) => event.category || "General"))].sort((a, b) => a.localeCompare(b));
+  const eventTypes = [...new Map(events.map((event) => {
+    const category = normalizeEventType(event.category);
+    return [category.toLocaleLowerCase(), category];
+  })).values()].sort((a, b) => a.localeCompare(b));
 
   const formatEventDate = (dateStr) => {
     if (!dateStr) return "No date";
@@ -169,6 +280,19 @@ export default function EventsPage() {
     })
     .sort((a, b) => new Date(a.date || a.created_at) - new Date(b.date || b.created_at))
     .slice(0, 6);
+  const activeFilterLabels = [
+    eventTypeFilter !== "all" ? eventTypeFilter : null,
+    mediaFilter !== "all" ? `${mediaFilter === "videos" ? "Videos" : "Images"}` : null,
+    filterDate ? formatEventDate(filterDate) : null,
+  ].filter(Boolean);
+  const eventListHeading = filterDate
+    ? `Events on ${formatEventDate(filterDate)}`
+    : eventTypeFilter !== "all"
+      ? `${eventTypeFilter} Events`
+      : mediaFilter !== "all"
+        ? `${mediaFilter === "videos" ? "Video" : "Image"} Events`
+        : "All Events";
+  const activeFilterDescription = activeFilterLabels.join(" and ");
 
   useEffect(() => {
     const closeOnEscape = (event) => {
@@ -235,8 +359,13 @@ export default function EventsPage() {
         </div>
         <div className="events-filter-bar" aria-label="Filter events">
           <label className="events-filter-field active-filter"><span><i className="bi bi-calendar-event" /> Select date</span><input className="events-filter-display active-display" type="date" value={filterDate} onChange={(event) => { const value = event.target.value; setFilterDate(value); if (value) { const [year, month] = value.split("-").map(Number); setCalendarMonth(new Date(year, month - 1, 1)); } }} aria-label="Search events by date" /></label>
+<<<<<<< HEAD
           <label className="events-filter-field active-filter"><span><i className="bi bi-funnel-fill" /> Event Type</span><select className="events-filter-display active-display" value={eventTypeFilter} onChange={(event) => setEventTypeFilter(event.target.value)} aria-label="Filter events by type"><option value="all">All event types</option>{eventTypes.map((type) => <option key={type} value={type}>{type}</option>)}</select></label>
           <label className="events-filter-field active-filter"><span><i className="bi bi-tag-fill" /> Media</span><select className="events-filter-display active-display" value={mediaFilter} onChange={(event) => setMediaFilter(event.target.value)} aria-label="Filter events by media"><option value="all">All media</option><option value="videos">Videos</option><option value="audio">Audio</option><option value="images">Images</option></select></label>
+=======
+          <div className="events-filter-field active-filter"><span><i className="bi bi-funnel-fill" /> Event Type</span><EventTypeDropdown value={eventTypeFilter} options={eventTypes} onChange={setEventTypeFilter} /></div>
+          <label className="events-filter-field active-filter"><span><i className="bi bi-tag-fill" /> Media</span><select className="events-filter-display active-display" value={mediaFilter} onChange={(event) => setMediaFilter(event.target.value)} aria-label="Filter events by media"><option value="all">All media</option><option value="videos">Videos</option><option value="images">Images</option></select></label>
+>>>>>>> 45501e0314c405963248e5722720ffe589930c2f
           <div className="events-search-field active-filter"><span><i className="bi bi-info-circle" /> Browse events</span><div className="events-filter-display active-display">Use the calendar to choose a day</div></div>
           <button type="button" className="events-search-button active-button" onClick={() => { setFilterDate(""); setEventTypeFilter("all"); setMediaFilter("all"); }}><i className="bi bi-arrow-counterclockwise" /> Clear filters</button>
         </div>
@@ -244,7 +373,7 @@ export default function EventsPage() {
           <div>
             {error && <div className="alert alert-danger" role="alert">{error}</div>}
             {loading && <div className="alert alert-light" role="status">Fetching latest events...</div>}
-            <div className="events-list-heading"><div><h2><i className="bi bi-calendar2-week-fill" /> {filterDate ? `Events on ${formatEventDate(filterDate)}` : "All Events"}</h2><p>Showing {filteredEvents.length} event{filteredEvents.length === 1 ? "" : "s"} from Lycee Saint Alexandre Sauli De Muhura.</p></div></div>
+            <div className="events-list-heading"><div><h2><i className="bi bi-calendar2-week-fill" /> {eventListHeading}</h2><p>Showing {filteredEvents.length} event{filteredEvents.length === 1 ? "" : "s"}{activeFilterDescription ? ` matching ${activeFilterDescription}` : " from Lycee Saint Alexandre Sauli De Muhura"}.</p></div></div>
             <div className="events-grid">
               {filteredEvents.map((event) => {
                 const eventDate = new Date(event.date || event.created_at);
@@ -262,7 +391,17 @@ export default function EventsPage() {
                   </div>
                 </article>;
               })}
-              {!loading && filteredEvents.length === 0 && <div className="events-empty">No events match your search.</div>}
+              {!loading && filteredEvents.length === 0 && (
+                <div className="events-empty" aria-live="polite">
+                  <i className="bi bi-calendar2-x" aria-hidden="true" />
+                  <p>
+                    {activeFilterDescription
+                      ? `No events match the selected filters: ${activeFilterDescription}.`
+                      : "There are no events to display right now."}
+                  </p>
+                  {activeFilterDescription && <small>Try another filter combination or use Clear filters above.</small>}
+                </div>
+              )}
             </div>
           </div>
           <aside className="events-sidebar">

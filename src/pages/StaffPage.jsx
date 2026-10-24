@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Seo from "../components/Seo";
 import { mediaUrl } from "../api/client";
 import { staffAPI, departmentsAPI } from "../api/services";
+import "./StaffPage.css";
 
 const sortStaffByIdAsc = (members = []) =>
   [...members].sort((a, b) => Number(a?.id ?? 0) - Number(b?.id ?? 0));
@@ -15,6 +16,66 @@ const formatWhatsAppNumber = (phone = "") => {
   if (digits.length === 9 && digits.startsWith("7")) return `250${digits}`;
   return digits;
 };
+
+const normalizeSearchValue = (value) =>
+  String(value ?? "")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+const departmentOptionValue = (department) => String(department?.id ?? department?.name ?? "");
+const DEPARTMENT_FIELD_NAMES = new Set([
+  "trade",
+  "trade_name",
+  "subject",
+  "subject_name",
+  "program",
+  "program_name",
+  "specialization",
+]);
+
+const getStaffDepartmentValues = (member) =>
+  Object.entries(member || {})
+    .filter(([key]) => {
+      const normalizedKey = key.toLocaleLowerCase();
+      return normalizedKey.includes("department") || DEPARTMENT_FIELD_NAMES.has(normalizedKey);
+    })
+    .flatMap(([, value]) => {
+      if (value && typeof value === "object") {
+        return [value.id, value.name, value.title, value.code, value.department_id, value.department_name];
+      }
+      return [value];
+    })
+    .filter((value) => value !== null && value !== undefined && String(value).trim() !== "");
+
+const staffMatchesDepartment = (member, department) => {
+  const departmentId = normalizeSearchValue(department?.id);
+  const departmentNames = [department?.name, department?.title]
+    .map(normalizeSearchValue)
+    .filter(Boolean);
+  const departmentCodes = [department?.code, department?.abbreviation]
+    .map(normalizeSearchValue)
+    .filter(Boolean);
+
+  return getStaffDepartmentValues(member).some((value) => {
+    const normalizedValue = normalizeSearchValue(value);
+    if (normalizedValue === departmentId) return true;
+
+    const matchesName = departmentNames.some((name) =>
+      normalizedValue === name || normalizedValue.includes(name) ||
+      (normalizedValue.length >= 5 && name.includes(normalizedValue))
+    );
+    const matchesCode = departmentCodes.some((code) =>
+      normalizedValue === code || ` ${normalizedValue} `.includes(` ${code} `)
+    );
+
+    return matchesName || matchesCode;
+  });
+};
+
+const findStaffDepartment = (member, departments) =>
+  departments.find((department) => staffMatchesDepartment(member, department));
 
 export default function StaffPage() {
   const [staff, setStaff] = useState([]);
@@ -54,21 +115,50 @@ export default function StaffPage() {
     let filtered = [...staff];
 
     if (filterDepartment !== "all") {
-      filtered = filtered.filter((member) => member.department === filterDepartment);
+      const selectedDepartment = departments.find(
+        (department) => departmentOptionValue(department) === filterDepartment
+      );
+      filtered = selectedDepartment
+        ? filtered.filter((member) => staffMatchesDepartment(member, selectedDepartment))
+        : filtered;
     }
 
     if (searchTerm) {
-      const query = searchTerm.toLowerCase();
+      const query = normalizeSearchValue(searchTerm);
       filtered = filtered.filter(
         (member) =>
-          member.name?.toLowerCase().includes(query) ||
-          member.position?.toLowerCase().includes(query) ||
-          member.bio?.toLowerCase().includes(query)
+          normalizeSearchValue(member.name).includes(query) ||
+          normalizeSearchValue(member.position).includes(query) ||
+          normalizeSearchValue(member.bio).includes(query)
       );
     }
 
     setFilteredStaff(sortStaffByIdAsc(filtered));
-  }, [filterDepartment, searchTerm, staff]);
+  }, [departments, filterDepartment, searchTerm, staff]);
+
+  const handleStaffSearch = (value) => {
+    setSearchTerm(value);
+    const query = normalizeSearchValue(value);
+    if (!query) return;
+
+    const exactNameMatches = staff.filter((member) => normalizeSearchValue(member.name) === query);
+    const nameMatches = exactNameMatches.length
+      ? exactNameMatches
+      : query.length >= 3
+        ? staff.filter((member) => normalizeSearchValue(member.name).includes(query))
+        : [];
+    const matchedDepartments = new Map();
+    nameMatches.forEach((member) => {
+      const department = findStaffDepartment(member, departments);
+      if (department) matchedDepartments.set(departmentOptionValue(department), department);
+    });
+
+    if (matchedDepartments.size === 1) {
+      setFilterDepartment([...matchedDepartments.keys()][0]);
+    } else if (matchedDepartments.size === 0 && nameMatches.length === 1) {
+      setFilterDepartment("all");
+    }
+  };
 
   if (loading) {
     return (
@@ -109,53 +199,87 @@ export default function StaffPage() {
         </div>
       </div>
 
-      <div className="container mb-4" data-aos="fade-up">
-        <div className="d-flex flex-wrap gap-2 justify-content-between align-items-center ui-filter-bar">
-          <div className="d-flex flex-wrap gap-2 align-items-center">
-            <div className="input-group input-group-sm" style={{ maxWidth: "320px" }}>
-              <span className="input-group-text bg-white border-end-0">
-                <i className="bi bi-search text-muted"></i>
-              </span>
-              <input
-                type="text"
-                className="form-control border-start-0"
-                placeholder="Search by name, position, or bio..."
-                value={searchTerm}
-                onChange={(event) => setSearchTerm(event.target.value)}
-              />
-              {searchTerm && (
-                <button
-                  className="btn btn-outline-secondary border-start-0"
-                  type="button"
-                  onClick={() => setSearchTerm("")}
-                >
-                  <i className="bi bi-x"></i>
-                </button>
-              )}
-            </div>
+      <div className="container mb-4 ui-staff-filter-shell" data-aos="fade-up">
+        <div className="ui-staff-filter-controls" aria-label="Filter staff">
+          <div className="ui-staff-filter-field">
+            <label htmlFor="staff-search" className="ui-staff-filter-label"><i className="bi bi-search" aria-hidden="true"></i> Search staff</label>
+          <div className={`input-group ui-staff-search-group${searchTerm ? " has-clear" : ""}`}>
+            <span className="input-group-text ui-staff-search-icon">
+              <i className="bi bi-search text-muted"></i>
+            </span>
+            <input
+              type="text"
+              id="staff-search"
+              className="form-control"
+              list="staff-search-options"
+              placeholder="Search by name, position, or bio..."
+              aria-label="Search staff by name, position, or biography"
+              value={searchTerm}
+              onChange={(event) => handleStaffSearch(event.target.value)}
+            />
+            <datalist id="staff-search-options">
+              {staff.map((member) => {
+                const department = findStaffDepartment(member, departments);
+                const suggestionLabel = [member.position, department?.name]
+                  .filter(Boolean)
+                  .join(" · ");
+
+                return (
+                  <option
+                    key={member.id}
+                    value={member.name || ""}
+                    label={suggestionLabel}
+                  />
+                );
+              })}
+            </datalist>
+            {searchTerm && (
+              <button
+                className="btn ui-staff-clear-search"
+                type="button"
+                onClick={() => setSearchTerm("")}
+                aria-label="Clear staff search"
+              >
+                <i className="bi bi-x"></i>
+              </button>
+            )}
+          </div>
+          </div>
+          <div className="ui-staff-filter-field">
+            <label htmlFor="staff-department" className="ui-staff-filter-label"><i className="bi bi-funnel-fill" aria-hidden="true"></i> Department</label>
+          <div className="ui-staff-department-wrap">
             <select
-              className="form-select form-select-sm"
-              style={{ width: "auto" }}
+              id="staff-department"
+              className="form-select ui-staff-department-select"
+              aria-label="Filter staff by department"
               value={filterDepartment}
               onChange={(event) => setFilterDepartment(event.target.value)}
             >
               <option value="all">All Departments</option>
               {departments.map((dept) => (
-                <option key={dept.id} value={dept.name}>{dept.name}</option>
+                <option key={dept.id ?? dept.name} value={departmentOptionValue(dept)}>
+                  {dept.name}
+                </option>
               ))}
             </select>
-            {(searchTerm || filterDepartment !== "all") && (
-              <button
-                className="btn btn-outline-secondary btn-sm"
-                onClick={() => {
-                  setFilterDepartment("all");
-                  setSearchTerm("");
-                }}
-              >
-                Clear all
-              </button>
-            )}
           </div>
+          </div>
+          <div className="ui-staff-filter-field ui-staff-filter-summary" aria-live="polite">
+            <span><i className="bi bi-people-fill" aria-hidden="true"></i> Browse staff</span>
+            <div className="ui-staff-filter-summary-value">
+              {filteredStaff.length} {filteredStaff.length === 1 ? "staff member" : "staff members"} found
+            </div>
+          </div>
+          <button
+            className="btn ui-staff-clear-filters"
+            type="button"
+            onClick={() => {
+              setFilterDepartment("all");
+              setSearchTerm("");
+            }}
+          >
+            <i className="bi bi-arrow-counterclockwise" aria-hidden="true"></i> Clear filters
+          </button>
         </div>
       </div>
 
@@ -178,94 +302,84 @@ export default function StaffPage() {
                 data-aos="fade-up"
                 data-aos-delay={index * 100}
               >
-                <div
-                  className="member-card h-100 border-0 shadow-sm rounded-3 overflow-hidden ui-staff-card"
-                  style={{ transition: "transform 0.3s, box-shadow 0.3s" }}
-                >
-                  <div className="position-relative" style={{ height: "280px", backgroundColor: "#f0f0f0" }}>
-                    {member.image_path ? (
-                      <img
-                        src={mediaUrl(member.image_path)}
-                        className="w-100 h-100 object-fit-cover"
-                        alt={member.name}
-                        loading="lazy"
-                        decoding="async"
-                        onError={(event) => {
-                          event.target.onerror = null;
-                          event.target.src = "/assets/img/default-avatar.jpg";
-                        }}
-                      />
-                    ) : (
-                      <div className="w-100 h-100 d-flex align-items-center justify-content-center">
-                        <i className="bi bi-person-circle text-muted" style={{ fontSize: "5rem" }}></i>
-                      </div>
-                    )}
+                <article className="ui-staff-card">
+                  <div className="ui-staff-cover">
                     {member.department && (
-                      <span className="badge position-absolute top-0 start-0 m-2" style={{ backgroundColor: "var(--brand-accent)" }}>
-                        <i className="bi bi-building me-1"></i>
+                      <span className="ui-staff-department">
+                        <i className="bi bi-building" aria-hidden="true"></i>
                         {member.department}
                       </span>
                     )}
                   </div>
 
-                  <div className="p-4 text-center bg-white">
-                    <h4 className="fw-bold mb-2">{member.name}</h4>
-                    <span className="badge text-white mb-3 px-3 py-2" style={{ backgroundColor: "#004080" }}>
-                      {member.position || "Staff Member"}
-                    </span>
-                    <p className="text-muted small mb-3" style={{ lineHeight: "1.6" }}>
-                      {member.bio ? `"${member.bio.slice(0, 150)}${member.bio.length > 150 ? "..." : ""}"` : "No biography available."}
-                    </p>
-                    {member.phone && (
-                      <p className="small mb-3">
-                        <i className="bi bi-telephone me-2" aria-hidden="true"></i>
-                        <span>{member.phone}</span>
-                      </p>
-                    )}
-
-                    <div className="d-flex justify-content-center gap-2 mb-3 ui-icon-actions">
-                      {member.email && (
-                        <a
-                          href={`mailto:${member.email}`}
-                          className="btn btn-sm btn-outline-secondary rounded-circle ui-icon-btn"
-                          style={{ width: "36px", height: "36px", padding: "0" }}
-                          title="Email"
-                        >
-                          <i className="bi bi-envelope"></i>
-                        </a>
+                  <div className="ui-staff-body">
+                    <div className="ui-staff-avatar">
+                      {member.image_path && (
+                        <img
+                          src={mediaUrl(member.image_path)}
+                          alt={member.name}
+                          loading="lazy"
+                          decoding="async"
+                          onError={(event) => {
+                            event.currentTarget.style.display = "none";
+                          }}
+                        />
                       )}
-                      {member.phone && (
-                        <a
-                          href={`https://wa.me/${formatWhatsAppNumber(member.phone)}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="btn btn-sm btn-outline-success d-inline-flex align-items-center gap-2 ui-icon-btn"
-                          title={`Chat with ${member.name} on WhatsApp`}
-                          aria-label={`Chat with ${member.name} on WhatsApp`}
-                        >
-                          <i className="bi bi-whatsapp"></i>
-                          <span>Call on WhatsApp</span>
-                        </a>
-                      )}
-                      {member.linkedin && (
-                        <a
-                          href={member.linkedin}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="btn btn-sm btn-outline-secondary rounded-circle ui-icon-btn"
-                          style={{ width: "36px", height: "36px", padding: "0" }}
-                          title="LinkedIn"
-                        >
-                          <i className="bi bi-linkedin"></i>
-                        </a>
-                      )}
+                      <i className="bi bi-person-fill" aria-hidden="true"></i>
                     </div>
 
-                    <Link to={`/staff/${member.id}`} className="btn btn-sm fw-semibold" style={{ color: "#004080" }}>
-                      View Profile <i className="bi bi-arrow-right"></i>
-                    </Link>
+                    <h2 className="ui-staff-name">{member.name}</h2>
+                    <p className="ui-staff-position">{member.position || "Staff Member"}</p>
+                    <p className="ui-staff-bio">
+                      {member.bio
+                        ? `${member.bio.slice(0, 120)}${member.bio.length > 120 ? "..." : ""}`
+                        : "No biography available."}
+                    </p>
+
+                    {member.phone && (
+                      <a className="ui-staff-phone" href={`tel:${member.phone.replace(/[^\d+]/g, "")}`}>
+                        <i className="bi bi-telephone" aria-hidden="true"></i>
+                        <span>{member.phone}</span>
+                      </a>
+                    )}
+
+                    <div className="ui-staff-footer">
+                      <Link to={`/staff/${member.id}`} className="ui-staff-profile-link">
+                        View Profile <i className="bi bi-arrow-right" aria-hidden="true"></i>
+                      </Link>
+
+                      <div className="ui-staff-socials" role="group" aria-label={`${member.name} contact links`}>
+                        {member.email && (
+                          <a href={`mailto:${member.email}`} aria-label={`Email ${member.name}`} title="Email">
+                            <i className="bi bi-envelope" aria-hidden="true"></i>
+                          </a>
+                        )}
+                        {member.phone && (
+                          <a
+                            href={`https://wa.me/${formatWhatsAppNumber(member.phone)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={`Chat with ${member.name} on WhatsApp`}
+                            title="WhatsApp"
+                          >
+                            <i className="bi bi-whatsapp" aria-hidden="true"></i>
+                          </a>
+                        )}
+                        {member.linkedin && (
+                          <a
+                            href={member.linkedin}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={`${member.name} on LinkedIn`}
+                            title="LinkedIn"
+                          >
+                            <i className="bi bi-linkedin" aria-hidden="true"></i>
+                          </a>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
+                </article>
               </div>
             ))
           ) : (
@@ -278,6 +392,11 @@ export default function StaffPage() {
                 <p className="text-muted mb-4 px-4">
                   No staff members match your current filters. Try adjusting your search criteria or clear all filters.
                 </p>
+                {filterDepartment !== "all" && !searchTerm && (
+                  <p className="text-muted small mb-4 px-4">
+                    If staff should appear in this department, check that their staff profiles have the department assigned.
+                  </p>
+                )}
                 <button
                   onClick={() => {
                     setFilterDepartment("all");
