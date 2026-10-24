@@ -13,41 +13,138 @@ const programNames = {
 };
 const number = (value) => Number(value || 0);
 
+const getGrade = (average) => {
+  if (average === null) return "—";
+  if (average >= 90) return "Wonderful";
+  if (average >= 80) return "Excellent";
+  if (average >= 75) return "Very good";
+  if (average >= 70) return "Good";
+  return "Fail";
+};
+
+const formatPosition = (position) => {
+  const rank = Number(position);
+  if (!Number.isInteger(rank) || rank < 1) return position;
+  const suffix = rank % 100 >= 11 && rank % 100 <= 13
+    ? "th"
+    : ({ 1: "st", 2: "nd", 3: "rd" }[rank % 10] || "th");
+  return `${rank}${suffix}`;
+};
+
+const normalizeStudentName = (name) => String(name || "")
+  .normalize("NFD")
+  .replace(/[\u0300-\u036f]/g, "")
+  .toLocaleLowerCase()
+  .replace(/[^a-z0-9]+/g, " ")
+  .trim()
+  .replace(/\s+/g, " ");
+
+const getNameEditDistance = (left, right) => {
+  const previous = Array.from({ length: right.length + 1 }, (_, index) => index);
+  for (let leftIndex = 1; leftIndex <= left.length; leftIndex += 1) {
+    const current = [leftIndex];
+    for (let rightIndex = 1; rightIndex <= right.length; rightIndex += 1) {
+      current[rightIndex] = Math.min(
+        current[rightIndex - 1] + 1,
+        previous[rightIndex] + 1,
+        previous[rightIndex - 1] + (left[leftIndex - 1] === right[rightIndex - 1] ? 0 : 1)
+      );
+    }
+    for (let index = 0; index < previous.length; index += 1) previous[index] = current[index];
+  }
+  return previous[right.length];
+};
+
+const searchResultsByName = async (studentName, classLevel) => {
+  const programCode = getProgramForLevel(classLevel);
+  const firstSearch = await resultsAPI.lookup(studentName, programCode, classLevel);
+  const initialResults = Array.isArray(firstSearch.data?.results) ? firstSearch.data.results : [];
+  if (initialResults.length) return initialResults;
+
+  const searchName = normalizeStudentName(studentName);
+  const tokens = [...new Set(searchName.split(" ").filter((token) => token.length >= 3))];
+  if (!tokens.length) return [];
+
+  const fallbackResponses = await Promise.all(
+    tokens.map((token) => resultsAPI.lookup(token.slice(0, 3), programCode, classLevel))
+  );
+  const candidates = new Map();
+  fallbackResponses.forEach(({ data }) => {
+    (Array.isArray(data?.results) ? data.results : []).forEach((result) => {
+      candidates.set(result.id, result);
+    });
+  });
+
+  return [...candidates.values()]
+    .map((result) => ({
+      result,
+      distance: getNameEditDistance(searchName, normalizeStudentName(result.student_name)),
+    }))
+    .filter(({ distance }) => distance <= 2)
+    .sort((left, right) => left.distance - right.distance)
+    .map(({ result }) => result);
+};
+
 function ResultCard({ result }) {
-  const totalScore = result.subjects.reduce((sum, subject) => sum + number(subject.score), 0);
-  const totalMaximum = result.subjects.reduce((sum, subject) => sum + number(subject.max_score), 0);
-  const percentage = totalMaximum ? (totalScore / totalMaximum) * 100 : 0;
+  const subjects = Array.isArray(result.subjects) ? result.subjects : [];
+  const totalScore = subjects.reduce((sum, subject) => sum + number(subject.score), 0);
+  const totalMaximum = subjects.reduce((sum, subject) => sum + number(subject.max_score), 0);
+  const percentage = totalMaximum ? (totalScore / totalMaximum) * 100 : null;
 
   return (
     <article className="student-result-card">
       <div className="student-result-heading">
         <div>
-          <span>{programNames[result.program_code] || result.program_code} · {getLevelLabel(result.class_level)}</span>
-          <h2>{result.academic_year} · {result.term}</h2>
+          <span className="student-result-kicker">OFFICIAL STUDENT REPORT</span>
+          <h2>{result.student_name}</h2>
+          <p className="student-result-meta">
+            {result.student_code && <span>Student code: <strong>{result.student_code}</strong></span>}
+            <span>{programNames[result.program_code] || result.program_code} · {getLevelLabel(result.class_level)}</span>
+            <span>{result.academic_year} · {result.term}</span>
+          </p>
         </div>
         <div className="student-result-total">
-          <strong>{percentage.toFixed(1)}%</strong>
-          <small>{totalScore.toFixed(2)} / {totalMaximum.toFixed(2)} total marks</small>
-          {result.position && <small>Position: {result.position}</small>}
+          <span>AVERAGE</span>
+          <strong>{percentage === null ? "—" : `${percentage.toFixed(1)}%`}</strong>
+          <span className="student-result-grade">{getGrade(percentage)}</span>
+          {result.position && <small>Class position <strong>{formatPosition(result.position)}</strong></small>}
         </div>
+      </div>
+
+      <div className="student-result-overview">
+        <div className="student-result-overview-heading">
+          <span>Overall average</span>
+          <strong>{percentage === null ? "No marks entered" : `${percentage.toFixed(1)}%`}</strong>
+        </div>
+        <div className="student-result-progress" role="progressbar" aria-label="Overall average" aria-valuemin="0" aria-valuemax="100" aria-valuenow={Math.min(percentage || 0, 100)}>
+          <span style={{ width: `${Math.min(percentage || 0, 100)}%` }} />
+        </div>
+        <small>{totalScore.toFixed(2)} out of {totalMaximum.toFixed(2)} total marks</small>
       </div>
 
       <div className="student-result-table-wrap">
         <table className="student-result-table">
           <thead><tr><th>Subject</th><th>Marks</th><th>Out of</th><th>Percentage</th></tr></thead>
           <tbody>
-            {result.subjects.map((subject) => {
+            {subjects.map((subject) => {
               const score = number(subject.score);
               const maximum = number(subject.max_score);
+              const subjectPercentage = maximum ? (score / maximum) * 100 : null;
               return (
                 <tr key={subject.id || subject.subject_name}>
                   <td>{subject.subject_name}</td>
                   <td>{score.toFixed(2)}</td>
                   <td>{maximum.toFixed(2)}</td>
-                  <td>{maximum ? `${((score / maximum) * 100).toFixed(1)}%` : "—"}</td>
+                  <td>
+                    <div className="student-result-subject-score">
+                      <strong>{subjectPercentage === null ? "—" : `${subjectPercentage.toFixed(1)}%`}</strong>
+                      <span><i style={{ width: `${Math.min(subjectPercentage || 0, 100)}%` }} /></span>
+                    </div>
+                  </td>
                 </tr>
               );
             })}
+            {subjects.length === 0 && <tr><td colSpan={4}>No subject marks are available for this result.</td></tr>}
           </tbody>
         </table>
       </div>
@@ -70,10 +167,10 @@ export default function StudentResultsPage() {
     setResults([]);
     setSearchBusy(true);
     try {
-      const { data } = await resultsAPI.lookup(studentName.trim(), getProgramForLevel(classLevel), classLevel);
-      setResults(Array.isArray(data?.results) ? data.results : []);
-      if (!data?.results?.length) {
-        setMessage("No published results matched that student name and program/level.");
+      const matches = await searchResultsByName(studentName.trim(), classLevel);
+      setResults(matches);
+      if (!matches.length) {
+        setMessage("No published results matched that name. Check the spelling and selected program/level, then try again.");
       }
     } catch (error) {
       setMessage(error?.response?.data?.error || "Unable to retrieve results. Please try again.");
@@ -102,16 +199,16 @@ export default function StudentResultsPage() {
         <form className="student-results-panel student-results-form" onSubmit={handleLookup}>
           <div>
             <h2>Find a student’s result</h2>
-            <p>Enter the student’s full name and select their program and level.</p>
+            <p>Capital letters do not matter. Small spelling mistakes are accepted; select the correct program and level.</p>
           </div>
           <label>
             <span>Student full name</span>
             <input
               autoComplete="off"
               maxLength={160}
-              minLength={3}
+              minLength={2}
               onChange={(event) => setStudentName(event.target.value)}
-              placeholder="Enter the student’s first and last name"
+              placeholder="For example: Alex Smith"
               required
               value={studentName}
             />

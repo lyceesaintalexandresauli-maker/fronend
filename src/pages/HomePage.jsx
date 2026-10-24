@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { mediaUrl } from "../api/client";
-import { eventsAPI, contentAPI, departmentsAPI } from "../api/services";
+import { eventsAPI, announcementsAPI, contentAPI, departmentsAPI } from "../api/services";
 import Seo from "../components/Seo";
 import "./HomePage.css";
 
@@ -47,9 +47,13 @@ const galleryImages = [
 ];
 
 const getDate = (value) => value ? new Date(value).toLocaleDateString("en-GB", { day: "2-digit", month: "short" }).toUpperCase() : "SCHOOL";
+const getAnnouncementText = (value) => String(value || "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+const isAnnouncementImage = (path = "") => /\.(jpe?g|png|gif|webp|bmp|svg|avif)(?:[?#].*)?$/i.test(path);
+const getAnnouncementFileName = (path = "") => String(path).split(/[\\/]/).pop() || "Announcement attachment";
 
 export default function HomePage() {
   const [events, setEvents] = useState([]);
+  const [announcements, setAnnouncements] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [content, setContent] = useState({});
   const [slide, setSlide] = useState(0);
@@ -63,11 +67,14 @@ export default function HomePage() {
     let active = true;
     Promise.all([
       eventsAPI.getAll().catch(() => ({ data: [] })),
+      announcementsAPI.getAll().catch(() => ({ data: [] })),
       departmentsAPI.getAll().catch(() => ({ data: [] })),
       contentAPI.getGrouped().catch(() => ({ data: {} })),
-    ]).then(([eventRes, departmentRes, contentRes]) => {
+    ]).then(([eventRes, announcementRes, departmentRes, contentRes]) => {
       if (!active) return;
-      setEvents(eventRes.data || []);
+      const newestFirst = (items, dateKey = "created_at") => [...(items || [])].sort((a, b) => new Date(b[dateKey] || b.created_at || 0) - new Date(a[dateKey] || a.created_at || 0));
+      setEvents(newestFirst(eventRes.data, "date").slice(0, 3));
+      setAnnouncements(newestFirst(announcementRes.data).slice(0, 1));
       setDepartments(departmentRes.data || []);
       setContent(contentRes.data || {});
     });
@@ -75,6 +82,9 @@ export default function HomePage() {
   }, []);
 
   const about = content.about?.[0];
+  const latestAnnouncement = announcements[0];
+  const announcementText = getAnnouncementText(latestAnnouncement?.content);
+  const announcementImage = latestAnnouncement?.image_path && isAnnouncementImage(latestAnnouncement.image_path);
   const programCards = trades.map((trade) => {
     const department = departments.find((item) => `${item.code || ""} ${item.name || ""}`.toLowerCase().includes(trade.code.toLowerCase()));
     return {
@@ -122,7 +132,41 @@ export default function HomePage() {
       </section>
 
       <section className="home-wrap home-community">
-        <div className="home-events"><div className="home-events-head"><div className="home-small-heading"><span>Recent Events</span><h2>Latest Events</h2></div><Link className="home-btn home-btn-small" to="/events">View All Events <i className="bi bi-arrow-right" /></Link></div><div className="home-event-list">{events.slice(0, 3).map((event) => <article className="home-event" key={event.id}><img src={mediaUrl(event.image_path) || "/assets/img/photos/acc2.jpg"} alt="" loading="lazy" /><time>{getDate(event.created_at)}</time><div><h3>{event.title}</h3><p>{event.description}</p></div></article>)}{events.length === 0 && <div className="home-empty-state">School events and activities will appear here.</div>}</div></div>
+        <div className="home-events"><div className="home-events-head"><div className="home-small-heading"><span>Recent Events</span><h2>Latest Events</h2></div><Link className="home-btn home-btn-small" to="/events">View All Events <i className="bi bi-arrow-right" /></Link></div><div className="home-event-list">{events.map((event) => <article className="home-event" key={event.id}><img src={mediaUrl(event.image_path) || "/assets/img/photos/acc2.jpg"} alt="" loading="lazy" /><time>{getDate(event.date || event.created_at)}</time><div><h3>{event.title}</h3><p>{event.description}</p></div></article>)}{events.length === 0 && <div className="home-empty-state">School events and activities will appear here.</div>}</div></div>
+        <aside className="home-popular-announcements" aria-labelledby="home-latest-announcement-title">
+          <div className="home-events-head">
+            <div className="home-small-heading"><span>School Updates</span><h2 id="home-latest-announcement-title">Latest Announcement</h2></div>
+            <Link className="home-btn home-btn-small" to="/announcements">All Notices <i className="bi bi-arrow-right" /></Link>
+          </div>
+          {latestAnnouncement ? (
+            <article className="home-announcement-card">
+              {announcementImage && (
+                <Link className="home-announcement-image" to="/announcements" aria-label={`Read ${latestAnnouncement.title}`}>
+                  <img src={mediaUrl(latestAnnouncement.image_path)} alt="" loading="lazy" />
+                  <span><i className="bi bi-megaphone" /> Latest notice</span>
+                </Link>
+              )}
+              <div className="home-announcement-content">
+                <div className="home-announcement-meta">
+                  {!announcementImage && <span className="home-announcement-icon"><i className="bi bi-megaphone" /></span>}
+                  <time dateTime={latestAnnouncement.created_at || undefined}>{getDate(latestAnnouncement.created_at)}</time>
+                </div>
+                <h3><Link to="/announcements">{latestAnnouncement.title}</Link></h3>
+                {announcementText && <p>{announcementText.slice(0, 220)}{announcementText.length > 220 ? "…" : ""}</p>}
+                {latestAnnouncement.image_path && !announcementImage && (
+                  <a className="home-announcement-attachment" href={mediaUrl(latestAnnouncement.image_path)} target="_blank" rel="noopener noreferrer">
+                    <i className="bi bi-file-earmark-text" />
+                    <span>{getAnnouncementFileName(latestAnnouncement.image_path)}</span>
+                    <i className="bi bi-box-arrow-up-right" />
+                  </a>
+                )}
+                <Link className="home-announcement-read" to="/announcements">Read full announcement <i className="bi bi-arrow-right" /></Link>
+              </div>
+            </article>
+          ) : (
+            <div className="home-empty-state">School announcements will appear here.</div>
+          )}
+        </aside>
       </section>
 
       <section className="home-gallery-strip"><div className="home-wrap"><div className="home-gallery-heading"><div className="home-small-heading"><span>Our Gallery</span><h2>Moments That Inspire</h2></div><Link to="/gallery">View All Photos <i className="bi bi-arrow-right" /></Link></div><div className="home-gallery-grid">{galleryImages.map((image) => <Link to="/gallery" key={image}><img src={image} alt="School life at Lycée Saint Alexandre Sauli" loading="lazy" /></Link>)}</div></div></section>

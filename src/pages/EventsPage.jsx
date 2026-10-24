@@ -17,8 +17,9 @@ const getEventVideoUrl = (event) => {
   if (!event) return null;
   return event.video_url || event.video_path || event.video || event.media_url || null;
 };
+const getEventAudioUrl = (event) => event?.audio_url || event?.audio_path || event?.audio || null;
 
-const isDirectVideoUrl = (value) => /\.(mp4|webm|ogg)(\?.*)?$/i.test(String(value));
+const isDirectVideoUrl = (value) => /\.(mp4|webm|ogg|avi|mov|mkv)(\?.*)?$/i.test(String(value));
 
 const getYoutubeEmbedUrl = (value) => {
   if (!value) return null;
@@ -115,6 +116,8 @@ export default function EventsPage() {
 
     if (mediaFilter === "videos") {
       filtered = filtered.filter((event) => Boolean(getEventVideoUrl(event)));
+    } else if (mediaFilter === "audio") {
+      filtered = filtered.filter((event) => Boolean(getEventAudioUrl(event)));
     } else if (mediaFilter === "images") {
       filtered = filtered.filter((event) => Boolean(event.image_path) && !getEventVideoUrl(event));
     }
@@ -217,6 +220,7 @@ export default function EventsPage() {
             <div className="events-detail-meta"><span><i className="bi bi-calendar-event" />{formatEventDate(selectedEvent.date || selectedEvent.created_at)}</span><span><i className="bi bi-geo-alt-fill" />{selectedEvent.location || "School grounds"}</span>{selectedEvent.time && <span><i className="bi bi-clock-fill" />{selectedEvent.time}</span>}</div>
             <p>{selectedEvent.description || "Join the school community for this special event."}</p>
             {getEventVideoUrl(selectedEvent) && <div className="events-video-tag"><i className="bi bi-play-circle-fill" /> Video event</div>}
+            {getEventAudioUrl(selectedEvent) && <div className="events-audio-player"><span><i className="bi bi-soundwave" /> Event audio</span><audio controls preload="metadata" src={mediaUrl(getEventAudioUrl(selectedEvent))}>Your browser does not support audio playback.</audio></div>}
             {selectedEvent.registration_link && <a className="events-detail-register" href={selectedEvent.registration_link} target="_blank" rel="noopener noreferrer">Learn more <i className="bi bi-arrow-up-right" /></a>}
           </div>
         </article>
@@ -232,7 +236,7 @@ export default function EventsPage() {
         <div className="events-filter-bar" aria-label="Filter events">
           <label className="events-filter-field active-filter"><span><i className="bi bi-calendar-event" /> Select date</span><input className="events-filter-display active-display" type="date" value={filterDate} onChange={(event) => { const value = event.target.value; setFilterDate(value); if (value) { const [year, month] = value.split("-").map(Number); setCalendarMonth(new Date(year, month - 1, 1)); } }} aria-label="Search events by date" /></label>
           <label className="events-filter-field active-filter"><span><i className="bi bi-funnel-fill" /> Event Type</span><select className="events-filter-display active-display" value={eventTypeFilter} onChange={(event) => setEventTypeFilter(event.target.value)} aria-label="Filter events by type"><option value="all">All event types</option>{eventTypes.map((type) => <option key={type} value={type}>{type}</option>)}</select></label>
-          <label className="events-filter-field active-filter"><span><i className="bi bi-tag-fill" /> Media</span><select className="events-filter-display active-display" value={mediaFilter} onChange={(event) => setMediaFilter(event.target.value)} aria-label="Filter events by media"><option value="all">All media</option><option value="videos">Videos</option><option value="images">Images</option></select></label>
+          <label className="events-filter-field active-filter"><span><i className="bi bi-tag-fill" /> Media</span><select className="events-filter-display active-display" value={mediaFilter} onChange={(event) => setMediaFilter(event.target.value)} aria-label="Filter events by media"><option value="all">All media</option><option value="videos">Videos</option><option value="audio">Audio</option><option value="images">Images</option></select></label>
           <div className="events-search-field active-filter"><span><i className="bi bi-info-circle" /> Browse events</span><div className="events-filter-display active-display">Use the calendar to choose a day</div></div>
           <button type="button" className="events-search-button active-button" onClick={() => { setFilterDate(""); setEventTypeFilter("all"); setMediaFilter("all"); }}><i className="bi bi-arrow-counterclockwise" /> Clear filters</button>
         </div>
@@ -246,7 +250,7 @@ export default function EventsPage() {
                 const eventDate = new Date(event.date || event.created_at);
                 return <article className="event-card" key={event.id}>
                   <div className="event-image-button" aria-label={event.title}>
-                    {event.image_path ? <img src={mediaUrl(event.image_path)} alt={event.title} loading="lazy" decoding="async" /> : <span className="event-image-placeholder"><i className="bi bi-calendar-event" /></span>}
+                    {event.image_path ? <img src={mediaUrl(event.image_path)} alt={event.title} loading="lazy" decoding="async" /> : <span className="event-image-placeholder"><i className={`bi ${getEventVideoUrl(event) ? "bi-play-circle" : getEventAudioUrl(event) ? "bi-soundwave" : "bi-calendar-event"}`} /></span>}
                     <span className="event-date-badge"><b>{Number.isNaN(eventDate.getTime()) ? "-" : String(eventDate.getDate()).padStart(2, "0")}</b><small>{Number.isNaN(eventDate.getTime()) ? "Date" : eventDate.toLocaleDateString("en-US", { month: "short", year: "numeric" })}</small></span>
                     <span className="event-category">{event.category || "General"}</span>
                   </div>

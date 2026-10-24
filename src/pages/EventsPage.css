@@ -196,6 +196,11 @@
 .events-page button:not(.btn-close):not(.accordion-button):not(.mobile-nav-toggle):not(.student-portal-btn-muted).event-details:hover,
 .events-page button:not(.btn-close):not(.accordion-button):not(.mobile-nav-toggle):not(.student-portal-btn-muted).events-search-button:hover { background: #a83d06 !important; border-color: #a83d06 !important; }
 
+.events-audio-player { display: grid; gap: 8px; margin-top: 16px; color: #59402f; font-size: .8rem; font-weight: 700; }
+.events-audio-player span { display: flex; align-items: center; gap: 7px; }
+.events-audio-player span i { color: #b24d12; }
+.events-audio-player audio { width: 100%; }
+
 @media (max-width: 1024px) {
   .events-layout { grid-template-columns: minmax(0, 1fr); }
   .events-layout > *, .events-grid > *, .events-sidebar > * { min-width: 0; }
