@@ -84,26 +84,37 @@ export default function HomePage() {
 
   useEffect(() => {
     let active = true;
+    let loadingAnnouncement = false;
     const loadLatestAnnouncement = async () => {
+      if (loadingAnnouncement) return;
+      loadingAnnouncement = true;
       try {
         const { data } = await announcementsAPI.getAll();
         if (!active) return;
-        const items = Array.isArray(data) ? data : [];
+        const items = Array.isArray(data)
+          ? data
+          : Array.isArray(data?.announcements)
+            ? data.announcements
+            : Array.isArray(data?.data)
+              ? data.data
+              : [];
         const getTimestamp = (item) => {
           const value = item.created_at || item.published_at || item.updated_at || item.date;
           if (!value) return null;
           const timestamp = new Date(value).getTime();
           return Number.isFinite(timestamp) ? timestamp : null;
         };
-        const newest = [...items].sort((left, right) => {
-          const leftTime = getTimestamp(left);
-          const rightTime = getTimestamp(right);
-          if (leftTime === null || rightTime === null) return 0;
-          return rightTime - leftTime;
-        })[0] || null;
+        const newest = items.reduce((latest, item) => {
+          if (!latest) return item;
+          const itemTime = getTimestamp(item);
+          const latestTime = getTimestamp(latest);
+          return itemTime !== null && (latestTime === null || itemTime > latestTime) ? item : latest;
+        }, null);
         setLatestAnnouncement(newest);
       } catch (error) {
         console.error("Failed to load the latest announcement:", error);
+      } finally {
+        loadingAnnouncement = false;
       }
     };
 
@@ -119,12 +130,14 @@ export default function HomePage() {
       setContent(contentRes.data || {});
     });
     loadLatestAnnouncement();
-    const refreshTimer = window.setInterval(loadLatestAnnouncement, 30000);
+    const refreshTimer = window.setInterval(loadLatestAnnouncement, 15000);
     window.addEventListener("focus", loadLatestAnnouncement);
+    document.addEventListener("visibilitychange", loadLatestAnnouncement);
     return () => {
       active = false;
       window.clearInterval(refreshTimer);
       window.removeEventListener("focus", loadLatestAnnouncement);
+      document.removeEventListener("visibilitychange", loadLatestAnnouncement);
     };
   }, []);
 

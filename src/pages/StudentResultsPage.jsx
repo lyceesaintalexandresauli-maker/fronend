@@ -98,16 +98,37 @@ function ResultCard({ result }) {
   const totalScore = subjects.reduce((sum, subject) => sum + number(subject.score), 0);
   const totalMaximum = subjects.reduce((sum, subject) => sum + number(subject.max_score), 0);
   const percentage = totalMaximum ? (totalScore / totalMaximum) * 100 : null;
+  const passed = percentage !== null && percentage >= 70;
 
   return (
     <article className="student-result-card">
+      <div className={`student-result-banner${passed ? " is-passed" : " is-failed"}`}>
+        <div className="student-result-ring-wrap">
+          <div className="student-result-ring" style={{ "--result-progress": `${Math.min(percentage || 0, 100)}%` }}>
+            <div>
+              <strong>{percentage === null ? "—" : percentage.toFixed(2)}<small>%</small></strong>
+              <span>OVERALL</span>
+            </div>
+          </div>
+        </div>
+        <div className="student-result-candidate">
+          <span className="student-result-kicker">CANDIDATE</span>
+          <h2>{result.student_name}</h2>
+          <p>
+            {result.student_code && <span>{result.student_code}</span>}
+            {result.position && <span>Class position: {formatPosition(result.position)}</span>}
+          </p>
+          <span className={`student-result-status${passed ? " is-passed" : " is-failed"}`}>
+            {percentage === null ? "NO MARKS" : `${getGrade(percentage)} · ${passed ? "PASS" : "NEEDS IMPROVEMENT"}`}
+          </span>
+        </div>
+      </div>
       <header className="student-result-heading">
         <div className="student-result-session">
           <span>{programNames[result.program_code] || result.program_code} · {getLevelLabel(result.class_level)}</span>
           <h3>{result.academic_year} · {result.term}</h3>
         </div>
         <div className="student-result-total">
-          <strong>{percentage === null ? "—" : `${percentage.toFixed(1)}%`}</strong>
           <small>{totalScore.toFixed(2)} / {totalMaximum.toFixed(2)} total marks</small>
           <span className="student-result-overall-rating">{getGrade(percentage)}</span>
           {result.position && <span className="student-result-position">Position: {formatPosition(result.position)}</span>}
@@ -121,7 +142,7 @@ function ResultCard({ result }) {
         </div>
         <div className="student-result-table-wrap">
           <table className="student-result-table">
-            <thead><tr><th>Subject</th><th>Marks</th><th>Out of</th><th>Percentage</th><th>Grade</th></tr></thead>
+            <thead><tr><th>Subject</th><th>Score (%)</th><th>Grade</th></tr></thead>
             <tbody>
               {subjects.map((subject) => {
                 const score = number(subject.score);
@@ -133,8 +154,6 @@ function ResultCard({ result }) {
                 return (
                   <tr key={subject.id || subject.subject_name}>
                     <td>{subject.subject_name}</td>
-                    <td>{score.toFixed(2)}</td>
-                    <td>{maximum.toFixed(2)}</td>
                     <td>
                       <div className={`student-result-subject-score is-grade-${gradeClass}`}>
                         <span
@@ -146,7 +165,7 @@ function ResultCard({ result }) {
                         >
                           <i style={{ width: `${Math.min(subjectPercentage || 0, 100)}%` }} />
                         </span>
-                        <strong>{subjectPercentage === null ? "—" : `${subjectPercentage.toFixed(1)}%`}</strong>
+                        <strong>{subjectPercentage === null ? "—" : subjectPercentage.toFixed(2)}</strong>
                       </div>
                     </td>
                     <td>
@@ -158,7 +177,7 @@ function ResultCard({ result }) {
                   </tr>
                 );
               })}
-              {subjects.length === 0 && <tr><td colSpan={5}>No subject marks are available for this result.</td></tr>}
+              {subjects.length === 0 && <tr><td colSpan={3}>No subject marks are available for this result.</td></tr>}
             </tbody>
           </table>
         </div>
@@ -194,6 +213,13 @@ export default function StudentResultsPage() {
     }
   };
 
+  const handleSearchAnother = () => {
+    setResults([]);
+    setMessage("");
+    setStudentName("");
+    setClassLevel("");
+  };
+
   return (
     <main className="main student-results-page">
       <Seo
@@ -211,45 +237,53 @@ export default function StudentResultsPage() {
       </header>
 
       <section className="container student-results-content">
-        <form className="student-results-panel student-results-form" onSubmit={handleLookup}>
-          <div>
-            <h2>Find a student’s result</h2>
-            <p>Capital letters do not matter. Small spelling mistakes are accepted; select the correct program and level.</p>
-          </div>
-          <label>
-            <span>Student full name</span>
-            <input
-              autoComplete="off"
-              maxLength={160}
-              minLength={2}
-              onChange={(event) => setStudentName(event.target.value)}
-              placeholder="For example: Alex Smith"
-              required
-              value={studentName}
-            />
-          </label>
-          <label>
-            <span>Program / level</span>
-            <select onChange={(event) => setClassLevel(event.target.value)} required value={classLevel}>
-              <option value="">Select program / level</option>
-              {STUDENT_LEVELS.map((level) => <option key={level.value} value={level.value}>{level.label}</option>)}
-            </select>
-          </label>
-          <button className="student-results-submit" disabled={searchBusy} type="submit">
-            {searchBusy ? "Searching…" : "Get Result"}
-          </button>
-        </form>
-        {message && <p className="student-results-message" role="status">{message}</p>}
-        {results.length > 0 && (
+        {results.length > 0 ? (
           <section className="student-results-list" aria-label="Published results">
             <div className="student-results-list-heading">
               <div><span>Published records for</span><h2>{results[0].student_name}</h2></div>
-              <button className="student-results-print" type="button" onClick={() => window.print()}>
-                <i className="bi bi-printer me-2" />Print results
-              </button>
+              <div className="student-results-actions">
+                <button className="student-results-print" type="button" onClick={() => window.print()}>
+                  <i className="bi bi-printer me-2" />Print results
+                </button>
+                <button className="student-results-search-again" type="button" onClick={handleSearchAnother}>
+                  <i className="bi bi-search me-2" />Search another student
+                </button>
+              </div>
             </div>
             {results.map((result) => <ResultCard key={result.id} result={result} />)}
           </section>
+        ) : (
+          <>
+            <form className="student-results-panel student-results-form" onSubmit={handleLookup}>
+              <div>
+                <h2>Find a student’s result</h2>
+                <p>Capital letters do not matter. Small spelling mistakes are accepted; select the correct program and level.</p>
+              </div>
+              <label>
+                <span>Student full name</span>
+                <input
+                  autoComplete="off"
+                  maxLength={160}
+                  minLength={2}
+                  onChange={(event) => setStudentName(event.target.value)}
+                  placeholder="For example: Alex Smith"
+                  required
+                  value={studentName}
+                />
+              </label>
+              <label>
+                <span>Program / level</span>
+                <select onChange={(event) => setClassLevel(event.target.value)} required value={classLevel}>
+                  <option value="">Select program / level</option>
+                  {STUDENT_LEVELS.map((level) => <option key={level.value} value={level.value}>{level.label}</option>)}
+                </select>
+              </label>
+              <button className="student-results-submit" disabled={searchBusy} type="submit">
+                {searchBusy ? "Searching…" : "Get Result"}
+              </button>
+            </form>
+            {message && <p className="student-results-message" role="status">{message}</p>}
+          </>
         )}
         <p className="student-results-privacy">Only published results are shown. Contact the school if a published result is missing.</p>
       </section>
