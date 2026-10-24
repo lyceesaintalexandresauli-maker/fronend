@@ -50,10 +50,29 @@ const getDate = (value) => value ? new Date(value).toLocaleDateString("en-GB", {
 const getAnnouncementText = (value) => String(value || "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 const isAnnouncementImage = (path = "") => /\.(jpe?g|png|gif|webp|bmp|svg|avif)(?:[?#].*)?$/i.test(path);
 const getAnnouncementFileName = (path = "") => String(path).split(/[\\/]/).pop() || "Announcement attachment";
+const getEventVideo = (event) => event.video_url || event.video_path || event.video || event.media_url
+  || (/\.(mp4|webm|ogg|avi|mov|mkv)(\?.*)?$/i.test(event.image_path || "") ? event.image_path : "");
+const getEventAudio = (event) => event.audio_url || event.audio_path || event.audio
+  || (/\.(mp3|wav|ogg|m4a|aac|flac)(\?.*)?$/i.test(event.image_path || "") ? event.image_path : "");
+
+function HomeEventMedia({ event }) {
+  const video = getEventVideo(event);
+  const audio = getEventAudio(event);
+  if (video) {
+    return <video className="home-event-video" controls preload="metadata" src={mediaUrl(video)}>Your browser does not support video playback.</video>;
+  }
+  if (audio) {
+    return <div className="home-event-audio"><i className="bi bi-soundwave" /><audio controls preload="metadata" src={mediaUrl(audio)}>Your browser does not support audio playback.</audio></div>;
+  }
+  if (event.image_path) {
+    return <img src={mediaUrl(event.image_path)} alt="" loading="lazy" />;
+  }
+  return <span className="home-event-placeholder"><i className="bi bi-calendar-event" /></span>;
+}
 
 export default function HomePage() {
   const [events, setEvents] = useState([]);
-  const [announcements, setAnnouncements] = useState([]);
+  const [latestAnnouncement, setLatestAnnouncement] = useState(null);
   const [departments, setDepartments] = useState([]);
   const [content, setContent] = useState({});
   const [slide, setSlide] = useState(0);
@@ -65,26 +84,57 @@ export default function HomePage() {
 
   useEffect(() => {
     let active = true;
+    const loadLatestAnnouncement = async () => {
+      try {
+        const { data } = await announcementsAPI.getAll();
+        if (!active) return;
+        const items = Array.isArray(data) ? data : [];
+        const getTimestamp = (item) => {
+          const value = item.created_at || item.published_at || item.updated_at || item.date;
+          if (!value) return null;
+          const timestamp = new Date(value).getTime();
+          return Number.isFinite(timestamp) ? timestamp : null;
+        };
+        const newest = [...items].sort((left, right) => {
+          const leftTime = getTimestamp(left);
+          const rightTime = getTimestamp(right);
+          if (leftTime === null || rightTime === null) return 0;
+          return rightTime - leftTime;
+        })[0] || null;
+        setLatestAnnouncement(newest);
+      } catch (error) {
+        console.error("Failed to load the latest announcement:", error);
+      }
+    };
+
     Promise.all([
       eventsAPI.getAll().catch(() => ({ data: [] })),
-      announcementsAPI.getAll().catch(() => ({ data: [] })),
       departmentsAPI.getAll().catch(() => ({ data: [] })),
       contentAPI.getGrouped().catch(() => ({ data: {} })),
-    ]).then(([eventRes, announcementRes, departmentRes, contentRes]) => {
+    ]).then(([eventRes, departmentRes, contentRes]) => {
       if (!active) return;
       const newestFirst = (items, dateKey = "created_at") => [...(items || [])].sort((a, b) => new Date(b[dateKey] || b.created_at || 0) - new Date(a[dateKey] || a.created_at || 0));
       setEvents(newestFirst(eventRes.data, "date").slice(0, 3));
-      setAnnouncements(newestFirst(announcementRes.data).slice(0, 1));
       setDepartments(departmentRes.data || []);
       setContent(contentRes.data || {});
     });
-    return () => { active = false; };
+    loadLatestAnnouncement();
+    const refreshTimer = window.setInterval(loadLatestAnnouncement, 30000);
+    window.addEventListener("focus", loadLatestAnnouncement);
+    return () => {
+      active = false;
+      window.clearInterval(refreshTimer);
+      window.removeEventListener("focus", loadLatestAnnouncement);
+    };
   }, []);
 
   const about = content.about?.[0];
-  const latestAnnouncement = announcements[0];
   const announcementText = getAnnouncementText(latestAnnouncement?.content);
   const announcementImage = latestAnnouncement?.image_path && isAnnouncementImage(latestAnnouncement.image_path);
+  const announcementDate = latestAnnouncement?.created_at
+    || latestAnnouncement?.published_at
+    || latestAnnouncement?.updated_at
+    || latestAnnouncement?.date;
   const programCards = trades.map((trade) => {
     const department = departments.find((item) => `${item.code || ""} ${item.name || ""}`.toLowerCase().includes(trade.code.toLowerCase()));
     return {
@@ -132,7 +182,7 @@ export default function HomePage() {
       </section>
 
       <section className="home-wrap home-community">
-        <div className="home-events"><div className="home-events-head"><div className="home-small-heading"><span>Recent Events</span><h2>Latest Events</h2></div><Link className="home-btn home-btn-small" to="/events">View All Events <i className="bi bi-arrow-right" /></Link></div><div className="home-event-list">{events.map((event) => <article className="home-event" key={event.id}><img src={mediaUrl(event.image_path) || "/assets/img/photos/acc2.jpg"} alt="" loading="lazy" /><time>{getDate(event.date || event.created_at)}</time><div><h3>{event.title}</h3><p>{event.description}</p></div></article>)}{events.length === 0 && <div className="home-empty-state">School events and activities will appear here.</div>}</div></div>
+        <div className="home-events"><div className="home-events-head"><div className="home-small-heading"><span>Recent Events</span><h2>Latest Events</h2></div><Link className="home-btn home-btn-small" to="/events">View All Events <i className="bi bi-arrow-right" /></Link></div><div className="home-event-list">{events.map((event) => <article className="home-event" key={event.id}><div className="home-event-media"><HomeEventMedia event={event} /></div><time>{getDate(event.date || event.created_at)}</time><div><h3>{event.title}</h3><p>{event.description}</p></div></article>)}{events.length === 0 && <div className="home-empty-state">School events and activities will appear here.</div>}</div></div>
         <aside className="home-popular-announcements" aria-labelledby="home-latest-announcement-title">
           <div className="home-events-head">
             <div className="home-small-heading"><span>School Updates</span><h2 id="home-latest-announcement-title">Latest Announcement</h2></div>
@@ -149,7 +199,7 @@ export default function HomePage() {
               <div className="home-announcement-content">
                 <div className="home-announcement-meta">
                   {!announcementImage && <span className="home-announcement-icon"><i className="bi bi-megaphone" /></span>}
-                  <time dateTime={latestAnnouncement.created_at || undefined}>{getDate(latestAnnouncement.created_at)}</time>
+                  <time dateTime={announcementDate || undefined}>{getDate(announcementDate)}</time>
                 </div>
                 <h3><Link to="/announcements">{latestAnnouncement.title}</Link></h3>
                 {announcementText && <p>{announcementText.slice(0, 220)}{announcementText.length > 220 ? "…" : ""}</p>}

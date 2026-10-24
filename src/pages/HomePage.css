@@ -60,3 +60,11 @@
 .home-announcement-read:hover{color:#a83f0d}
 @media(max-width:900px){.home-announcement-image{height:190px}.home-announcement-content h3{font-size:1.08rem}}
 @media(max-width:560px){.home-popular-announcements{padding:14px}.home-announcement-content{padding:14px}.home-announcement-image{height:170px}}
+.home-event{grid-template-columns:112px 38px minmax(0,1fr)}
+.home-event-media{width:112px;min-width:0;overflow:hidden;border-radius:8px;background:#eef3f6}
+.home-event-media>img,.home-event-video,.home-event-placeholder{display:grid;width:100%;height:68px;object-fit:cover}
+.home-event-placeholder{place-items:center;color:#c94f12;font-size:1.2rem}
+.home-event-audio{display:grid;min-height:68px;align-content:center;justify-items:center;gap:4px;padding:4px}
+.home-event-audio>i{color:#c94f12}
+.home-event-audio audio{width:100%;height:30px}
+@media(max-width:560px){.home-event{grid-template-columns:88px 34px minmax(0,1fr)}.home-event-media{width:88px}.home-event-media>img,.home-event-video,.home-event-placeholder{height:58px}.home-event-audio{min-height:58px}.home-event-audio audio{height:26px}}
