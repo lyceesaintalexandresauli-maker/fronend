@@ -17,6 +17,33 @@ const formatWhatsAppNumber = (phone = "") => {
   return digits;
 };
 
+const normalizeSearchValue = (value) => String(value ?? "").trim().toLocaleLowerCase();
+const departmentOptionValue = (department) => String(department?.id ?? department?.name ?? "");
+
+const getStaffDepartmentValues = (member) =>
+  Object.entries(member || {})
+    .filter(([key]) => key.toLocaleLowerCase().includes("department"))
+    .flatMap(([, value]) => {
+      if (value && typeof value === "object") {
+        return [value.id, value.name, value.title, value.code, value.department_id, value.department_name];
+      }
+      return [value];
+    })
+    .filter((value) => value !== null && value !== undefined && String(value).trim() !== "");
+
+const staffMatchesDepartment = (member, department) => {
+  const departmentId = normalizeSearchValue(department?.id);
+  const departmentName = normalizeSearchValue(department?.name);
+
+  return getStaffDepartmentValues(member).some((value) => {
+    const normalizedValue = normalizeSearchValue(value);
+    return normalizedValue === departmentId || normalizedValue === departmentName;
+  });
+};
+
+const findStaffDepartment = (member, departments) =>
+  departments.find((department) => staffMatchesDepartment(member, department));
+
 export default function StaffPage() {
   const [staff, setStaff] = useState([]);
   const [departments, setDepartments] = useState([]);
@@ -55,21 +82,45 @@ export default function StaffPage() {
     let filtered = [...staff];
 
     if (filterDepartment !== "all") {
-      filtered = filtered.filter((member) => member.department === filterDepartment);
+      const selectedDepartment = departments.find(
+        (department) => departmentOptionValue(department) === filterDepartment
+      );
+      filtered = selectedDepartment
+        ? filtered.filter((member) => staffMatchesDepartment(member, selectedDepartment))
+        : filtered;
     }
 
     if (searchTerm) {
-      const query = searchTerm.toLowerCase();
+      const query = normalizeSearchValue(searchTerm);
       filtered = filtered.filter(
         (member) =>
-          member.name?.toLowerCase().includes(query) ||
-          member.position?.toLowerCase().includes(query) ||
-          member.bio?.toLowerCase().includes(query)
+          normalizeSearchValue(member.name).includes(query) ||
+          normalizeSearchValue(member.position).includes(query) ||
+          normalizeSearchValue(member.bio).includes(query)
       );
     }
 
     setFilteredStaff(sortStaffByIdAsc(filtered));
-  }, [filterDepartment, searchTerm, staff]);
+  }, [departments, filterDepartment, searchTerm, staff]);
+
+  const handleStaffSearch = (value) => {
+    setSearchTerm(value);
+    const query = normalizeSearchValue(value);
+    if (!query) return;
+
+    const exactMatches = staff.filter(
+      (member) => normalizeSearchValue(member.name) === query
+    );
+    const matchedDepartments = new Map();
+    exactMatches.forEach((member) => {
+      const department = findStaffDepartment(member, departments);
+      if (department) matchedDepartments.set(departmentOptionValue(department), department);
+    });
+
+    if (matchedDepartments.size === 1) {
+      setFilterDepartment([...matchedDepartments.keys()][0]);
+    }
+  };
 
   if (loading) {
     return (
@@ -119,11 +170,28 @@ export default function StaffPage() {
             <input
               type="text"
               className="form-control"
+              list="staff-search-options"
               placeholder="Search by name, position, or bio..."
               aria-label="Search staff by name, position, or biography"
               value={searchTerm}
-              onChange={(event) => setSearchTerm(event.target.value)}
+              onChange={(event) => handleStaffSearch(event.target.value)}
             />
+            <datalist id="staff-search-options">
+              {staff.map((member) => {
+                const department = findStaffDepartment(member, departments);
+                const suggestionLabel = [member.position, department?.name]
+                  .filter(Boolean)
+                  .join(" · ");
+
+                return (
+                  <option
+                    key={member.id}
+                    value={member.name || ""}
+                    label={suggestionLabel}
+                  />
+                );
+              })}
+            </datalist>
             {searchTerm && (
               <button
                 className="btn ui-staff-clear-search"
@@ -144,7 +212,9 @@ export default function StaffPage() {
             >
               <option value="all">All Departments</option>
               {departments.map((dept) => (
-                <option key={dept.id} value={dept.name}>{dept.name}</option>
+                <option key={dept.id ?? dept.name} value={departmentOptionValue(dept)}>
+                  {dept.name}
+                </option>
               ))}
             </select>
           </div>
