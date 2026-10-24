@@ -49,7 +49,6 @@ const galleryImages = [
 const getDate = (value) => value ? new Date(value).toLocaleDateString("en-GB", { day: "2-digit", month: "short" }).toUpperCase() : "SCHOOL";
 const getAnnouncementText = (value) => String(value || "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 const isAnnouncementImage = (path = "") => /\.(jpe?g|png|gif|webp|bmp|svg|avif)(?:[?#].*)?$/i.test(path);
-const getAnnouncementFileName = (path = "") => String(path).split(/[\\/]/).pop() || "Announcement attachment";
 const getEventVideo = (event) => event.video_url || event.video_path || event.video || event.media_url
   || (/\.(mp4|webm|ogg|avi|mov|mkv)(\?.*)?$/i.test(event.image_path || "") ? event.image_path : "");
 const getEventAudio = (event) => event.audio_url || event.audio_path || event.audio
@@ -176,10 +175,47 @@ export default function HomePage() {
           <p>Quality education, moral formation, and practical training for future leaders.</p>
           <div className="home-hero-actions"><Link className="home-btn" to="/about">Explore Our School <i className="bi bi-arrow-right" /></Link><Link className="home-btn home-btn-outline" to="/academic">Learn More</Link></div>
         </div>
+        {latestAnnouncement && (
+          <Link className="home-hero-announcement" to="/announcements" aria-label={`Latest announcement: ${latestAnnouncement.title}. Read announcement.`}>
+            {announcementImage && <img src={mediaUrl(latestAnnouncement.image_path)} alt="" loading="lazy" />}
+            <span className="home-hero-announcement-content">
+              <span className="home-hero-announcement-meta"><i className="bi bi-megaphone-fill" /> Latest announcement <time dateTime={announcementDate || undefined}>{getDate(announcementDate)}</time></span>
+              <strong>{latestAnnouncement.title}</strong>
+              {announcementText && <span className="home-hero-announcement-text">{announcementText}</span>}
+              <span className="home-hero-announcement-link">Read announcement <i className="bi bi-arrow-right" /></span>
+            </span>
+          </Link>
+        )}
       </section>
 
       <section className="home-wrap home-shortcuts" aria-label="Quick links">
         {quickLinks.map(([icon, title, description, href, action]) => <Link className="home-shortcut-card" to={href} key={title}><span><i className={`bi ${icon}`} /></span><h2>{title}</h2><p>{description}</p><b>{action} <i className="bi bi-arrow-right" /></b></Link>)}
+      </section>
+
+      <section className="home-wrap home-results-promo" aria-labelledby="home-results-promo-title">
+        <div className="home-results-copy">
+          <span>For students and families</span>
+          <h2 id="home-results-promo-title">View student results</h2>
+          <p>Look up published marks and see each subject score in a clear report.</p>
+          <Link className="home-btn" to="/results">Get Result <i className="bi bi-arrow-right" /></Link>
+        </div>
+        <Link className="home-results-preview" to="/results" aria-label="Open Student Results lookup. Preview shows example marks only.">
+          <div className="home-results-preview-top">
+            <div>
+              <span className="home-results-preview-label">EXAMPLE REPORT · NOT A REAL STUDENT</span>
+              <h3>Student Results</h3>
+            </div>
+            <div className="home-results-ring" role="img" aria-label="Example overall score: 70.56 percent">
+              <span><strong>70.56<small>%</small></strong><b>OVERALL</b></span>
+            </div>
+          </div>
+          <div className="home-results-preview-list" aria-hidden="true">
+            <div><span>Biology and Health Sciences</span><i className="is-d"><b style={{ width: "68%" }} /></i><strong className="is-d">68.00</strong><em className="is-d">D</em></div>
+            <div><span>Chemistry</span><i className="is-a"><b style={{ width: "80%" }} /></i><strong className="is-a">80.00</strong><em className="is-a">A</em></div>
+            <div><span>English</span><i className="is-d"><b style={{ width: "65%" }} /></i><strong className="is-d">65.00</strong><em className="is-d">D</em></div>
+          </div>
+          <span className="home-results-preview-note">Illustrative preview — click to search for a published result.</span>
+        </Link>
       </section>
 
       <section className="home-wrap home-intro">
@@ -196,40 +232,6 @@ export default function HomePage() {
 
       <section className="home-wrap home-community">
         <div className="home-events"><div className="home-events-head"><div className="home-small-heading"><span>Recent Events</span><h2>Latest Events</h2></div><Link className="home-btn home-btn-small" to="/events">View All Events <i className="bi bi-arrow-right" /></Link></div><div className="home-event-list">{events.map((event) => <article className="home-event" key={event.id}><div className="home-event-media"><HomeEventMedia event={event} /></div><time>{getDate(event.date || event.created_at)}</time><div><h3>{event.title}</h3><p>{event.description}</p></div></article>)}{events.length === 0 && <div className="home-empty-state">School events and activities will appear here.</div>}</div></div>
-        <aside className="home-popular-announcements" aria-labelledby="home-latest-announcement-title">
-          <div className="home-events-head">
-            <div className="home-small-heading"><span>School Updates</span><h2 id="home-latest-announcement-title">Latest Announcement</h2></div>
-            <Link className="home-btn home-btn-small" to="/announcements">All Notices <i className="bi bi-arrow-right" /></Link>
-          </div>
-          {latestAnnouncement ? (
-            <article className="home-announcement-card">
-              {announcementImage && (
-                <Link className="home-announcement-image" to="/announcements" aria-label={`Read ${latestAnnouncement.title}`}>
-                  <img src={mediaUrl(latestAnnouncement.image_path)} alt="" loading="lazy" />
-                  <span><i className="bi bi-megaphone" /> Latest notice</span>
-                </Link>
-              )}
-              <div className="home-announcement-content">
-                <div className="home-announcement-meta">
-                  {!announcementImage && <span className="home-announcement-icon"><i className="bi bi-megaphone" /></span>}
-                  <time dateTime={announcementDate || undefined}>{getDate(announcementDate)}</time>
-                </div>
-                <h3><Link to="/announcements">{latestAnnouncement.title}</Link></h3>
-                {announcementText && <p>{announcementText.slice(0, 220)}{announcementText.length > 220 ? "…" : ""}</p>}
-                {latestAnnouncement.image_path && !announcementImage && (
-                  <a className="home-announcement-attachment" href={mediaUrl(latestAnnouncement.image_path)} target="_blank" rel="noopener noreferrer">
-                    <i className="bi bi-file-earmark-text" />
-                    <span>{getAnnouncementFileName(latestAnnouncement.image_path)}</span>
-                    <i className="bi bi-box-arrow-up-right" />
-                  </a>
-                )}
-                <Link className="home-announcement-read" to="/announcements">Read full announcement <i className="bi bi-arrow-right" /></Link>
-              </div>
-            </article>
-          ) : (
-            <div className="home-empty-state">School announcements will appear here.</div>
-          )}
-        </aside>
       </section>
 
       <section className="home-gallery-strip"><div className="home-wrap"><div className="home-gallery-heading"><div className="home-small-heading"><span>Our Gallery</span><h2>Moments That Inspire</h2></div><Link to="/gallery">View All Photos <i className="bi bi-arrow-right" /></Link></div><div className="home-gallery-grid">{galleryImages.map((image) => <Link to="/gallery" key={image}><img src={image} alt="School life at Lycée Saint Alexandre Sauli" loading="lazy" /></Link>)}</div></div></section>
