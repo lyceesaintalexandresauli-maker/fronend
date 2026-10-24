@@ -4,39 +4,74 @@
 
 .ui-staff-filter-controls {
   display: grid;
-  grid-template-columns: minmax(0, 320px) minmax(180px, 220px) auto;
+  grid-template-columns: minmax(240px, 1.35fr) minmax(190px, 1fr) minmax(180px, 1fr) auto;
+  align-items: end;
+  gap: 12px;
+  padding: 13px 15px;
+  border: 1px solid #eee4d9;
+  border-radius: 14px;
+  background: #fbf7f1;
+  box-shadow: 0 7px 20px rgba(76, 48, 24, 0.07);
+}
+
+.ui-staff-filter-field {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+  margin: 0;
+  color: #4a392c;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.ui-staff-filter-field > span,
+.ui-staff-filter-label {
+  display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 7px;
+}
+
+.ui-staff-filter-label {
+  cursor: pointer;
+}
+
+.ui-staff-filter-field > span i,
+.ui-staff-filter-label i {
+  color: #b24d12;
+  font-size: 0.82rem;
 }
 
 .ui-staff-search-group {
   width: 100%;
   min-width: 0;
   flex-wrap: nowrap;
+  height: 38px;
 }
 
 .ui-staff-search-icon {
-  padding: 0 0.8rem;
-  border: 1px solid #d8dee7 !important;
+  padding: 0 0.65rem;
+  border: 1px solid #eadfd3 !important;
   border-right: 0 !important;
   border-radius: 8px 0 0 8px;
   background: #fff !important;
+  color: #8a7868;
 }
 
 .ui-staff-search-group .form-control {
   min-width: 0;
-  height: 40px;
-  border: 1px solid #d8dee7 !important;
+  height: 38px;
+  border: 1px solid #eadfd3 !important;
   border-left: 0 !important;
   border-radius: 0 8px 8px 0 !important;
   background: #fff !important;
   box-shadow: none !important;
-  font-size: 0.9rem;
+  color: #514235;
+  font-size: 0.74rem;
 }
 
 .ui-staff-search-group .form-control:focus {
-  border-color: #8aa7ce !important;
-  box-shadow: 0 0 0 3px rgba(66, 111, 208, 0.13) !important;
+  border-color: #c66a35 !important;
+  box-shadow: 0 0 0 3px rgba(178, 77, 18, 0.12) !important;
 }
 
 .ui-staff-search-group.has-clear .form-control {
@@ -45,18 +80,18 @@
 }
 
 .ui-staff-clear-search {
-  min-width: 40px;
-  border: 1px solid #d8dee7 !important;
+  min-width: 36px;
+  border: 1px solid #eadfd3 !important;
   border-left: 0 !important;
   border-radius: 0 8px 8px 0 !important;
-  background: #f4f6f9 !important;
-  color: #586371 !important;
+  background: #fff8ef !important;
+  color: #8a7868 !important;
 }
 
 .ui-staff-clear-search:hover,
 .ui-staff-clear-search:focus-visible {
-  background: #e8edf4 !important;
-  color: #27384c !important;
+  background: #f7eadb !important;
+  color: #71300f !important;
 }
 
 .ui-staff-department-wrap {
@@ -80,24 +115,58 @@
 
 .ui-staff-filter-controls .ui-staff-department-select {
   width: 100%;
-  min-height: 40px;
-  padding: 0.375rem 2.25rem 0.375rem 0.8rem;
-  border: 1px solid #d8dee7 !important;
+  height: 38px;
+  min-height: 38px;
+  padding: 0 2rem 0 0.7rem;
+  border: 1px solid #eadfd3 !important;
   border-radius: 8px;
   appearance: none !important;
   -webkit-appearance: none !important;
   background: #fff !important;
-  color: #364152;
-  font-size: 0.9rem;
+  color: #514235;
+  font-size: 0.74rem;
 }
 
 .ui-staff-filter-controls .ui-staff-department-select:focus {
-  border-color: #8aa7ce !important;
-  box-shadow: 0 0 0 3px rgba(66, 111, 208, 0.13) !important;
+  border-color: #c66a35 !important;
+  box-shadow: 0 0 0 3px rgba(178, 77, 18, 0.12) !important;
 }
 
 .ui-staff-clear-filters {
-  justify-self: start;
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 13px;
+  border: 0 !important;
+  border-radius: 8px;
+  background: #b24d12 !important;
+  color: #fff !important;
+  font-size: 0.72rem;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.ui-staff-clear-filters:hover:not(:disabled),
+.ui-staff-clear-filters:focus-visible:not(:disabled) {
+  background: #913b10 !important;
+  color: #fff !important;
+}
+
+.ui-staff-filter-summary-value {
+  display: flex;
+  height: 38px;
+  align-items: center;
+  padding: 0 11px;
+  overflow: hidden;
+  border: 1px solid #eadfd3;
+  border-radius: 8px;
+  background: #fff;
+  color: #7b6857;
+  font-size: 0.74rem;
+  font-weight: 500;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -320,6 +389,12 @@
   .ui-staff-body {
     padding-right: 15px;
     padding-left: 15px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .ui-staff-filter-controls {
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
   }
 }
 

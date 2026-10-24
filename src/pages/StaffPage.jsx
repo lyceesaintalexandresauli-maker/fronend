@@ -200,13 +200,16 @@ export default function StaffPage() {
       </div>
 
       <div className="container mb-4 ui-staff-filter-shell" data-aos="fade-up">
-        <div className="ui-staff-filter-controls">
+        <div className="ui-staff-filter-controls" aria-label="Filter staff">
+          <div className="ui-staff-filter-field">
+            <label htmlFor="staff-search" className="ui-staff-filter-label"><i className="bi bi-search" aria-hidden="true"></i> Search staff</label>
           <div className={`input-group ui-staff-search-group${searchTerm ? " has-clear" : ""}`}>
             <span className="input-group-text ui-staff-search-icon">
               <i className="bi bi-search text-muted"></i>
             </span>
             <input
               type="text"
+              id="staff-search"
               className="form-control"
               list="staff-search-options"
               placeholder="Search by name, position, or bio..."
@@ -241,8 +244,12 @@ export default function StaffPage() {
               </button>
             )}
           </div>
+          </div>
+          <div className="ui-staff-filter-field">
+            <label htmlFor="staff-department" className="ui-staff-filter-label"><i className="bi bi-funnel-fill" aria-hidden="true"></i> Department</label>
           <div className="ui-staff-department-wrap">
             <select
+              id="staff-department"
               className="form-select ui-staff-department-select"
               aria-label="Filter staff by department"
               value={filterDepartment}
@@ -256,17 +263,23 @@ export default function StaffPage() {
               ))}
             </select>
           </div>
-          {(searchTerm || filterDepartment !== "all") && (
-            <button
-              className="btn btn-outline-secondary btn-sm ui-staff-clear-filters"
-              onClick={() => {
-                setFilterDepartment("all");
-                setSearchTerm("");
-              }}
-            >
-              Clear all
-            </button>
-          )}
+          </div>
+          <div className="ui-staff-filter-field ui-staff-filter-summary" aria-live="polite">
+            <span><i className="bi bi-people-fill" aria-hidden="true"></i> Browse staff</span>
+            <div className="ui-staff-filter-summary-value">
+              {filteredStaff.length} {filteredStaff.length === 1 ? "staff member" : "staff members"} found
+            </div>
+          </div>
+          <button
+            className="btn ui-staff-clear-filters"
+            type="button"
+            onClick={() => {
+              setFilterDepartment("all");
+              setSearchTerm("");
+            }}
+          >
+            <i className="bi bi-arrow-counterclockwise" aria-hidden="true"></i> Clear filters
+          </button>
         </div>
       </div>
 
