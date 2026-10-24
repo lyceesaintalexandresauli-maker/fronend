@@ -654,10 +654,28 @@
   font-weight: 850;
 }
 
+.student-result-subject-grade-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .55rem;
+}
+
+.student-result-subject-rating {
+  color: #536577;
+  font-size: .82rem;
+  font-weight: 700;
+}
+
 .student-result-subject-grade.is-grade-a,
 .student-result-subject-grade.is-grade-b {
   border-color: #bee8dc;
   background: #effbf7;
+  color: #008b67;
+}
+
+.student-result-subject-rating.is-grade-a,
+.student-result-subject-rating.is-grade-b {
   color: #008b67;
 }
 
@@ -667,10 +685,128 @@
   color: #a76a00;
 }
 
+.student-result-subject-rating.is-grade-d {
+  color: #a76a00;
+}
+
 .student-result-subject-grade.is-grade-s {
   border-color: #ffd9c4;
   background: #fff6f0;
   color: #d94a16;
+}
+
+.student-result-subject-rating.is-grade-s {
+  color: #d94a16;
+}
+
+.student-result-card::before {
+  display: none;
+}
+
+.student-result-heading {
+  margin-bottom: 1.5rem;
+  padding: 0 0 1.35rem;
+}
+
+.student-result-session > span {
+  color: #617184;
+  font-size: 1rem;
+}
+
+.student-result-session h3 {
+  margin-top: .35rem;
+  font-size: 1.45rem;
+}
+
+.student-result-total {
+  min-width: 220px;
+  gap: .35rem;
+}
+
+.student-result-total strong {
+  color: #a6440e;
+  font-size: clamp(2rem, 3vw, 2.4rem);
+}
+
+.student-result-total small {
+  font-size: 1rem;
+}
+
+.student-result-overall-rating,
+.student-result-position {
+  color: #617184;
+  font-size: .95rem;
+}
+
+.student-result-subjects {
+  max-width: 100%;
+  margin-top: 0;
+}
+
+.student-result-subjects-heading {
+  padding-right: 0;
+  padding-left: 0;
+}
+
+.student-result-table {
+  min-width: 760px;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+.student-result-table th,
+.student-result-table td {
+  padding: .9rem .65rem;
+  border-radius: 0 !important;
+  border-bottom: 1px solid #e7edf2;
+  background: transparent;
+}
+
+.student-result-table th:first-child,
+.student-result-table td:first-child {
+  width: 28%;
+}
+
+.student-result-table th:nth-child(2),
+.student-result-table td:nth-child(2),
+.student-result-table th:nth-child(3),
+.student-result-table td:nth-child(3) {
+  width: 12%;
+  text-align: right;
+}
+
+.student-result-table th:nth-child(4),
+.student-result-table td:nth-child(4) {
+  width: 30%;
+}
+
+.student-result-table th:last-child,
+.student-result-table td:last-child {
+  width: 18%;
+}
+
+.student-result-table td {
+  color: #34495e;
+  font-size: 1rem;
+}
+
+.student-result-subject-score {
+  justify-content: flex-start;
+  gap: .75rem;
+}
+
+.student-result-subject-score > span {
+  flex: 1 1 8rem;
+  max-width: 10.5rem;
+}
+
+.student-result-subject-score strong {
+  min-width: 4rem;
+  font-size: .9rem;
+}
+
+.student-result-subject-grade-wrap {
+  justify-content: flex-start;
 }
 
 .student-result-remarks {
@@ -725,6 +861,15 @@
 
   .student-result-total small {
     text-align: left;
+  }
+
+  .student-result-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .student-result-total {
+    justify-items: start;
   }
 
   .student-result-subject-score {

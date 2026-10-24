@@ -98,71 +98,21 @@ function ResultCard({ result }) {
   const totalScore = subjects.reduce((sum, subject) => sum + number(subject.score), 0);
   const totalMaximum = subjects.reduce((sum, subject) => sum + number(subject.max_score), 0);
   const percentage = totalMaximum ? (totalScore / totalMaximum) * 100 : null;
-  const passed = percentage !== null && percentage >= 70;
 
   return (
     <article className="student-result-card">
-      <div className={`student-result-banner${passed ? " is-passed" : " is-failed"}`}>
-        <div className="student-result-ring-wrap">
-          <div className="student-result-ring" style={{ "--result-progress": `${Math.min(percentage || 0, 100)}%` }}>
-            <div>
-              <strong>{percentage === null ? "—" : percentage.toFixed(2)}<small>%</small></strong>
-              <span>OVERALL</span>
-            </div>
-          </div>
-        </div>
-        <div className="student-result-candidate">
-          <span className="student-result-kicker">CANDIDATE</span>
-          <h2>{result.student_name}</h2>
-          <p>
-            {result.student_code && <span>{result.student_code}</span>}
-            <span>{result.academic_year}</span>
-            <span>{programNames[result.program_code] || result.program_code} · {getLevelLabel(result.class_level)}</span>
-            {result.position && <span>Class position: {formatPosition(result.position)}</span>}
-          </p>
-          <span className={`student-result-status${passed ? " is-passed" : " is-failed"}`}>
-            <i className={`bi ${passed ? "bi-check-circle-fill" : "bi-info-circle-fill"}`} />
-            {passed ? "PASS" : percentage === null ? "NO MARKS" : "NEEDS IMPROVEMENT"}
-          </span>
-        </div>
-        <div className={`student-result-congratulations${passed ? " is-passed" : " is-failed"}`}>
-          <span className={`student-result-check${passed ? " is-passed" : " is-failed"}`}>
-            <i className={`bi ${passed ? "bi-check-lg" : "bi-arrow-up"}`} />
-          </span>
-          <div>
-            <strong>{passed ? "Congratulations — you passed!" : "Keep working toward your goal"}</strong>
-            <p>
-              {passed
-                ? `Your ${getGrade(percentage)} result qualifies you for promotion consideration. View your subject marks and print this report below.`
-                : percentage === null
-                  ? "Subject results have not been entered yet. Please contact the school if you expected to see your marks."
-                  : "Review your subject marks below and speak with your teacher about how to improve your average."}
-            </p>
-          </div>
-        </div>
-      </div>
-      <div className="student-result-heading">
-        <div>
-          <span className="student-result-kicker">OFFICIAL STUDENT REPORT</span>
+      <header className="student-result-heading">
+        <div className="student-result-session">
+          <span>{programNames[result.program_code] || result.program_code} · {getLevelLabel(result.class_level)}</span>
           <h3>{result.academic_year} · {result.term}</h3>
         </div>
         <div className="student-result-total">
-          <span>AVERAGE · {getGrade(percentage)}</span>
           <strong>{percentage === null ? "—" : `${percentage.toFixed(1)}%`}</strong>
           <small>{totalScore.toFixed(2)} / {totalMaximum.toFixed(2)} total marks</small>
+          <span className="student-result-overall-rating">{getGrade(percentage)}</span>
+          {result.position && <span className="student-result-position">Position: {formatPosition(result.position)}</span>}
         </div>
-      </div>
-
-      <div className="student-result-overview">
-        <div className="student-result-overview-heading">
-          <span>Overall average</span>
-          <strong>{percentage === null ? "No marks entered" : `${percentage.toFixed(1)}%`}</strong>
-        </div>
-        <div className="student-result-progress" role="progressbar" aria-label="Overall average" aria-valuemin="0" aria-valuemax="100" aria-valuenow={Math.min(percentage || 0, 100)}>
-          <span style={{ width: `${Math.min(percentage || 0, 100)}%` }} />
-        </div>
-        <small>{totalScore.toFixed(2)} out of {totalMaximum.toFixed(2)} total marks</small>
-      </div>
+      </header>
 
       <section className="student-result-subjects" aria-label="Subject results">
         <div className="student-result-subjects-heading">
@@ -170,39 +120,47 @@ function ResultCard({ result }) {
           <span>{subjects.length} {subjects.length === 1 ? "subject" : "subjects"}</span>
         </div>
         <div className="student-result-table-wrap">
-        <table className="student-result-table">
-          <thead><tr><th>Subject</th><th>Score (%)</th><th>Grade</th></tr></thead>
-          <tbody>
-            {subjects.map((subject) => {
-              const score = number(subject.score);
-              const maximum = number(subject.max_score);
-              const subjectPercentage = maximum ? (score / maximum) * 100 : null;
-              const subjectGrade = getSubjectGrade(subjectPercentage);
-              const gradeClass = subjectGrade === "—" ? "ungraded" : subjectGrade.toLowerCase();
-              return (
-                <tr key={subject.id || subject.subject_name}>
-                  <td>{subject.subject_name}</td>
-                  <td>
-                    <div className={`student-result-subject-score is-grade-${gradeClass}`}>
-                      <span
-                        role="progressbar"
-                        aria-label={`${subject.subject_name} score`}
-                        aria-valuemin="0"
-                        aria-valuemax="100"
-                        aria-valuenow={Math.min(subjectPercentage || 0, 100)}
-                      >
-                        <i style={{ width: `${Math.min(subjectPercentage || 0, 100)}%` }} />
-                      </span>
-                      <strong>{subjectPercentage === null ? "—" : `${subjectPercentage.toFixed(2)}%`}</strong>
-                    </div>
-                  </td>
-                  <td><span className={`student-result-subject-grade is-grade-${gradeClass}`}>{subjectGrade}</span></td>
-                </tr>
-              );
-            })}
-            {subjects.length === 0 && <tr><td colSpan={3}>No subject marks are available for this result.</td></tr>}
-          </tbody>
-        </table>
+          <table className="student-result-table">
+            <thead><tr><th>Subject</th><th>Marks</th><th>Out of</th><th>Percentage</th><th>Grade</th></tr></thead>
+            <tbody>
+              {subjects.map((subject) => {
+                const score = number(subject.score);
+                const maximum = number(subject.max_score);
+                const subjectPercentage = maximum ? (score / maximum) * 100 : null;
+                const subjectGrade = getSubjectGrade(subjectPercentage);
+                const subjectRating = getGrade(subjectPercentage);
+                const gradeClass = subjectGrade === "—" ? "ungraded" : subjectGrade.toLowerCase();
+                return (
+                  <tr key={subject.id || subject.subject_name}>
+                    <td>{subject.subject_name}</td>
+                    <td>{score.toFixed(2)}</td>
+                    <td>{maximum.toFixed(2)}</td>
+                    <td>
+                      <div className={`student-result-subject-score is-grade-${gradeClass}`}>
+                        <span
+                          role="progressbar"
+                          aria-label={`${subject.subject_name} score`}
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                          aria-valuenow={Math.min(subjectPercentage || 0, 100)}
+                        >
+                          <i style={{ width: `${Math.min(subjectPercentage || 0, 100)}%` }} />
+                        </span>
+                        <strong>{subjectPercentage === null ? "—" : `${subjectPercentage.toFixed(1)}%`}</strong>
+                      </div>
+                    </td>
+                    <td>
+                      <div className="student-result-subject-grade-wrap">
+                        <span className={`student-result-subject-grade is-grade-${gradeClass}`}>{subjectGrade}</span>
+                        <span className={`student-result-subject-rating is-grade-${gradeClass}`}>{subjectRating}</span>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+              {subjects.length === 0 && <tr><td colSpan={5}>No subject marks are available for this result.</td></tr>}
+            </tbody>
+          </table>
         </div>
       </section>
 
