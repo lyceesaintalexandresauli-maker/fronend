@@ -58,7 +58,7 @@ function HomeEventMedia({ event }) {
   const video = getEventVideo(event);
   const audio = getEventAudio(event);
   if (video) {
-    return <video className="home-event-video" controls preload="metadata" src={mediaUrl(video)}>Your browser does not support video playback.</video>;
+    return <video className="home-event-video" controls playsInline preload="metadata" src={mediaUrl(video)}>Your browser does not support video playback.</video>;
   }
   if (audio) {
     return <div className="home-event-audio"><i className="bi bi-soundwave" /><audio controls preload="metadata" src={mediaUrl(audio)}>Your browser does not support audio playback.</audio></div>;
@@ -190,32 +190,6 @@ export default function HomePage() {
 
       <section className="home-wrap home-shortcuts" aria-label="Quick links">
         {quickLinks.map(([icon, title, description, href, action]) => <Link className="home-shortcut-card" to={href} key={title}><span><i className={`bi ${icon}`} /></span><h2>{title}</h2><p>{description}</p><b>{action} <i className="bi bi-arrow-right" /></b></Link>)}
-      </section>
-
-      <section className="home-wrap home-results-promo" aria-labelledby="home-results-promo-title">
-        <div className="home-results-copy">
-          <span>For students and families</span>
-          <h2 id="home-results-promo-title">View student results</h2>
-          <p>Look up published marks and see each subject score in a clear report.</p>
-          <Link className="home-btn" to="/results">Get Result <i className="bi bi-arrow-right" /></Link>
-        </div>
-        <Link className="home-results-preview" to="/results" aria-label="Open Student Results lookup. Preview shows example marks only.">
-          <div className="home-results-preview-top">
-            <div>
-              <span className="home-results-preview-label">EXAMPLE REPORT · NOT A REAL STUDENT</span>
-              <h3>Student Results</h3>
-            </div>
-            <div className="home-results-ring" role="img" aria-label="Example overall score: 70.56 percent">
-              <span><strong>70.56<small>%</small></strong><b>OVERALL</b></span>
-            </div>
-          </div>
-          <div className="home-results-preview-list" aria-hidden="true">
-            <div><span>Biology and Health Sciences</span><i className="is-d"><b style={{ width: "68%" }} /></i><strong className="is-d">68.00</strong><em className="is-d">D</em></div>
-            <div><span>Chemistry</span><i className="is-a"><b style={{ width: "80%" }} /></i><strong className="is-a">80.00</strong><em className="is-a">A</em></div>
-            <div><span>English</span><i className="is-d"><b style={{ width: "65%" }} /></i><strong className="is-d">65.00</strong><em className="is-d">D</em></div>
-          </div>
-          <span className="home-results-preview-note">Illustrative preview — click to search for a published result.</span>
-        </Link>
       </section>
 
       <section className="home-wrap home-intro">
