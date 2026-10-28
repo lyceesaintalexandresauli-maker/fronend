@@ -19,6 +19,7 @@ const departmentPrograms = [
 ];
 
 const departmentMenu = { id: "departments-menu", label: "Departments", href: null, children: departmentPrograms };
+const documentsLink = { id: "documents", label: "Documents", href: "/documents", children: [] };
 const tradePaths = new Set(["/fad", "/acc", "/sod", "/csa", "/nit"]);
 
 const fallbackNavigation = [
@@ -31,6 +32,7 @@ const fallbackNavigation = [
     children: [],
   },
   { id: 15, label: "Time Tables", href: "/timetables", children: [] },
+  { id: 16, label: "Documents", href: "/documents", children: [] },
   { id: 4, label: "Staff", href: "/trainers", children: [] },
   { id: 5, label: "Events", href: "/events", children: [] },
   { id: 6, label: "Announcements", href: "/anouncement", children: [] },
@@ -42,6 +44,10 @@ const withTradeLinks = (items) => {
   const cleanNavigation = (Array.isArray(items) ? items : []).filter((item) =>
     !tradePaths.has(item?.href) && !["departments", "trades"].includes(item?.label?.trim().toLowerCase())
   );
+  if (!cleanNavigation.some((item) => item?.href === documentsLink.href || item?.label?.trim().toLowerCase() === "documents")) {
+    const contactIndex = cleanNavigation.findIndex((item) => item?.label?.trim().toLowerCase() === "contact");
+    cleanNavigation.splice(contactIndex < 0 ? cleanNavigation.length : contactIndex, 0, documentsLink);
+  }
   const contactIndex = cleanNavigation.findIndex((item) => item?.label?.trim().toLowerCase() === "contact");
   cleanNavigation.splice(contactIndex < 0 ? cleanNavigation.length : contactIndex, 0, departmentMenu);
   return cleanNavigation;

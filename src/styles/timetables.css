@@ -1,4 +1,4 @@
-/* Timetables Page Styles - Matching Cadeau Design */
+/* Timetables Page Styles */
 
 .timetable-app {
   min-height: 100vh;
@@ -739,7 +739,7 @@
   }
 }
 
-/* Enhanced Chat Styles - Like Cadeau */
+/* Conversation panel styles */
 .chat-tab-content-full {
   height: calc(100vh - 180px);
   padding: 0;

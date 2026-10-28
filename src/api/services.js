@@ -34,6 +34,11 @@ export const announcementsAPI = {
   delete: (id) => api.delete(`/announcements/${id}`),
 };
 
+export const documentsAPI = {
+  getPublic: () => api.get('/uploads/public/documents'),
+  getDownloadUrl: (id) => `${api.defaults.baseURL}/uploads/public/documents/${id}/download`,
+};
+
 // Staff API
 export const staffAPI = {
   getAll: () => api.get('/staff'),
