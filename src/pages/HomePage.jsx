@@ -64,7 +64,7 @@ function HomeEventMedia({ event }) {
     return <div className="home-event-audio"><i className="bi bi-soundwave" /><audio controls preload="metadata" src={mediaUrl(audio)}>Your browser does not support audio playback.</audio></div>;
   }
   if (event.image_path) {
-    return <img src={mediaUrl(event.image_path)} alt="" loading="lazy" />;
+    return <img src={(event.image_data || event.image_path || "").startsWith("data:") ? (event.image_data || event.image_path) : mediaUrl(event.image_data || event.image_path)} alt={event.title || "School event"} loading="lazy" />;
   }
   return <span className="home-event-placeholder"><i className="bi bi-calendar-event" /></span>;
 }
@@ -124,7 +124,10 @@ export default function HomePage() {
     ]).then(([eventRes, departmentRes, contentRes]) => {
       if (!active) return;
       const newestFirst = (items, dateKey = "created_at") => [...(items || [])].sort((a, b) => new Date(b[dateKey] || b.created_at || 0) - new Date(a[dateKey] || a.created_at || 0));
-      setEvents(newestFirst(eventRes.data, "date").slice(0, 3));
+      let localEvents = [];
+      try { localEvents = JSON.parse(window.localStorage.getItem("school_frontend_events_v1") || "[]"); } catch { localEvents = []; }
+      const mergedEvents = [...localEvents, ...(eventRes.data || []).filter((event) => !localEvents.some((local) => String(local.id) === String(event.id)))];
+      setEvents(newestFirst(mergedEvents, "date").slice(0, 3));
       setDepartments(departmentRes.data || []);
       setContent(contentRes.data || {});
     });

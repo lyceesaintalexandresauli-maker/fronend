@@ -22,6 +22,7 @@ const TimetablesPage = lazy(() => import("./pages/TimetablesPage"));
 const GalleryPage = lazy(() => import("./pages/GalleryPage"));
 const StudentResultsPage = lazy(() => import("./pages/StudentResultsPage"));
 const DocumentsPage = lazy(() => import("./pages/DocumentsPage"));
+const AdminWorkspace = lazy(() => import("./pages/AdminWorkspace"));
 
 
 
@@ -40,8 +41,8 @@ export default function App() {
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/login" element={<Navigate to="/results" replace />} />
           <Route path="/results" element={<StudentResultsPage />} />
-          <Route element={<ProtectedRoute roles={["admin", "teacher", "secretary"]} />}>
-           
+          <Route element={<ProtectedRoute roles={["admin"]} />}>
+            <Route path="/admin/workspace" element={<AdminWorkspace />} />
           </Route>
 
         <Route path="/about" element={<AboutPage />} />

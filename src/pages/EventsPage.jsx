@@ -171,7 +171,7 @@ function EventVideoPlayer({ event, className }) {
       controls
       playsInline
       preload="metadata"
-      poster={event.image_path ? mediaUrl(event.image_path) : undefined}
+      poster={(event.image_data || event.image_path) ? ((event.image_data || event.image_path).startsWith("data:") ? (event.image_data || event.image_path) : mediaUrl(event.image_data || event.image_path)) : undefined}
       src={mediaUrl(videoUrl)}
     >
       Your browser does not support video playback.
@@ -217,7 +217,11 @@ export default function EventsPage() {
         loadingRequest = false;
       }
       if (alive && typeof nextEvents !== "undefined") {
-        setEvents(nextEvents);
+        // Browser-only events are additive: keep all existing API/Supabase records intact.
+        let localEvents = [];
+        try { localEvents = JSON.parse(window.localStorage.getItem("school_frontend_events_v1") || "[]"); } catch { localEvents = []; }
+        const localIds = new Set(localEvents.map((event) => String(event.id)));
+        setEvents([...localEvents, ...(nextEvents || []).filter((event) => !localIds.has(String(event.id)))]);
         setError(null);
       }
     };
@@ -389,7 +393,7 @@ export default function EventsPage() {
                     {hasVideo
                       ? <EventVideoPlayer event={event} className="event-card-video-wrap" />
                       : event.image_path
-                        ? <img src={mediaUrl(event.image_path)} alt={event.title} loading="lazy" decoding="async" />
+                        ? <img src={(event.image_data || event.image_path || "").startsWith("data:") ? (event.image_data || event.image_path) : mediaUrl(event.image_data || event.image_path)} alt={event.title} loading="lazy" decoding="async" />
                         : <span className="event-image-placeholder"><i className={`bi ${getEventAudioUrl(event) ? "bi-soundwave" : "bi-calendar-event"}`} /></span>}
                     <span className="event-date-badge"><b>{Number.isNaN(eventDate.getTime()) ? "-" : String(eventDate.getDate()).padStart(2, "0")}</b><small>{Number.isNaN(eventDate.getTime()) ? "Date" : eventDate.toLocaleDateString("en-US", { month: "short", year: "numeric" })}</small></span>
                     <span className="event-category">{event.category || "General"}</span>
