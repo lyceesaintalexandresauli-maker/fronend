@@ -1,6 +1,7 @@
 import axios from "axios";
 
 const LOCAL_API_BASE_URL = "http://localhost:5000";
+const DEFAULT_REMOTE_API_BASE_URL = "https://muhura-backend.onrender.com";
 const LOCAL_API_ORIGINS = new Set(["http://localhost:5000", "http://127.0.0.1:5000"]);
 
 const trimTrailingSlash = (value = "") => String(value).replace(/\/+$/, "");
@@ -16,7 +17,7 @@ const resolveApiBaseUrl = () => {
   if (isLocalFrontend()) {
     return LOCAL_API_BASE_URL;
   }
-  return "";
+  return DEFAULT_REMOTE_API_BASE_URL;
 };
 
 const resolveAssetsBaseUrl = (apiBaseUrl) => {
