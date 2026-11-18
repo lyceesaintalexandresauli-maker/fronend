@@ -203,21 +203,34 @@ export default function EventsPage() {
       let nextEvents;
       try {
         if (!hasLoaded && alive) setLoading(true);
+        let supabaseEvents = [];
+        let backendEvents = [];
         if (isSupabaseConfigured()) {
           try {
-            nextEvents = await fetchAllEventsFromSupabase();
+            supabaseEvents = await fetchAllEventsFromSupabase();
           } catch (supabaseError) {
-            console.warn("Supabase event read failed; trying the configured events API.", supabaseError);
-            nextEvents = [];
+            console.warn("Supabase event read failed; using the configured events API.", supabaseError);
           }
-          if (!nextEvents.length) {
-            const res = await eventsAPI.getAll();
-            const backendEvents = Array.isArray(res.data) ? res.data : (res.data?.data || []);
-            if (backendEvents.length) nextEvents = backendEvents;
-          }
-        } else {
+        }
+        try {
           const res = await eventsAPI.getAll();
-          nextEvents = Array.isArray(res.data) ? res.data : (res.data?.data || []);
+          backendEvents = Array.isArray(res.data) ? res.data : (res.data?.data || []);
+        } catch (backendError) {
+          if (!supabaseEvents.length) throw backendError;
+          console.warn("Backend event read failed; showing Supabase events.", backendError);
+        }
+        if (isSupabaseConfigured()) {
+          const mergedByKey = new Map();
+          for (const event of supabaseEvents) {
+            mergedByKey.set(event.id != null ? `id:${event.id}` : `${event.title || event.name}:${event.date || event.created_at}`, event);
+          }
+          for (const event of backendEvents) {
+            const key = event.id != null ? `id:${event.id}` : `${event.title || event.name}:${event.date || event.created_at}`;
+            mergedByKey.set(key, { ...mergedByKey.get(key), ...event });
+          }
+          nextEvents = [...mergedByKey.values()];
+        } else {
+          nextEvents = backendEvents;
         }
       } catch (err) {
         console.error("Error loading events:", err);

@@ -41,7 +41,7 @@ export default function App() {
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/login" element={<Navigate to="/results" replace />} />
           <Route path="/results" element={<StudentResultsPage />} />
-          <Route element={<ProtectedRoute roles={["admin", "teacher", "secretary"]} />}>
+          <Route element={<ProtectedRoute roles={["admin"]} />}>
             <Route path="/admin/events/new" element={<EventUploadPage />} />
             <Route path="/admin/events" element={<EventUploadPage />} />
           </Route>

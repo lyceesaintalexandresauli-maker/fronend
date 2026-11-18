@@ -18,7 +18,7 @@ export const contentAPI = {
 
 // Events API
 export const eventsAPI = {
-  getAll: () => api.get('/events'),
+  getAll: () => api.get('/events', { params: { limit: 50 } }),
   getById: (id) => api.get(`/events/${id}`),
   create: (data) => api.post('/events', data),
   update: (id, data) => api.put(`/events/${id}`, data),
