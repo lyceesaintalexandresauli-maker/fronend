@@ -11,6 +11,7 @@ export async function fetchAllEventsFromSupabase() {
     const { data, error } = await supabase
       .from("events")
       .select("*")
+      .order("date", { ascending: false, nullsFirst: false })
       .range(offset, offset + PAGE_SIZE - 1);
 
     if (error) throw error;

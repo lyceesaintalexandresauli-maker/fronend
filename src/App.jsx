@@ -22,6 +22,7 @@ const TimetablesPage = lazy(() => import("./pages/TimetablesPage"));
 const GalleryPage = lazy(() => import("./pages/GalleryPage"));
 const StudentResultsPage = lazy(() => import("./pages/StudentResultsPage"));
 const DocumentsPage = lazy(() => import("./pages/DocumentsPage"));
+const EventUploadPage = lazy(() => import("./pages/EventUploadPage"));
 
 
 
@@ -41,7 +42,8 @@ export default function App() {
           <Route path="/login" element={<Navigate to="/results" replace />} />
           <Route path="/results" element={<StudentResultsPage />} />
           <Route element={<ProtectedRoute roles={["admin", "teacher", "secretary"]} />}>
-           
+            <Route path="/admin/events/new" element={<EventUploadPage />} />
+            <Route path="/admin/events" element={<EventUploadPage />} />
           </Route>
 
         <Route path="/about" element={<AboutPage />} />

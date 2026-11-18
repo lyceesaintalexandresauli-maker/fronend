@@ -13,6 +13,7 @@ const toLocalDateValue = (date) => {
   return `${year}-${month}-${day}`;
 };
 
+const getEventImageUrl = (event) => event?.image_path || event?.image_url || event?.image || event?.cover_image || null;
 const getEventVideoUrl = (event) => {
   if (!event) return null;
   return event.video_url || event.video_path || event.video || event.media_url || null;
@@ -171,7 +172,7 @@ function EventVideoPlayer({ event, className }) {
       controls
       playsInline
       preload="metadata"
-      poster={event.image_path ? mediaUrl(event.image_path) : undefined}
+        poster={getEventImageUrl(event) ? mediaUrl(getEventImageUrl(event)) : undefined}
       src={mediaUrl(videoUrl)}
     >
       Your browser does not support video playback.
@@ -203,10 +204,20 @@ export default function EventsPage() {
       try {
         if (!hasLoaded && alive) setLoading(true);
         if (isSupabaseConfigured()) {
-          nextEvents = await fetchAllEventsFromSupabase();
+          try {
+            nextEvents = await fetchAllEventsFromSupabase();
+          } catch (supabaseError) {
+            console.warn("Supabase event read failed; trying the configured events API.", supabaseError);
+            nextEvents = [];
+          }
+          if (!nextEvents.length) {
+            const res = await eventsAPI.getAll();
+            const backendEvents = Array.isArray(res.data) ? res.data : (res.data?.data || []);
+            if (backendEvents.length) nextEvents = backendEvents;
+          }
         } else {
           const res = await eventsAPI.getAll();
-          nextEvents = res.data || [];
+          nextEvents = Array.isArray(res.data) ? res.data : (res.data?.data || []);
         }
       } catch (err) {
         console.error("Error loading events:", err);
@@ -217,7 +228,15 @@ export default function EventsPage() {
         loadingRequest = false;
       }
       if (alive && typeof nextEvents !== "undefined") {
-        setEvents(nextEvents);
+        setEvents(Array.isArray(nextEvents) ? nextEvents.map((event) => ({
+          ...event,
+          title: event.title || event.name || "School event",
+          date: event.date || event.event_date || event.start_date || event.created_at,
+          category: event.category || event.event_type || event.type || "General",
+          image_path: getEventImageUrl(event),
+          video_url: getEventVideoUrl(event),
+          audio_url: getEventAudioUrl(event),
+        })) : []);
         setError(null);
       }
     };
@@ -342,8 +361,8 @@ export default function EventsPage() {
             {(() => {
               const videoUrl = getEventVideoUrl(selectedEvent);
               if (videoUrl) return <EventVideoPlayer event={selectedEvent} className="events-detail-video-wrap" />;
-              if (selectedEvent.image_path) {
-                return <img src={mediaUrl(selectedEvent.image_path)} alt={selectedEvent.title} />;
+              if (getEventImageUrl(selectedEvent)) {
+                return <img src={mediaUrl(getEventImageUrl(selectedEvent))} alt={selectedEvent.title} />;
               }
               return <div className="events-detail-image-empty"><i className="bi bi-calendar-event" /></div>;
             })()}
@@ -388,8 +407,8 @@ export default function EventsPage() {
                   <div className={`event-image-button${hasVideo ? " has-event-video" : ""}`} aria-label={event.title}>
                     {hasVideo
                       ? <EventVideoPlayer event={event} className="event-card-video-wrap" />
-                      : event.image_path
-                        ? <img src={mediaUrl(event.image_path)} alt={event.title} loading="lazy" decoding="async" />
+                      : getEventImageUrl(event)
+                        ? <img src={mediaUrl(getEventImageUrl(event))} alt={event.title} loading="lazy" decoding="async" />
                         : <span className="event-image-placeholder"><i className={`bi ${getEventAudioUrl(event) ? "bi-soundwave" : "bi-calendar-event"}`} /></span>}
                     <span className="event-date-badge"><b>{Number.isNaN(eventDate.getTime()) ? "-" : String(eventDate.getDate()).padStart(2, "0")}</b><small>{Number.isNaN(eventDate.getTime()) ? "Date" : eventDate.toLocaleDateString("en-US", { month: "short", year: "numeric" })}</small></span>
                     <span className="event-category">{event.category || "General"}</span>
