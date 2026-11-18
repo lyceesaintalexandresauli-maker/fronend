@@ -4,6 +4,7 @@ import { eventsAPI } from "../api/services";
 import Seo from "../components/Seo";
 import { fetchAllEventsFromSupabase } from "../api/supabaseEvents";
 import { isSupabaseConfigured } from "../supabase";
+import SafeImage from "../components/SafeImage";
 import "./EventsPage.css";
 
 const toLocalDateValue = (date) => {
@@ -13,7 +14,10 @@ const toLocalDateValue = (date) => {
   return `${year}-${month}-${day}`;
 };
 
-const getEventImageUrl = (event) => event?.image_path || event?.image_url || event?.image || event?.cover_image || null;
+const getEventImageUrl = (event) => {
+  const image = event?.image_path || event?.image_url || event?.image || event?.cover_image || event?.image_data || event?.photo || event?.thumbnail_url || null;
+  return typeof image === "object" && image !== null ? image.url || image.path || null : image;
+};
 const getEventVideoUrl = (event) => {
   if (!event) return null;
   return event.video_url || event.video_path || event.video || event.media_url || null;
@@ -375,7 +379,7 @@ export default function EventsPage() {
               const videoUrl = getEventVideoUrl(selectedEvent);
               if (videoUrl) return <EventVideoPlayer event={selectedEvent} className="events-detail-video-wrap" />;
               if (getEventImageUrl(selectedEvent)) {
-                return <img src={mediaUrl(getEventImageUrl(selectedEvent))} alt={selectedEvent.title} />;
+                return <SafeImage key={getEventImageUrl(selectedEvent)} className="events-detail-photo" style={{ width: "100%", height: "100%", objectFit: "cover" }} src={getEventImageUrl(selectedEvent)} alt={selectedEvent.title} fallbackText="Event image unavailable" />;
               }
               return <div className="events-detail-image-empty"><i className="bi bi-calendar-event" /></div>;
             })()}
@@ -421,7 +425,7 @@ export default function EventsPage() {
                     {hasVideo
                       ? <EventVideoPlayer event={event} className="event-card-video-wrap" />
                       : getEventImageUrl(event)
-                        ? <img src={mediaUrl(getEventImageUrl(event))} alt={event.title} loading="lazy" decoding="async" />
+                        ? <SafeImage key={getEventImageUrl(event)} className="event-card-photo" style={{ width: "100%", height: "100%", objectFit: "cover" }} src={getEventImageUrl(event)} alt={event.title} fallbackText="Event image unavailable" />
                         : <span className="event-image-placeholder"><i className={`bi ${getEventAudioUrl(event) ? "bi-soundwave" : "bi-calendar-event"}`} /></span>}
                     <span className="event-date-badge"><b>{Number.isNaN(eventDate.getTime()) ? "-" : String(eventDate.getDate()).padStart(2, "0")}</b><small>{Number.isNaN(eventDate.getTime()) ? "Date" : eventDate.toLocaleDateString("en-US", { month: "short", year: "numeric" })}</small></span>
                     <span className="event-category">{event.category || "General"}</span>

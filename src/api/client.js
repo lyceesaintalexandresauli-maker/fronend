@@ -114,6 +114,11 @@ export const mediaUrl = (inputPath) => {
     return `${base}/${uploadPath.replace(/^\//, "")}`;
   }
 
+  // Backend upload responses from older admin builds may omit the /uploads prefix.
+  if (/^(images|videos|audio|documents)\//i.test(uploadPath)) {
+    return `${base}/uploads/${uploadPath}`;
+  }
+
   // Handle /assets paths - these may be served separately
   if (uploadPath.startsWith("/assets/")) return `${ASSETS_BASE_URL}${uploadPath}`;
   if (uploadPath.startsWith("assets/")) return `${ASSETS_BASE_URL}/${uploadPath}`;
