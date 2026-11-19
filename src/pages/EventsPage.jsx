@@ -26,10 +26,17 @@ const getEventAudioUrl = (event) => event?.audio_url || event?.audio_path || eve
 const LOCAL_ITORERO_VIDEO_URL = "/videos/itorero-icyeza-lycee-saint-alexandre-sauli.mp4";
 const LOCAL_ITORERO_EVENT = {
   id: "local-itorero-video",
-  title: "Itorero Icyeza rya Lycee Saint Alexandre Maria Sauli Ribinyiye Ababyeyi Baratanga!",
+  title: "this video was taken during the parent meeting with our staff and enjoyed with participating with our traditional dance!",
   category: "School video",
   description: "A video from Lycee Saint Alexandre Sauli de Muhura.",
   video_url: LOCAL_ITORERO_VIDEO_URL,
+};
+const LOCAL_CULTURAL_EVENT = {
+  id: "local-cultural-performance",
+  title: "This image was taken during the school meeting on 08 /11/2026 the parent enjoyed with icyeza traditional dance to paticipate in front of our parent ",
+  category: "Cultural performance",
+  description: "Students share a traditional cultural dance at a school gathering.",
+  image_path: "/assets/img/events/itorero-cultural-performance.png",
 };
 const isItoreroEvent = (event) => String(event?.title || event?.name || "")
   .toLocaleLowerCase()
@@ -196,7 +203,7 @@ function EventVideoPlayer({ event, className }) {
 }
 
 export default function EventsPage() {
-  const [events, setEvents] = useState([LOCAL_ITORERO_EVENT]);
+  const [events, setEvents] = useState([LOCAL_ITORERO_EVENT, LOCAL_CULTURAL_EVENT]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filterDate, setFilterDate] = useState("");
@@ -266,6 +273,9 @@ export default function EventsPage() {
           audio_url: getEventAudioUrl(event),
         })) : [];
         if (!normalizedEvents.some(isItoreroEvent)) normalizedEvents.push(LOCAL_ITORERO_EVENT);
+        if (!normalizedEvents.some((event) => event.id === LOCAL_CULTURAL_EVENT.id || event.title === LOCAL_CULTURAL_EVENT.title)) {
+          normalizedEvents.push(LOCAL_CULTURAL_EVENT);
+        }
         setEvents(normalizedEvents);
         setError(null);
       }
