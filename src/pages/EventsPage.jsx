@@ -23,6 +23,17 @@ const getEventVideoUrl = (event) => {
   return event.video_url || event.video_path || event.video || event.media_url || null;
 };
 const getEventAudioUrl = (event) => event?.audio_url || event?.audio_path || event?.audio || null;
+const LOCAL_ITORERO_VIDEO_URL = "/videos/itorero-icyeza-lycee-saint-alexandre-sauli.mp4";
+const LOCAL_ITORERO_EVENT = {
+  id: "local-itorero-video",
+  title: "Itorero Icyeza rya Lycee Saint Alexandre Maria Sauli Ribinyiye Ababyeyi Baratanga!",
+  category: "School video",
+  description: "A video from Lycee Saint Alexandre Sauli de Muhura.",
+  video_url: LOCAL_ITORERO_VIDEO_URL,
+};
+const isItoreroEvent = (event) => String(event?.title || event?.name || "")
+  .toLocaleLowerCase()
+  .includes("itorero icyeza");
 
 const normalizeEventType = (value) => String(value || "General").trim().replace(/\s+/g, " ");
 
@@ -175,8 +186,8 @@ function EventVideoPlayer({ event, className }) {
       className="event-card-video"
       controls
       playsInline
-      preload="metadata"
-        poster={getEventImageUrl(event) ? mediaUrl(getEventImageUrl(event)) : undefined}
+      preload={videoUrl === LOCAL_ITORERO_VIDEO_URL ? "none" : "metadata"}
+      poster={getEventImageUrl(event) ? mediaUrl(getEventImageUrl(event)) : undefined}
       src={mediaUrl(videoUrl)}
     >
       Your browser does not support video playback.
@@ -185,7 +196,7 @@ function EventVideoPlayer({ event, className }) {
 }
 
 export default function EventsPage() {
-  const [events, setEvents] = useState([]);
+  const [events, setEvents] = useState([LOCAL_ITORERO_EVENT]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filterDate, setFilterDate] = useState("");
@@ -245,15 +256,17 @@ export default function EventsPage() {
         loadingRequest = false;
       }
       if (alive && typeof nextEvents !== "undefined") {
-        setEvents(Array.isArray(nextEvents) ? nextEvents.map((event) => ({
+        const normalizedEvents = Array.isArray(nextEvents) ? nextEvents.map((event) => ({
           ...event,
           title: event.title || event.name || "School event",
           date: event.date || event.event_date || event.start_date || event.created_at,
           category: event.category || event.event_type || event.type || "General",
           image_path: getEventImageUrl(event),
-          video_url: getEventVideoUrl(event),
+          video_url: getEventVideoUrl(event) || (isItoreroEvent(event) ? LOCAL_ITORERO_VIDEO_URL : null),
           audio_url: getEventAudioUrl(event),
-        })) : []);
+        })) : [];
+        if (!normalizedEvents.some(isItoreroEvent)) normalizedEvents.push(LOCAL_ITORERO_EVENT);
+        setEvents(normalizedEvents);
         setError(null);
       }
     };
@@ -427,7 +440,7 @@ export default function EventsPage() {
                       : getEventImageUrl(event)
                         ? <SafeImage key={getEventImageUrl(event)} className="event-card-photo" style={{ width: "100%", height: "100%", objectFit: "cover" }} src={getEventImageUrl(event)} alt={event.title} fallbackText="Event image unavailable" />
                         : <span className="event-image-placeholder"><i className={`bi ${getEventAudioUrl(event) ? "bi-soundwave" : "bi-calendar-event"}`} /></span>}
-                    <span className="event-date-badge"><b>{Number.isNaN(eventDate.getTime()) ? "-" : String(eventDate.getDate()).padStart(2, "0")}</b><small>{Number.isNaN(eventDate.getTime()) ? "Date" : eventDate.toLocaleDateString("en-US", { month: "short", year: "numeric" })}</small></span>
+                    {(event.date || event.created_at) && <span className="event-date-badge"><b>{Number.isNaN(eventDate.getTime()) ? "-" : String(eventDate.getDate()).padStart(2, "0")}</b><small>{Number.isNaN(eventDate.getTime()) ? "Date" : eventDate.toLocaleDateString("en-US", { month: "short", year: "numeric" })}</small></span>}
                     <span className="event-category">{event.category || "General"}</span>
                   </div>
                   <div className="event-card-content">
